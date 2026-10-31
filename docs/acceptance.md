@@ -2,6 +2,9 @@
 
 Implemented first-release contracts:
 
+- [x] Canonical strict Pydantic engine contracts, generated tool schemas and runtime
+  validation, one tool/resource catalog, typed repository and assessment boundaries.
+
 - [x] Schema-authored types, relations, JSON Schema 2020-12 properties and readable
   schema/nodes/edges YAML shorthand without hardcoded type names.
 - [x] Endpoint/cardinality validation and bounded declarative invariants.

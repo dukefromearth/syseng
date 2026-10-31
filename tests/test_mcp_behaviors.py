@@ -394,3 +394,29 @@ async def test_encoded_node_identity_resource_and_notification(tmp_path: Path) -
             assert isinstance(event, ResourceUpdated) and event.uri == uri
             resource = await client.read_resource(uri)
             assert json.loads(resource.contents[0].text)["node"]["id"] == "team/service"
+
+
+@pytest.mark.parametrize(
+    "name,arguments",
+    [
+        ("query_graph", {"type": None}),
+        ("search_graph", {"type": None}),
+        ("trace_path", {"source": "a", "target": "b", "relation": None}),
+        ("get_assessments", {"revision": None}),
+        ("trace_path", {"source": "a", "target": "b", "relation": "unregistered"}),
+    ],
+)
+async def test_authored_and_omission_only_contracts_agree(
+    tmp_path: Path, name: str, arguments: dict[str, object]
+) -> None:
+    from jsonschema import Draft202012Validator
+
+    author(tmp_path)
+    service = open_service(tmp_path)
+    service.dispatch("index_model", {})
+    with pytest.raises(ValueError):
+        service.dispatch(name, arguments)
+    async with Client(create_server(service)) as client:
+        tool = next(tool for tool in (await client.list_tools()).tools if tool.name == name)
+        assert not Draft202012Validator(tool.input_schema).is_valid(arguments)
+        assert (await client.call_tool(name, arguments)).is_error

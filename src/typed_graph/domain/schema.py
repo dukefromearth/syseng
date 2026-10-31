@@ -7,33 +7,22 @@ from typing import Any
 
 from jsonschema import Draft202012Validator
 from jsonschema.exceptions import SchemaError
+from pydantic import ValidationError as ModelValidationError
+
+from typed_graph.domain.models import (
+    ApplyChangesRequest,
+    ApplyResult,
+    AssessmentResult,
+    GraphSchema,
+    RequiresEdgeInvariant,
+)
 
 
 class GraphError(ValueError):
     """An authored graph or operation violates its declared contract."""
 
 
-def _object(properties: dict[str, Any], required: list[str]) -> dict[str, Any]:
-    return {
-        "type": "object",
-        "properties": properties,
-        "required": required,
-        "additionalProperties": False,
-    }
-
-
-ID = {"type": "string", "minLength": 1}
-RESULT_SCHEMA = _object(
-    {
-        "status": {"enum": ["pass", "fail", "indeterminate"]},
-        "findings": {"type": "array", "items": {"type": "object"}},
-        "evidence": {
-            "type": "array",
-            "items": _object({"obligation": ID, "uri": ID}, ["obligation", "uri"]),
-        },
-    },
-    ["status", "findings", "evidence"],
-)
+RESULT_SCHEMA = AssessmentResult.model_json_schema()
 
 
 _SCHEMA_MAP_KEYWORDS = {"properties", "$defs", "patternProperties", "dependentSchemas"}
@@ -105,121 +94,50 @@ def _check_json_schema(value: Any) -> None:
 
 
 def validate_schema(schema: dict[str, Any]) -> None:
-    """Reject unsupported vocabulary instead of silently ignoring constraints."""
-    if not isinstance(schema, dict):
-        raise GraphError("Schema must be an object")
-    unknown = set(schema) - {"version", "node_types", "relations", "invariants", "interceptors"}
-    if unknown:
-        raise GraphError(f"Unknown schema fields: {sorted(unknown)}")
-    if not isinstance(schema.get("version"), str) or not schema["version"]:
-        raise GraphError("Schema version must be a nonempty string")
-    types = schema.get("node_types")
-    relations = schema.get("relations")
-    if not isinstance(types, dict) or not isinstance(relations, dict):
-        raise GraphError("node_types and relations must be objects")
-    for name, definition in types.items():
-        if not isinstance(name, str) or not name:
-            raise GraphError("Type names must be nonempty strings")
+    """Validate canonical shape once, then the authored graph's semantic references."""
+    try:
+        model = GraphSchema.model_validate(schema)
+    except ModelValidationError as exc:
+        raise GraphError(f"Invalid graph schema: {exc}") from exc
+    validate_typed_schema(model)
+
+
+def validate_typed_schema(model: GraphSchema) -> None:
+    """Semantic checks on an already validated canonical graph schema."""
+    for definition in model.node_types.values():
         _check_json_schema(definition)
-    for name, relation in relations.items():
-        if not isinstance(name, str) or not name or not isinstance(relation, dict):
-            raise GraphError("Relations require named object definitions")
-        if set(relation) - {"source", "target", "impact", "cardinality", "properties"}:
-            raise GraphError(f"Unknown relation fields on {name}")
-        for endpoint in ("source", "target"):
-            allowed = relation.get(endpoint)
-            if (
-                not isinstance(allowed, list)
-                or not allowed
-                or any(not isinstance(t, str) or t not in types for t in allowed)
-            ):
-                raise GraphError(f"Relation {name} has invalid {endpoint} types")
-        if relation.get("impact") not in {"none", "both", "target_to_source", "source_to_target"}:
-            raise GraphError(f"Relation {name} requires an explicit impact direction")
-        cardinality = relation.get("cardinality", {})
-        if not isinstance(cardinality, dict) or set(cardinality) - {
-            "out_min",
-            "out_max",
-            "in_min",
-            "in_max",
-        }:
-            raise GraphError(f"Invalid cardinality on {name}")
-        for key, value in cardinality.items():
-            if type(value) is not int or value < 0:
-                raise GraphError(f"Invalid cardinality {key}")
-        for direction in ("out", "in"):
-            if cardinality.get(f"{direction}_min", 0) > cardinality.get(
-                f"{direction}_max", float("inf")
-            ):
-                raise GraphError("Cardinality minimum exceeds maximum")
-        if "properties" in relation:
-            _check_json_schema(relation["properties"])
-    invariants = schema.get("invariants", [])
-    if not isinstance(invariants, list):
-        raise GraphError("invariants must be an array")
-    for invariant in invariants:
-        if (
-            not isinstance(invariant, dict)
-            or not isinstance(invariant.get("node_type"), str)
-            or invariant.get("node_type") not in types
-        ):
+    for name, relation in model.relations.items():
+        for endpoint in (relation.source, relation.target):
+            if any(node_type not in model.node_types for node_type in endpoint):
+                raise GraphError(f"Relation {name} references unknown endpoint type")
+        cardinality = relation.cardinality
+        if cardinality is not None:
+            for direction in ("out", "in"):
+                minimum = getattr(cardinality, f"{direction}_min")
+                maximum = getattr(cardinality, f"{direction}_max")
+                if minimum is not None and maximum is not None and minimum > maximum:
+                    raise GraphError("Cardinality minimum exceeds maximum")
+        if "properties" in relation.model_fields_set:
+            _check_json_schema(relation.properties)
+    for invariant in model.invariants:
+        if invariant.node_type not in model.node_types:
             raise GraphError("Invariant requires registered node_type")
-        kind = invariant.get("kind")
-        if kind == "unique":
-            if set(invariant) != {"kind", "node_type", "property"} or not isinstance(
-                invariant["property"], str
-            ):
-                raise GraphError("unique requires one property name")
-        elif kind == "requires_edge":
-            if set(invariant) - {"kind", "node_type", "relation", "direction", "min"}:
-                raise GraphError("Unknown requires_edge fields")
-            if (
-                not isinstance(invariant.get("relation"), str)
-                or invariant.get("relation") not in relations
-            ):
-                raise GraphError("requires_edge references unknown relation")
-            if invariant.get("direction", "out") not in {"out", "in"}:
-                raise GraphError("requires_edge direction must be out or in")
-            if type(invariant.get("min", 1)) is not int or invariant.get("min", 1) < 0:
-                raise GraphError("requires_edge min must be nonnegative integer")
-        else:
-            raise GraphError(f"Unsupported invariant kind: {kind}")
-    interceptors = schema.get("interceptors", [])
-    if not isinstance(interceptors, list):
-        raise GraphError("interceptors must be an array")
+        if (
+            isinstance(invariant, RequiresEdgeInvariant)
+            and invariant.relation not in model.relations
+        ):
+            raise GraphError("requires_edge references unknown relation")
     seen: set[str] = set()
-    for handler in interceptors:
-        if not isinstance(handler, dict) or set(handler) - {
-            "id",
-            "target_type",
-            "handler",
-            "version",
-            "trigger",
-            "result_schema",
-            "evidence_required",
-        }:
-            raise GraphError("Invalid interceptor definition")
-        for key in ("id", "handler", "version"):
-            if not isinstance(handler.get(key), str) or not handler[key]:
-                raise GraphError(f"Interceptor requires {key}")
-        if handler["id"] in seen:
+    for interceptor in model.interceptors:
+        if interceptor.id in seen:
             raise GraphError("Duplicate interceptor id")
-        seen.add(handler["id"])
-        if (
-            not isinstance(handler.get("target_type"), str)
-            or handler.get("target_type") not in types
-            or handler.get("trigger") != "dependency_changed"
-        ):
-            raise GraphError("Interceptor requires registered target_type and dependency_changed")
-        obligations = handler.get("evidence_required", [])
-        if (
-            not isinstance(obligations, list)
-            or any(not isinstance(x, str) or not x for x in obligations)
-            or len(obligations) != len(set(obligations))
-        ):
-            raise GraphError("evidence_required must contain unique nonempty strings")
-        if "result_schema" in handler:
-            _check_json_schema(handler["result_schema"])
+        seen.add(interceptor.id)
+        if interceptor.target_type not in model.node_types:
+            raise GraphError("Interceptor requires registered target_type")
+        if len(interceptor.evidence_required) != len(set(interceptor.evidence_required)):
+            raise GraphError("evidence_required must contain unique identifiers")
+        if "result_schema" in interceptor.model_fields_set:
+            _check_json_schema(interceptor.result_schema)
 
 
 def _relocate(schema: Any, prefix: str) -> Any:
@@ -239,79 +157,50 @@ def _relocate(schema: Any, prefix: str) -> Any:
 
 
 def apply_input_schema(schema: dict[str, Any]) -> dict[str, Any]:
-    """Typed full-replacement updates; no untyped properties escape hatch."""
+    """Specialize canonical operation schemas with registered types and property contracts."""
     validate_schema(schema)
+    model = GraphSchema.model_validate(schema)
+    result = ApplyChangesRequest.model_json_schema()
+    definitions = result["$defs"]
     alternatives: list[dict[str, Any]] = []
-    definitions: dict[str, Any] = {}
     for index, (name, definition) in enumerate(sorted(schema["node_types"].items())):
         key = f"node_{index}"
         definitions[key] = _relocate(definition, f"#/$defs/{key}")
-        fields = {
-            "id": ID,
-            "type": {"const": name},
-            "properties": {"allOf": [{"type": "object"}, {"$ref": f"#/$defs/{key}"}]},
-        }
-        node = _object(fields, list(fields))
-        alternatives.append(_object({"op": {"const": "create_node"}, "node": node}, ["op", "node"]))
-        alternatives.append(_object({"op": {"const": "update_node"}, **fields}, ["op", *fields]))
-    for index, (name, relation) in enumerate(sorted(schema["relations"].items())):
+        properties = {"allOf": [{"type": "object"}, {"$ref": f"#/$defs/{key}"}]}
+        node = copy.deepcopy(definitions["Node"])
+        node["properties"]["type"] = {"const": name, "type": "string"}
+        node["properties"]["properties"] = properties
+        create = copy.deepcopy(definitions["CreateNode"])
+        create["properties"]["node"] = node
+        update = copy.deepcopy(definitions["UpdateNode"])
+        update["properties"]["type"] = {"const": name, "type": "string"}
+        update["properties"]["properties"] = properties
+        alternatives.extend((create, update))
+    for index, (name, relation) in enumerate(sorted(model.relations.items())):
         key = f"edge_{index}"
         definitions[key] = _relocate(
-            relation.get("properties", {"type": "object", "additionalProperties": False}),
+            relation.property_schema,
             f"#/$defs/{key}",
         )
-        fields = {
-            "id": ID,
-            "type": {"const": name},
-            "source": ID,
-            "target": ID,
-            "properties": {"allOf": [{"type": "object"}, {"$ref": f"#/$defs/{key}"}]},
-        }
-        required = ["id", "type", "source", "target"]
-        alternatives.append(
-            _object(
-                {"op": {"const": "create_edge"}, "edge": _object(fields, required)}, ["op", "edge"]
-            )
-        )
-        alternatives.append(_object({"op": {"const": "update_edge"}, **fields}, ["op", *required]))
-    for kind in ("node", "edge"):
-        alternatives.append(_object({"op": {"const": f"delete_{kind}"}, "id": ID}, ["op", "id"]))
-    return {
-        "$schema": "https://json-schema.org/draft/2020-12/schema",
-        "$defs": definitions,
-        **_object(
-            {
-                "expected_revision": {"type": "integer", "minimum": 0},
-                "changes": {
-                    "type": "array",
-                    "items": {"oneOf": alternatives} if schema["node_types"] else False,
-                },
-            },
-            ["expected_revision", "changes"],
-        ),
-    }
+        properties = {"allOf": [{"type": "object"}, {"$ref": f"#/$defs/{key}"}]}
+        edge = copy.deepcopy(definitions["Edge"])
+        edge["properties"]["type"] = {"const": name, "type": "string"}
+        edge["properties"]["properties"] = properties
+        create = copy.deepcopy(definitions["CreateEdge"])
+        create["properties"]["edge"] = edge
+        update = copy.deepcopy(definitions["UpdateEdge"])
+        update["properties"]["type"] = {"const": name, "type": "string"}
+        update["properties"]["properties"] = properties
+        alternatives.extend((create, update))
+    alternatives.extend(copy.deepcopy(definitions[kind]) for kind in ("DeleteNode", "DeleteEdge"))
+    result["properties"]["changes"]["items"] = (
+        {"oneOf": alternatives} if schema["node_types"] else False
+    )
+    result["$schema"] = "https://json-schema.org/draft/2020-12/schema"
+    return result
 
 
-APPLY_OUTPUT_SCHEMA = _object(
-    {
-        "revision": {"type": "integer", "minimum": 0},
-        "applied_changes": {"type": "array", "items": {"type": "object"}},
-        "invalidations": {
-            "type": "array",
-            "items": _object(
-                {
-                    "node_id": ID,
-                    "paths": {"type": "array", "items": {"type": "array", "items": ID}},
-                    "triggering_revision": {"type": "integer", "minimum": 0},
-                    "component_id": ID,
-                    "component": {"type": "array", "items": ID, "minItems": 1},
-                },
-                ["node_id", "paths", "triggering_revision", "component_id", "component"],
-            ),
-        },
-    },
-    ["revision", "applied_changes", "invalidations"],
-)
+APPLY_OUTPUT_SCHEMA = ApplyResult.model_json_schema()
 
 
 def compile_schema(document: dict[str, Any]) -> dict[str, Any]:
