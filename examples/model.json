@@ -1,0 +1,221 @@
+{
+  "schema": {
+    "version": "1.0",
+    "node_types": {
+      "Capability": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "additionalProperties": false
+      },
+      "Boundary": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "additionalProperties": false
+      },
+      "Binding": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "additionalProperties": false
+      },
+      "Contract": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string"
+          },
+          "requirements": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "name",
+          "requirements"
+        ],
+        "additionalProperties": false
+      },
+      "System": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "relations": {
+      "implements": {
+        "source": [
+          "Binding"
+        ],
+        "target": [
+          "Contract"
+        ],
+        "impact": "target_to_source",
+        "cardinality": {
+          "out_min": 1
+        }
+      },
+      "realizes": {
+        "source": [
+          "Capability"
+        ],
+        "target": [
+          "Binding"
+        ],
+        "impact": "target_to_source"
+      },
+      "offers": {
+        "source": [
+          "System"
+        ],
+        "target": [
+          "Capability"
+        ],
+        "impact": "target_to_source"
+      },
+      "contains": {
+        "source": [
+          "Boundary"
+        ],
+        "target": [
+          "System"
+        ],
+        "impact": "target_to_source"
+      }
+    },
+    "invariants": [
+      {
+        "kind": "unique",
+        "node_type": "Contract",
+        "property": "name"
+      }
+    ],
+    "interceptors": [
+      {
+        "id": "contract-review",
+        "target_type": "Binding",
+        "handler": "pending",
+        "version": "1",
+        "trigger": "dependency_changed",
+        "evidence_required": [
+          "contract-conformance"
+        ]
+      }
+    ]
+  },
+  "nodes": [
+    {
+      "id": "payments",
+      "type": "Boundary",
+      "properties": {
+        "name": "Payments boundary"
+      }
+    },
+    {
+      "id": "checkout",
+      "type": "System",
+      "properties": {
+        "name": "Checkout service"
+      }
+    },
+    {
+      "id": "authorize",
+      "type": "Capability",
+      "properties": {
+        "name": "Authorize a payment"
+      }
+    },
+    {
+      "id": "gateway",
+      "type": "Binding",
+      "properties": {
+        "name": "Gateway adapter"
+      }
+    },
+    {
+      "id": "authorization-contract",
+      "type": "Contract",
+      "properties": {
+        "name": "Authorization contract",
+        "requirements": [
+          "Idempotency key is required",
+          "No duplicate authorization on retry"
+        ]
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "gateway-contract",
+      "type": "implements",
+      "source": "gateway",
+      "target": "authorization-contract"
+    },
+    {
+      "id": "authorize-gateway",
+      "type": "realizes",
+      "source": "authorize",
+      "target": "gateway"
+    },
+    {
+      "id": "checkout-authorize",
+      "type": "offers",
+      "source": "checkout",
+      "target": "authorize"
+    },
+    {
+      "id": "payments-checkout",
+      "type": "contains",
+      "source": "payments",
+      "target": "checkout"
+    }
+  ]
+}
