@@ -436,3 +436,41 @@ def test_concurrent_indexed_queries_stamp_the_exact_snapshot_read(tmp_path):
         results = reading.result()
     assert results
     assert all(actual == expected for actual, expected in results)
+
+
+def test_concurrent_schema_and_node_resources_stamp_the_exact_snapshot(tmp_path):
+    from threading import Event
+
+    writer, file = boot(tmp_path)
+    reader = open_service(tmp_path)
+    done = Event()
+
+    def update_revisions():
+        try:
+            for revision in range(2, 22):
+                document = model()
+                document["schema"]["version"] = str(revision)
+                document["nodes"][2] = node("c", str(revision))
+                file.write_text(json.dumps(document))
+                writer.dispatch("index_model", {})
+        finally:
+            done.set()
+
+    def read_revisions():
+        results = []
+        while not done.is_set():
+            schema = reader.dispatch("get_graph_schema", {})
+            if schema["revision"] > 1:
+                results.append((schema["schema"]["version"], str(schema["revision"])))
+            resource = reader.resource("graph://model/nodes/c")
+            expected = "c" if resource["revision"] == 1 else str(resource["revision"])
+            results.append((resource["node"]["properties"]["name"], expected))
+        return results
+
+    with ThreadPoolExecutor(2) as pool:
+        reading = pool.submit(read_revisions)
+        writing = pool.submit(update_revisions)
+        writing.result()
+        results = reading.result()
+    assert results
+    assert all(actual == expected for actual, expected in results)

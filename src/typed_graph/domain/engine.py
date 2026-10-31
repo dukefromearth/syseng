@@ -9,13 +9,14 @@ from collections import deque
 from typing import Any
 
 from jsonschema import Draft202012Validator
+from referencing import Registry
 
 from typed_graph.domain.schema import GraphError, apply_input_schema, validate_schema
 
 
 def _validate(instance: Any, schema: Any) -> None:
     try:
-        Draft202012Validator(schema).validate(instance)
+        Draft202012Validator(schema, registry=Registry()).validate(instance)
     except Exception as exc:
         # Reference resolution failures are also authored contract errors, never network fallbacks.
         raise GraphError(f"Schema validation failed: {exc}") from exc

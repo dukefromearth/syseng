@@ -6,6 +6,7 @@ build==1.6.1
 cffi==2.1.1
 click==8.5.0
 cryptography==50.0.2
+editables==0.6
 h11==0.16.0
 hatchling==1.33.0
 httpcore2==2.16.0

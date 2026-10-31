@@ -36,29 +36,72 @@ RESULT_SCHEMA = _object(
 )
 
 
+_SCHEMA_MAP_KEYWORDS = {"properties", "$defs", "patternProperties", "dependentSchemas"}
+_SCHEMA_ARRAY_KEYWORDS = {"allOf", "anyOf", "oneOf", "prefixItems"}
+_SCHEMA_SINGLE_KEYWORDS = {
+    "items",
+    "additionalProperties",
+    "contains",
+    "unevaluatedItems",
+    "unevaluatedProperties",
+    "not",
+    "if",
+    "then",
+    "else",
+    "propertyNames",
+    "contentSchema",
+}
+
+
+def _schema_children(schema: dict[str, Any]) -> list[Any]:
+    children: list[Any] = []
+    for key, value in schema.items():
+        if key in _SCHEMA_MAP_KEYWORDS and isinstance(value, dict):
+            children.extend(value.values())
+        elif key in _SCHEMA_ARRAY_KEYWORDS and isinstance(value, list):
+            children.extend(value)
+        elif key in _SCHEMA_SINGLE_KEYWORDS:
+            children.append(value)
+    return children
+
+
 def _check_json_schema(value: Any) -> None:
     try:
         Draft202012Validator.check_schema(value)
     except SchemaError as exc:
         raise GraphError(f"Invalid JSON Schema: {exc.message}") from exc
 
+    schema_locations: set[int] = set()
+    references: list[str] = []
+
     def walk(item: Any) -> None:
-        if isinstance(item, dict):
-            for key, child in item.items():
-                if key in {"$ref", "$dynamicRef"} and (
-                    not isinstance(child, str) or (child != "#" and not child.startswith("#/"))
-                ):
-                    raise GraphError("Only document-local JSON Pointer references are supported")
-                if key in {"$id", "$anchor", "$dynamicAnchor", "$dynamicRef"}:
-                    raise GraphError(
-                        "Use local $defs, not resource IDs or dynamic/anchor references"
-                    )
-                walk(child)
-        elif isinstance(item, list):
-            for child in item:
-                walk(child)
+        schema_locations.add(id(item))
+        if not isinstance(item, dict):
+            return
+        if "$ref" in item:
+            references.append(item["$ref"])
+        for key, child in item.items():
+            if key in {"$ref", "$dynamicRef"} and (
+                not isinstance(child, str) or (child != "#" and not child.startswith("#/"))
+            ):
+                raise GraphError("Only document-local JSON Pointer references are supported")
+            if key in {"$id", "$anchor", "$dynamicAnchor", "$dynamicRef"}:
+                raise GraphError("Use local $defs, not resource IDs or dynamic/anchor references")
+        for child in _schema_children(item):
+            walk(child)
 
     walk(value)
+    for reference in references:
+        target = value
+        if reference != "#":
+            try:
+                for token in reference[2:].split("/"):
+                    token = token.replace("~1", "/").replace("~0", "~")
+                    target = target[int(token)] if isinstance(target, list) else target[token]
+            except (KeyError, IndexError, TypeError, ValueError) as exc:
+                raise GraphError(f"Unresolved local schema reference: {reference}") from exc
+        if id(target) not in schema_locations:
+            raise GraphError("Local references must target schema-bearing keyword locations")
 
 
 def validate_schema(schema: dict[str, Any]) -> None:
@@ -180,14 +223,19 @@ def validate_schema(schema: dict[str, Any]) -> None:
 
 
 def _relocate(schema: Any, prefix: str) -> Any:
-    if isinstance(schema, dict):
-        return {
-            key: prefix + value[1:] if key in {"$ref", "$dynamicRef"} else _relocate(value, prefix)
-            for key, value in schema.items()
-        }
-    if isinstance(schema, list):
-        return [_relocate(value, prefix) for value in schema]
-    return copy.deepcopy(schema)
+    if not isinstance(schema, dict):
+        return copy.deepcopy(schema)
+    result = copy.deepcopy(schema)
+    for key, value in schema.items():
+        if key in {"$ref", "$dynamicRef"}:
+            result[key] = prefix + value[1:]
+        elif key in _SCHEMA_MAP_KEYWORDS and isinstance(value, dict):
+            result[key] = {name: _relocate(child, prefix) for name, child in value.items()}
+        elif key in _SCHEMA_ARRAY_KEYWORDS and isinstance(value, list):
+            result[key] = [_relocate(child, prefix) for child in value]
+        elif key in _SCHEMA_SINGLE_KEYWORDS:
+            result[key] = _relocate(value, prefix)
+    return result
 
 
 def apply_input_schema(schema: dict[str, Any]) -> dict[str, Any]:

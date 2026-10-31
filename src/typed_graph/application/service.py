@@ -10,6 +10,7 @@ from typing import Any
 from urllib.parse import unquote
 
 from jsonschema import Draft202012Validator
+from referencing import Registry
 
 from typed_graph.application.ports import Document, Repository
 from typed_graph.domain.engine import apply_operations, compute_impact, validate_graph
@@ -50,7 +51,8 @@ class GraphService:
         return handlers[tool](args)
 
     def get_graph_schema(self, args: Document) -> Document:
-        return {"revision": self.revision, "schema": self.schema}
+        document = self.store.current()
+        return {"revision": document["revision"], "schema": document["schema"]}
 
     def _validate(self, document: Document) -> None:
         validate_schema(document["schema"])
@@ -287,7 +289,7 @@ class GraphService:
             }
         ).validate(result)
         if interceptor.get("result_schema"):
-            Draft202012Validator(interceptor["result_schema"]).validate(result)
+            Draft202012Validator(interceptor["result_schema"], registry=Registry()).validate(result)
         supplied = {e["obligation"] for e in result["evidence"]}
         required = set(interceptor.get("evidence_required", []))
         if result["status"] == "pass" and (not required or not required <= supplied):
@@ -339,12 +341,11 @@ class GraphService:
         if not separator or "/" in value:
             raise ValueError("unknown resource")
         if kind == "nodes":
-            node = next(
-                (n for n in self.store.current()["nodes"] if n["id"] == unquote(value)), None
-            )
+            document = self.store.current()
+            node = next((n for n in document["nodes"] if n["id"] == unquote(value)), None)
             if node is None:
                 raise ValueError("unknown node")
-            return {"revision": self.revision, "node": node}
+            return {"revision": document["revision"], "node": node}
         if not value.isdecimal():
             raise ValueError("revision must be nonnegative integer")
         revision = int(value)

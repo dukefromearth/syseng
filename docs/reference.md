@@ -38,7 +38,10 @@ types are not hardcoded by the engine.
   optional JSON Schema `properties` definition. Without that definition, edge
   properties are a closed empty object.
 - Property schemas use JSON Schema 2020-12. Local JSON Pointer references
-  (`#`, `#/$defs/...`) are supported. Remote references, resource `$id`,
+  (`#`, `#/$defs/...`) are supported when they target schema-bearing
+  keyword locations (for example `$defs` and `properties`), not literal values
+  or annotations. Literal keyword names and values inside `const`, `enum`,
+  `default`, and `examples` remain unchanged. Remote references, resource `$id`,
   anchors, and dynamic references are rejected. Formats are annotations rather
   than assertions. The engine never fetches schemas from a network.
 - Every relation declares `impact`: `target_to_source`, `source_to_target`,

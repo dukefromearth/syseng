@@ -23,6 +23,7 @@ from mcp.server.subscriptions import (
     ResourceUpdated,
     ToolsListChanged,
 )
+from referencing import Registry
 
 from typed_graph.adapters.external_handlers import ExternalHandlers
 from typed_graph.adapters.workspace import open_service
@@ -183,7 +184,9 @@ def create_server(
                     if params.name not in schemas:
                         raise ValueError("Unknown tool")
                     arguments = params.arguments or {}
-                    Draft202012Validator(schemas[params.name]).validate(arguments)
+                    Draft202012Validator(schemas[params.name], registry=Registry()).validate(
+                        arguments
+                    )
                     before_schema = json.dumps(service.schema, sort_keys=True)
                     before_revision = service.revision
                     changed_ids: set[str] = set()
@@ -204,7 +207,7 @@ def create_server(
                     if handlers and params.name in {"index_model", "apply_changes"}:
                         await execute_pending(service, handlers)
                     output_schema = OUTPUT_SCHEMAS[params.name]
-                    Draft202012Validator(output_schema).validate(result)
+                    Draft202012Validator(output_schema, registry=Registry()).validate(result)
                     if subscriptions:
                         if before_schema != json.dumps(service.schema, sort_keys=True):
                             await bus.publish(ToolsListChanged())

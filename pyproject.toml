@@ -1,12 +1,12 @@
 [build-system]
-requires = ["hatchling>=1.27"]
+requires = ["hatchling>=1.27", "editables>=0.3,<1"]
 build-backend = "hatchling.build"
 [project]
 name = "typed-reactive-graph"
 version = "0.1.0"
 description = "Schema-authored deterministic reactive graph MCP server"
 requires-python = ">=3.12"
-dependencies = ["jsonschema>=4.23,<5", "PyYAML>=6,<7", "mcp>=2,<3", "anyio>=4,<5"]
+dependencies = ["jsonschema>=4.23,<5", "PyYAML>=6,<7", "mcp>=2,<3", "anyio>=4,<5", "referencing>=0.36,<1"]
 [project.optional-dependencies]
 dev = ["pytest>=8,<10", "pytest-asyncio>=1,<2", "ruff>=0.11", "mypy>=1.15", "types-jsonschema", "types-PyYAML", "build"]
 [project.scripts]
