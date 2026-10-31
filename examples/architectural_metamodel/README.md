@@ -10,8 +10,9 @@ indeterminate assessments and no evidence or completed measurements.
 From the repository root with its installed Python environment:
 
 ```bash
+WORKSPACE=/tmp/syseng-architectural-metamodel-fresh
 .venv/bin/python examples/architectural_metamodel/author.py \
-  /tmp/syseng-architectural-metamodel-fresh
+  "$WORKSPACE"
 ```
 
 Choose a fresh path: the script refuses any existing workspace. It launches
@@ -26,20 +27,15 @@ relationship direction. The ten fixed cross-ontology endpoint constraints are de
 once in `CROSS_RELATION_ENDPOINTS`; occurrences are validated against them, not used
 to infer those semantics.
 
-The reviewed successful run used MCP 2.3.0 and workspace:
-`/tmp/syseng-architectural-metamodel-demo-v5` (revision 2). See
-`verification.json` for its compact receipt. The full MCP request/result transcript
-is in that workspace's `mcp-transcript.json`, outside the repository. Two earlier
-isolated runs successfully authored their graphs but stopped on client-side
-verification errors (a null-result assumption and an incorrectly named comparison
-tool); neither overwrote another workspace. The final script and successful run
-correct both errors.
+See `verification.json` for a compact successful-run receipt. Each run writes its
+full MCP request/result transcript to `mcp-transcript.json` inside the selected
+workspace, outside the repository.
 
 ## Read the live specification
 
 ```bash
 .venv/bin/python -m typed_graph.adapters.spec_server \
-  /tmp/syseng-architectural-metamodel-demo-v5 \
+  "$WORKSPACE" \
   --profile examples/architectural_metamodel/presentation.json
 ```
 
