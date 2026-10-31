@@ -57,3 +57,31 @@ error, not a reason to silently reset the user's graph.
 Run the commands in README. The behavior suites cover actual file/SQLite integration,
 rollback, revisions, source reconciliation, dependencies and MCP behavior. They favor
 table-driven observable outcomes over isolated private-method tests.
+
+## Author a specification through tools and read it live
+
+The example schema declares a string `description` property on its node types.
+Use that field for authored Markdown, with the other required properties in each
+full-replacement update. For example, after indexing the unmodified example:
+
+```json
+{
+  "expected_revision": 1,
+  "changes": [{
+    "op": "update_node",
+    "id": "authorize",
+    "type": "Capability",
+    "properties": {
+      "name": "Authorize a payment",
+      "description": "## Acceptance criteria\n- Preserve the caller's idempotency key.\n- Repeated requests return the original outcome.\n\n**Evidence:** attach repeat-request test results to the contract review."
+    }
+  }]
+}
+```
+
+Read the current revision before applying this example; do not reuse a stale number.
+Run `typed-graph-serve /path/to/the/same/workspace --port 8080` and open the local
+reader. This tool-authored Markdown becomes a section of the procedurally generated
+specification after the next update poll. Relations and assessments are rendered
+from their typed records, not guessed from the prose. Downloaded Markdown is a view,
+not an input file to edit or re-import independently.

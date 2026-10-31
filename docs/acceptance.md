@@ -23,6 +23,12 @@ Implemented first-release contracts:
 - [x] Opt-in MCP subscriptions and explicitly configured external MCP handlers,
   including current-revision pending job recovery on restart (at-least-once execution).
 
+- [x] Pure typed graph-to-Markdown specification projection and safe HTML reader.
+- [x] Cross-process revision/assessment live feed with shared change-aware cache.
+- [x] Local static responsive UI, accessible outline, source view and Markdown download.
+- [x] Loopback/read-only boundary, sanitized rendering, no remote image execution.
+- [x] Frontend ESLint gate plus real HTTP/MCP/SSE behavior coverage.
+
 Deliberate limits:
 
 - Python/stdio first release, local POSIX filesystem, one workspace per server.

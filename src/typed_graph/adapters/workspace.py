@@ -26,8 +26,11 @@ if TYPE_CHECKING:
 import yaml
 
 from typed_graph.application.contracts import SearchResult
+from typed_graph.application.ports import SpecificationToken
+from typed_graph.application.specification import SpecificationState
 from typed_graph.domain.models import (
     Assessment,
+    AssessmentKey,
     AssessmentState,
     Edge,
     GraphSchema,
@@ -109,11 +112,22 @@ class WorkspaceRepository:
             raise ValueError(".graph must not be a symlink")
         self.state.mkdir(exist_ok=True)
         self.snapshots = self.state / "snapshots"
+        self.manifest_path = self.state / "manifest.json"
+        self.index_path = self.state / "index.sqlite3"
+        self.lock_path = self.state / "lock"
+        self.assessment_path = self.state / "assessments.jsonl"
+        self.source_path = self.root / "model"
         self.snapshots.mkdir(exist_ok=True)
-        for name in ("snapshots", "manifest.json", "index.sqlite3", "lock", "assessments.jsonl"):
-            if (self.state / name).is_symlink():
+        for path in (
+            self.snapshots,
+            self.manifest_path,
+            self.index_path,
+            self.lock_path,
+            self.assessment_path,
+        ):
+            if path.is_symlink():
                 raise ValueError("symlinks forbidden in graph state")
-        self.db = sqlite3.connect(self.state / "index.sqlite3", check_same_thread=False)
+        self.db = sqlite3.connect(self.index_path, check_same_thread=False)
         self.db.executescript("""
           CREATE TABLE IF NOT EXISTS revisions(
             revision INTEGER PRIMARY KEY, document TEXT NOT NULL);
@@ -127,17 +141,17 @@ class WorkspaceRepository:
             PRIMARY KEY(revision,interceptor_id,target_id));
         """)
         with self.lock():
-            if not (self.state / "manifest.json").exists():
+            if not (self.manifest_path).exists():
                 initial = Snapshot(
                     revision=0, schema=EMPTY_SCHEMA, nodes=[], edges=[], impact=[], changes=[]
                 )
                 self._write(self.snapshots / "0.json", canonical(initial))
-                self._write(self.state / "manifest.json", canonical(Manifest(revision=0)))
+                self._write(self.manifest_path, canonical(Manifest(revision=0)))
             self._recover()
 
     @contextmanager
     def lock(self) -> Iterator[None]:
-        with (self.state / "lock").open("a") as stream:
+        with (self.lock_path).open("a") as stream:
             fcntl.flock(stream.fileno(), fcntl.LOCK_EX)
             try:
                 yield
@@ -162,7 +176,7 @@ class WorkspaceRepository:
                 os.unlink(temporary)
 
     def _manifest(self) -> Manifest:
-        return Manifest.model_validate_json((self.state / "manifest.json").read_text())
+        return Manifest.model_validate_json((self.manifest_path).read_text())
 
     def current(self) -> Snapshot:
         manifest = self._manifest()
@@ -176,7 +190,7 @@ class WorkspaceRepository:
     def read_revision(self, revision: Revision) -> Snapshot:
         if type(revision) is not int or revision < 0:
             raise ValueError("revision must be a nonnegative integer")
-        manifest = self.state / "manifest.json"
+        manifest = self.manifest_path
         if manifest.exists() and revision > self._manifest().revision:
             raise ValueError(f"uncommitted revision {revision}")
         path = self.snapshots / f"{revision}.json"
@@ -204,7 +218,7 @@ class WorkspaceRepository:
                 [(e.id, e.type, e.source, e.target) for e in current.edges],
             )
             self.db.execute("DELETE FROM assessments")
-            log = self.state / "assessments.jsonl"
+            log = self.assessment_path
             if log.exists():
                 for line in log.read_text().splitlines():
                     assessment = Assessment.model_validate_json(line)
@@ -213,7 +227,7 @@ class WorkspaceRepository:
     def import_document(self) -> Snapshot:
         """Three-way reconcile authored fragments through canonical typed codecs."""
         current = self.current()
-        source = self.root / "model"
+        source = self.source_path
         if not source.exists() and current.source_baseline is None:
             return current
         if source.is_symlink():
@@ -274,7 +288,7 @@ class WorkspaceRepository:
         with self.lock():
             if self.current().revision != expected_revision:
                 raise ValueError("revision conflict")
-            self._write(self.state / "manifest.json", canonical(manifest_for(document)))
+            self._write(self.manifest_path, canonical(manifest_for(document)))
 
     def commit(self, document: Snapshot, expected_revision: Revision) -> Snapshot:
         with self.lock():
@@ -285,7 +299,7 @@ class WorkspaceRepository:
                 )
             result = document.model_copy(update={"revision": expected_revision + 1})
             self._write(self.snapshots / f"{result.revision}.json", canonical(result))
-            self._write(self.state / "manifest.json", canonical(manifest_for(result)))
+            self._write(self.manifest_path, canonical(manifest_for(result)))
             self._index_delta(current, result)
             return result
 
@@ -357,7 +371,7 @@ class WorkspaceRepository:
 
     def record_assessment(self, assessment: Assessment) -> None:
         with self.lock():
-            log = self.state / "assessments.jsonl"
+            log = self.assessment_path
             if assessment.state == AssessmentState.PENDING and log.exists():
                 existing = (
                     Assessment.model_validate_json(line) for line in log.read_text().splitlines()
@@ -378,6 +392,35 @@ class WorkspaceRepository:
                 (revision,),
             )
         ]
+
+    def close(self) -> None:
+        self.db.close()
+
+    def specification_token(self) -> SpecificationToken:
+        """Cheap filesystem token; projection semantics never depend on timestamps."""
+        manifest = self.manifest_path.stat()
+        if self.assessment_path.exists():
+            assessment = self.assessment_path.stat()
+            return (
+                f"{manifest.st_mtime_ns}:{manifest.st_size}:"
+                f"{assessment.st_mtime_ns}:{assessment.st_size}"
+            )
+        return f"{manifest.st_mtime_ns}:{manifest.st_size}:0:0"
+
+    def specification_state(self) -> SpecificationState:
+        """Read one committed revision and its assessment log under the writer lock."""
+        with self.lock():
+            snapshot = self.current()
+            # Read the authoritative assessment log, not a possibly lagging SQLite projection.
+            latest: dict[AssessmentKey, Assessment] = {}
+            if self.assessment_path.exists():
+                for line in self.assessment_path.read_text().splitlines():
+                    assessment = Assessment.model_validate_json(line)
+                    if assessment.revision == snapshot.revision:
+                        latest[assessment.key] = assessment
+            return SpecificationState(
+                snapshot=snapshot, assessments=[latest[key] for key in sorted(latest)]
+            )
 
 
 def open_service(workspace: Path) -> GraphService:

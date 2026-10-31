@@ -1,0 +1,237 @@
+{
+  "workspace": "/tmp/syseng-architectural-metamodel-demo-v5",
+  "transport": "MCP stdio / mcp.client.Client",
+  "revision": 2,
+  "nodes": 63,
+  "edges": 104,
+  "node_types": {
+    "AbstractionLayer": 5,
+    "Binding": 3,
+    "Capability": 6,
+    "Contract": 4,
+    "DomainConcept": 9,
+    "Environment": 2,
+    "Guardrail": 6,
+    "InteractionBoundary": 5,
+    "Invariant": 5,
+    "ModelPurpose": 1,
+    "Objective": 1,
+    "RealizationConcept": 5,
+    "Responsibility": 4,
+    "SemanticRule": 3,
+    "System": 4
+  },
+  "relation_types": 29,
+  "pending_assessments": 3,
+  "completed_assessments": 0,
+  "tool_calls": 18,
+  "mcp_sdk_version": "2.3.0",
+  "receipt": [
+    {
+      "tool": "index_model",
+      "revision": 1,
+      "is_error": false
+    },
+    {
+      "tool": "query_graph",
+      "revision": 1,
+      "is_error": false
+    },
+    {
+      "tool": "apply_changes",
+      "revision": 2,
+      "is_error": false
+    },
+    {
+      "tool": "get_graph_schema",
+      "revision": 2,
+      "is_error": false
+    },
+    {
+      "tool": "query_graph",
+      "revision": 2,
+      "is_error": false
+    },
+    {
+      "tool": "get_assessments",
+      "revision": 2,
+      "is_error": false
+    },
+    {
+      "tool": "trace_path",
+      "revision": 2,
+      "is_error": false,
+      "arguments": {
+        "source": "S1-responsibility",
+        "target": "S1-contract",
+        "relation": "specified_by"
+      },
+      "path": [
+        "S1-responsibility",
+        "S1-contract"
+      ]
+    },
+    {
+      "tool": "trace_path",
+      "revision": 2,
+      "is_error": false,
+      "arguments": {
+        "source": "S1",
+        "target": "S1-contract",
+        "relation": "specified_by"
+      },
+      "path": []
+    },
+    {
+      "tool": "trace_path",
+      "revision": 2,
+      "is_error": false,
+      "arguments": {
+        "source": "S2-responsibility",
+        "target": "S2-contract",
+        "relation": "specified_by"
+      },
+      "path": [
+        "S2-responsibility",
+        "S2-contract"
+      ]
+    },
+    {
+      "tool": "trace_path",
+      "revision": 2,
+      "is_error": false,
+      "arguments": {
+        "source": "S2",
+        "target": "S2-contract",
+        "relation": "specified_by"
+      },
+      "path": []
+    },
+    {
+      "tool": "trace_path",
+      "revision": 2,
+      "is_error": false,
+      "arguments": {
+        "source": "S3-responsibility",
+        "target": "S3-contract",
+        "relation": "specified_by"
+      },
+      "path": [
+        "S3-responsibility",
+        "S3-contract"
+      ]
+    },
+    {
+      "tool": "trace_path",
+      "revision": 2,
+      "is_error": false,
+      "arguments": {
+        "source": "S3",
+        "target": "S3-contract",
+        "relation": "specified_by"
+      },
+      "path": []
+    },
+    {
+      "tool": "trace_path",
+      "revision": 2,
+      "is_error": false,
+      "arguments": {
+        "source": "S4-responsibility",
+        "target": "S4-contract",
+        "relation": "specified_by"
+      },
+      "path": [
+        "S4-responsibility",
+        "S4-contract"
+      ]
+    },
+    {
+      "tool": "trace_path",
+      "revision": 2,
+      "is_error": false,
+      "arguments": {
+        "source": "S4",
+        "target": "S4-contract",
+        "relation": "specified_by"
+      },
+      "path": []
+    },
+    {
+      "tool": "trace_path",
+      "revision": 2,
+      "is_error": false,
+      "arguments": {
+        "source": "engine-binding",
+        "target": "S3-contract",
+        "relation": "satisfies"
+      },
+      "path": [
+        "engine-binding",
+        "S3-contract"
+      ]
+    },
+    {
+      "tool": "trace_path",
+      "revision": 2,
+      "is_error": false,
+      "arguments": {
+        "source": "graphics-binding",
+        "target": "S3-contract",
+        "relation": "satisfies"
+      },
+      "path": [
+        "graphics-binding",
+        "S3-contract"
+      ]
+    },
+    {
+      "tool": "trace_path",
+      "revision": 2,
+      "is_error": false,
+      "arguments": {
+        "source": "compositor-binding",
+        "target": "S3-contract",
+        "relation": "satisfies"
+      },
+      "path": [
+        "compositor-binding",
+        "S3-contract"
+      ]
+    },
+    {
+      "tool": "compare_graphs",
+      "revision": null,
+      "is_error": false
+    }
+  ],
+  "assessment_results": [
+    {
+      "target_id": "compositor-binding",
+      "state": "pending",
+      "result": {
+        "status": "indeterminate",
+        "findings": [],
+        "evidence": []
+      }
+    },
+    {
+      "target_id": "engine-binding",
+      "state": "pending",
+      "result": {
+        "status": "indeterminate",
+        "findings": [],
+        "evidence": []
+      }
+    },
+    {
+      "target_id": "graphics-binding",
+      "state": "pending",
+      "result": {
+        "status": "indeterminate",
+        "findings": [],
+        "evidence": []
+      }
+    }
+  ]
+}

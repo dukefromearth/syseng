@@ -110,3 +110,19 @@ No implicit model mutation or external invocation follows from a model definitio
 - History derives its change union from the mutation union plus the import event.
   Assessment identity, empty relation-property defaults, dependency adjacency and
   changed-node calculation each have one implementation reused by their consumers.
+
+## ADR 004: the specification reader is a projection
+
+The tools continue to author the graph. A pure typed projector reads one Snapshot plus
+that revision's Assessments and produces canonical Markdown with outline/provenance.
+The HTTP adapter renders that exact Markdown through a non-HTML Markdown parser and
+sanitizer; the thin browser receives the result and adds no graph rules.
+
+A SpecificationSource port exposes an opaque cheap change token and a consistent state
+read. The file adapter centralizes paths, compares manifest/assessment-log metadata and
+reads both under the writer lock. One shared server cache performs projection only after
+change, compares semantic digests and broadcasts to subscribers. Reconnect sends the
+latest state; polling errors preserve the last valid document and remain visible.
+Presentation profiles select grouping and graph-derived summaries but never author
+another model or copy contract prose into frontend code. All HTTP controls remain
+read-only and loopback-bound.

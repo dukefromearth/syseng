@@ -2,6 +2,7 @@ annotated-types==0.8.0
 anyio==4.15.1
 ast_serialize==0.13.1
 attrs==26.1.0
+bleach==6.4.0
 build==1.6.1
 cffi==2.1.1
 click==8.5.0
@@ -16,8 +17,10 @@ iniconfig==2.3.1
 jsonschema==4.26.0
 jsonschema-specifications==2025.9.1
 librt==0.16.0
+markdown-it-py==4.2.0
 mcp==2.3.0
 mcp-types==2.3.0
+mdurl==0.1.2
 mypy==2.4.1
 mypy_extensions==1.1.0
 opentelemetry-api==1.45.2
@@ -42,8 +45,12 @@ starlette==1.10.0
 tomlkit==0.15.2
 trove-classifiers==2026.9.21.13
 truststore==0.10.5
+types-bleach==6.4.0.20260728
+types-html5lib==1.1.11.20260518
 types-jsonschema==4.26.0.20261006
 types-PyYAML==6.0.12.20261030
+types-webencodings==0.6.0.20260907
 typing-inspection==0.4.4
 typing_extensions==4.16.0
 uvicorn==0.54.0
+webencodings==0.6.1

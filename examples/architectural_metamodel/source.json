@@ -1,0 +1,1323 @@
+{
+  "nodes": [
+    {
+      "id": "purpose",
+      "type": "ModelPurpose",
+      "properties": {
+        "name": "Architectural Metamodel v1.0",
+        "description": "A technology-independent architecture for learning and executing transformations of digital experiences while preserving correctness and real-time performance. Three independently extensible ontologies are connected by fixed semantic relationships; do not prematurely choose components.",
+        "section": "Purpose",
+        "order": 0,
+        "status": "definition"
+      }
+    },
+    {
+      "id": "experience",
+      "type": "DomainConcept",
+      "properties": {
+        "name": "Experience",
+        "description": "Evolving state over time and interaction, expressed through representations.",
+        "section": "Domain",
+        "order": 1,
+        "status": "definition"
+      }
+    },
+    {
+      "id": "representation",
+      "type": "DomainConcept",
+      "properties": {
+        "name": "Representation",
+        "description": "Describes an experience at some level of abstraction.",
+        "section": "Domain",
+        "order": 2,
+        "status": "definition"
+      }
+    },
+    {
+      "id": "production",
+      "type": "DomainConcept",
+      "properties": {
+        "name": "Production",
+        "description": "Transforms information toward presentation; consumes and produces representations. Production may be a graph, not a line.",
+        "section": "Domain",
+        "order": 3,
+        "status": "definition"
+      }
+    },
+    {
+      "id": "presentation",
+      "type": "DomainConcept",
+      "properties": {
+        "name": "Presentation",
+        "description": "A perceptible result that realizes an experience.",
+        "section": "Domain",
+        "order": 4,
+        "status": "definition"
+      }
+    },
+    {
+      "id": "objective",
+      "type": "DomainConcept",
+      "properties": {
+        "name": "Objective",
+        "description": "A desired change that constrains an intervention.",
+        "section": "Domain",
+        "order": 5,
+        "status": "definition"
+      }
+    },
+    {
+      "id": "intervention",
+      "type": "DomainConcept",
+      "properties": {
+        "name": "Intervention",
+        "description": "Modifies information or production.",
+        "section": "Domain",
+        "order": 6,
+        "status": "definition"
+      }
+    },
+    {
+      "id": "counterfactual",
+      "type": "DomainConcept",
+      "properties": {
+        "name": "Counterfactual",
+        "description": "Alternative outcomes under controlled conditions, enabling comparable experiences.",
+        "section": "Domain",
+        "order": 7,
+        "status": "definition"
+      }
+    },
+    {
+      "id": "evidence",
+      "type": "DomainConcept",
+      "properties": {
+        "name": "Evidence",
+        "description": "Observations with provenance that support evaluation.",
+        "section": "Domain",
+        "order": 8,
+        "status": "definition"
+      }
+    },
+    {
+      "id": "policy",
+      "type": "DomainConcept",
+      "properties": {
+        "name": "Policy",
+        "description": "A reusable intervention rule that selects interventions.",
+        "section": "Domain",
+        "order": 9,
+        "status": "definition"
+      }
+    },
+    {
+      "id": "causal",
+      "type": "Invariant",
+      "properties": {
+        "name": "Causal correspondence",
+        "description": "Known shared conditions and controlled differences make outcomes comparable.",
+        "section": "Domain",
+        "order": 10,
+        "status": "requirement"
+      }
+    },
+    {
+      "id": "provenance",
+      "type": "Invariant",
+      "properties": {
+        "name": "Provenance",
+        "description": "Preserve the origin and interpretation of observations.",
+        "section": "Domain",
+        "order": 11,
+        "status": "requirement"
+      }
+    },
+    {
+      "id": "semantic",
+      "type": "Invariant",
+      "properties": {
+        "name": "Semantic preservation",
+        "description": "Preserve the properties required by the objective.",
+        "section": "Domain",
+        "order": 12,
+        "status": "requirement"
+      }
+    },
+    {
+      "id": "integrity",
+      "type": "Invariant",
+      "properties": {
+        "name": "Presentation integrity",
+        "description": "Prohibit exposure to the original content IF strict prevention is required; this is a conditional requirement.",
+        "section": "Domain",
+        "order": 13,
+        "status": "requirement"
+      }
+    },
+    {
+      "id": "performance",
+      "type": "Invariant",
+      "properties": {
+        "name": "Performance",
+        "description": "Latency and throughput are parameterized requirements. 120 FPS implies an approximately 8.33 ms frame interval, not a universal limit or automatically the entire intervention budget.",
+        "section": "Domain",
+        "order": 14,
+        "status": "requirement"
+      }
+    },
+    {
+      "id": "S1",
+      "type": "System",
+      "properties": {
+        "name": "S1 \u00b7 Counterfactual Experimentation",
+        "description": "Owns a responsibility, not the definition of any domain concept.",
+        "section": "Systems",
+        "order": 15,
+        "status": "definition"
+      }
+    },
+    {
+      "id": "S1-responsibility",
+      "type": "Responsibility",
+      "properties": {
+        "name": "Counterfactual Experimentation responsibility",
+        "description": "Produces comparable alternative experiences; research path.",
+        "section": "Systems",
+        "order": 16,
+        "status": "definition"
+      }
+    },
+    {
+      "id": "S1-contract",
+      "type": "Contract",
+      "properties": {
+        "name": "Counterfactual Experimentation contract",
+        "description": "Controlled, attributable evidence.",
+        "section": "Systems",
+        "order": 17,
+        "status": "requirement"
+      }
+    },
+    {
+      "id": "S2",
+      "type": "System",
+      "properties": {
+        "name": "S2 \u00b7 Transformation Synthesis",
+        "description": "Owns a responsibility, not the definition of any domain concept.",
+        "section": "Systems",
+        "order": 18,
+        "status": "definition"
+      }
+    },
+    {
+      "id": "S2-responsibility",
+      "type": "Responsibility",
+      "properties": {
+        "name": "Transformation Synthesis responsibility",
+        "description": "Derives and validates reusable interventions; research path.",
+        "section": "Systems",
+        "order": 19,
+        "status": "definition"
+      }
+    },
+    {
+      "id": "S2-contract",
+      "type": "Contract",
+      "properties": {
+        "name": "Transformation Synthesis contract",
+        "description": "Policies with defined applicability and verified properties. This is a promised obligation, not a claim of completed verification.",
+        "section": "Systems",
+        "order": 20,
+        "status": "requirement"
+      }
+    },
+    {
+      "id": "S3",
+      "type": "System",
+      "properties": {
+        "name": "S3 \u00b7 Presentation Mediation",
+        "description": "Owns a responsibility, not the definition of any domain concept.",
+        "section": "Systems",
+        "order": 21,
+        "status": "definition"
+      }
+    },
+    {
+      "id": "S3-responsibility",
+      "type": "Responsibility",
+      "properties": {
+        "name": "Presentation Mediation responsibility",
+        "description": "Executes interventions within an environment; runtime path.",
+        "section": "Systems",
+        "order": 22,
+        "status": "definition"
+      }
+    },
+    {
+      "id": "S3-contract",
+      "type": "Contract",
+      "properties": {
+        "name": "Presentation Mediation contract",
+        "description": "The modified presentation satisfies applicable constraints.",
+        "section": "Systems",
+        "order": 23,
+        "status": "requirement"
+      }
+    },
+    {
+      "id": "S4",
+      "type": "System",
+      "properties": {
+        "name": "S4 \u00b7 Preference Management",
+        "description": "Owns a responsibility, not the definition of any domain concept.",
+        "section": "Systems",
+        "order": 24,
+        "status": "definition"
+      }
+    },
+    {
+      "id": "S4-responsibility",
+      "type": "Responsibility",
+      "properties": {
+        "name": "Preference Management responsibility",
+        "description": "Manages desired outcomes and feedback; intent path.",
+        "section": "Systems",
+        "order": 25,
+        "status": "definition"
+      }
+    },
+    {
+      "id": "S4-contract",
+      "type": "Contract",
+      "properties": {
+        "name": "Preference Management contract",
+        "description": "Stable technology-independent objectives.",
+        "section": "Systems",
+        "order": 26,
+        "status": "requirement"
+      }
+    },
+    {
+      "id": "environment-concept",
+      "type": "RealizationConcept",
+      "properties": {
+        "name": "Environment",
+        "description": "A computational or physical producer of experiences.",
+        "section": "Realization",
+        "order": 27,
+        "status": "definition"
+      }
+    },
+    {
+      "id": "layer-concept",
+      "type": "RealizationConcept",
+      "properties": {
+        "name": "Abstraction Layer",
+        "description": "Classification by information and operations; layers are NOT a sequential pipeline.",
+        "section": "Realization",
+        "order": 28,
+        "status": "definition"
+      }
+    },
+    {
+      "id": "boundary-concept",
+      "type": "RealizationConcept",
+      "properties": {
+        "name": "Interaction Boundary",
+        "description": "An observation and control point; an environment may expose some, multiple, or no relevant boundaries.",
+        "section": "Realization",
+        "order": 29,
+        "status": "definition"
+      }
+    },
+    {
+      "id": "capability-concept",
+      "type": "RealizationConcept",
+      "properties": {
+        "name": "Capability",
+        "description": "A supported observation or modification operation.",
+        "section": "Realization",
+        "order": 30,
+        "status": "definition"
+      }
+    },
+    {
+      "id": "binding-concept",
+      "type": "RealizationConcept",
+      "properties": {
+        "name": "Binding",
+        "description": "Connects a contract to sufficient capabilities and may use multiple boundaries.",
+        "section": "Realization",
+        "order": 31,
+        "status": "definition"
+      }
+    },
+    {
+      "id": "L1",
+      "type": "AbstractionLayer",
+      "properties": {
+        "name": "L1 \u00b7 State and semantics",
+        "description": "Entities, relations and behavior. A classification, not a mandatory sequential pipeline stage.",
+        "section": "Realization",
+        "order": 32,
+        "status": "definition"
+      }
+    },
+    {
+      "id": "L2",
+      "type": "AbstractionLayer",
+      "properties": {
+        "name": "L2 \u00b7 Presentation description",
+        "description": "Layout, geometry, materials and effects. A classification, not a mandatory sequential pipeline stage.",
+        "section": "Realization",
+        "order": 33,
+        "status": "definition"
+      }
+    },
+    {
+      "id": "L3",
+      "type": "AbstractionLayer",
+      "properties": {
+        "name": "L3 \u00b7 Rendering operations",
+        "description": "Commands, resources and shaders. A classification, not a mandatory sequential pipeline stage.",
+        "section": "Realization",
+        "order": 34,
+        "status": "definition"
+      }
+    },
+    {
+      "id": "L4",
+      "type": "AbstractionLayer",
+      "properties": {
+        "name": "L4 \u00b7 Composed representation",
+        "description": "Surfaces, buffers and pixels. A classification, not a mandatory sequential pipeline stage.",
+        "section": "Realization",
+        "order": 35,
+        "status": "definition"
+      }
+    },
+    {
+      "id": "L5",
+      "type": "AbstractionLayer",
+      "properties": {
+        "name": "L5 \u00b7 Physical presentation",
+        "description": "Display planes and timing / scanout. A classification, not a mandatory sequential pipeline stage.",
+        "section": "Realization",
+        "order": 36,
+        "status": "definition"
+      }
+    },
+    {
+      "id": "unreal",
+      "type": "Environment",
+      "properties": {
+        "name": "Unreal Engine",
+        "description": "Engine execution/rendering interfaces; layer coverage depends on the selected interface. Illustrative mapping, not a dependency or verified capability inventory.",
+        "section": "Realization",
+        "order": 37,
+        "status": "definition"
+      }
+    },
+    {
+      "id": "unreal-boundary",
+      "type": "InteractionBoundary",
+      "properties": {
+        "name": "Unreal Engine illustrative boundary",
+        "description": "Engine execution/rendering interfaces; layer coverage depends on the selected interface. Exact interface and capability availability remain unknown.",
+        "section": "Realization",
+        "order": 38,
+        "status": "unknown"
+      }
+    },
+    {
+      "id": "godot",
+      "type": "Environment",
+      "properties": {
+        "name": "Godot",
+        "description": "Engine execution/rendering interfaces; layer coverage depends on the selected interface. Illustrative mapping, not a dependency or verified capability inventory.",
+        "section": "Realization",
+        "order": 39,
+        "status": "definition"
+      }
+    },
+    {
+      "id": "godot-boundary",
+      "type": "InteractionBoundary",
+      "properties": {
+        "name": "Godot illustrative boundary",
+        "description": "Engine execution/rendering interfaces; layer coverage depends on the selected interface. Exact interface and capability availability remain unknown.",
+        "section": "Realization",
+        "order": 40,
+        "status": "unknown"
+      }
+    },
+    {
+      "id": "vulkan-boundary",
+      "type": "InteractionBoundary",
+      "properties": {
+        "name": "Vulkan illustrative boundary",
+        "description": "Graphics boundary, primarily rendering operations. Exact interface and capability availability remain unknown.",
+        "section": "Realization",
+        "order": 41,
+        "status": "unknown"
+      }
+    },
+    {
+      "id": "wayland-boundary",
+      "type": "InteractionBoundary",
+      "properties": {
+        "name": "Wayland illustrative boundary",
+        "description": "Compositor boundary at composed representation. Exact interface and capability availability remain unknown.",
+        "section": "Realization",
+        "order": 42,
+        "status": "unknown"
+      }
+    },
+    {
+      "id": "drm-boundary",
+      "type": "InteractionBoundary",
+      "properties": {
+        "name": "Linux DRM/KMS illustrative boundary",
+        "description": "Physical presentation / display control boundary. Exact interface and capability availability remain unknown.",
+        "section": "Realization",
+        "order": 43,
+        "status": "unknown"
+      }
+    },
+    {
+      "id": "example-objective",
+      "type": "Objective",
+      "properties": {
+        "name": "Blood \u2192 glitter at 120 FPS",
+        "description": "Replace blood with glitter while preserving other scene properties, targeting 120 FPS. The frame interval is approximately 8.33 ms; available intervention latency must be derived from the actual environment. No measurements have been completed.",
+        "section": "Example",
+        "order": 44,
+        "status": "requirement"
+      }
+    },
+    {
+      "id": "targeting",
+      "type": "Capability",
+      "properties": {
+        "name": "Specific target identification",
+        "description": "Identify the intended blood content with enough specificity to avoid unrelated changes. Required capability; actual availability is unknown.",
+        "section": "Example",
+        "order": 45,
+        "status": "unknown"
+      }
+    },
+    {
+      "id": "modification",
+      "type": "Capability",
+      "properties": {
+        "name": "Controlled modification",
+        "description": "Modify the target information or operations into the intended glitter result. Required capability; actual availability is unknown.",
+        "section": "Example",
+        "order": 46,
+        "status": "unknown"
+      }
+    },
+    {
+      "id": "preservation",
+      "type": "Capability",
+      "properties": {
+        "name": "Preservation observation",
+        "description": "Observe and establish that all required other scene properties remain preserved. Required capability; actual availability is unknown.",
+        "section": "Example",
+        "order": 47,
+        "status": "unknown"
+      }
+    },
+    {
+      "id": "timing",
+      "type": "Capability",
+      "properties": {
+        "name": "Latency and throughput measurement",
+        "description": "Measure the complete intervention and presentation path against the allocated budget. Required capability; actual availability is unknown.",
+        "section": "Example",
+        "order": 48,
+        "status": "unknown"
+      }
+    },
+    {
+      "id": "recognition",
+      "type": "Capability",
+      "properties": {
+        "name": "Pixel content recognition",
+        "description": "Recognize intended content where intrinsic object identity is absent. Required capability; actual availability is unknown.",
+        "section": "Example",
+        "order": 49,
+        "status": "unknown"
+      }
+    },
+    {
+      "id": "exposure",
+      "type": "Capability",
+      "properties": {
+        "name": "Exposure prevention observation and control",
+        "description": "Check and prevent original-content exposure when strict prevention is required. Required capability; actual availability is unknown.",
+        "section": "Example",
+        "order": 50,
+        "status": "unknown"
+      }
+    },
+    {
+      "id": "engine-binding",
+      "type": "Binding",
+      "properties": {
+        "name": "Engine candidate binding",
+        "description": "May modify identified materials/effects if targeting, preservation and performance are demonstrated. Unverified candidate: no completed measurements, conformance proof or capability-availability evidence.",
+        "section": "Example",
+        "order": 51,
+        "status": "candidate"
+      }
+    },
+    {
+      "id": "graphics-binding",
+      "type": "Binding",
+      "properties": {
+        "name": "Graphics API candidate binding",
+        "description": "May substitute resources or operations only if specific enough to preserve the contract. Unverified candidate: no completed measurements, conformance proof or capability-availability evidence.",
+        "section": "Example",
+        "order": 52,
+        "status": "candidate"
+      }
+    },
+    {
+      "id": "compositor-binding",
+      "type": "Binding",
+      "properties": {
+        "name": "Compositor candidate binding",
+        "description": "May alter pixels, but lacks intrinsic object identity; requires recognition and latency/exposure checks. Unverified candidate: no completed measurements, conformance proof or capability-availability evidence.",
+        "section": "Example",
+        "order": 53,
+        "status": "candidate"
+      }
+    },
+    {
+      "id": "capability-relation",
+      "type": "SemanticRule",
+      "properties": {
+        "name": "Boundary provides capability",
+        "description": "The provides relation means an interaction boundary supports a capability. No candidate boundary is asserted to provide a capability until availability is established.",
+        "section": "Governance",
+        "order": 54,
+        "status": "definition"
+      }
+    },
+    {
+      "id": "validity",
+      "type": "SemanticRule",
+      "properties": {
+        "name": "Binding validity",
+        "description": "Valid(B,C,I) iff B models C and B models I. A declared satisfies edge expresses an attempt to fulfill a contract, NOT proof; preserves expresses an obligation, not demonstrated preservation.",
+        "section": "Governance",
+        "order": 55,
+        "status": "requirement"
+      }
+    },
+    {
+      "id": "domain-independence",
+      "type": "Guardrail",
+      "properties": {
+        "name": "Domain independence",
+        "description": "Domain concepts and invariants are independent of technologies and system decomposition.",
+        "section": "Governance",
+        "order": 56,
+        "status": "requirement"
+      }
+    },
+    {
+      "id": "system-independence",
+      "type": "Guardrail",
+      "properties": {
+        "name": "System independence",
+        "description": "A system is defined by responsibility, not its implementation method.",
+        "section": "Governance",
+        "order": 57,
+        "status": "requirement"
+      }
+    },
+    {
+      "id": "capability-selection",
+      "type": "Guardrail",
+      "properties": {
+        "name": "Capability-based realization",
+        "description": "Select realizations by capabilities, not assumed interface equivalence. Unreal Engine is not literally a substitute for a Vulkan interface; bindings may fulfill the same higher contract only when capabilities are sufficient.",
+        "section": "Governance",
+        "order": 58,
+        "status": "requirement"
+      }
+    },
+    {
+      "id": "joint-sufficiency",
+      "type": "Guardrail",
+      "properties": {
+        "name": "Joint observation and control sufficiency",
+        "description": "Observation and control capabilities must jointly suffice for the applicable contract and invariants.",
+        "section": "Governance",
+        "order": 59,
+        "status": "requirement"
+      }
+    },
+    {
+      "id": "substitutability",
+      "type": "Guardrail",
+      "properties": {
+        "name": "Semantic substitutability",
+        "description": "Substitution requires the same contract to remain preserved, not merely similar outputs or interchangeable technology names.",
+        "section": "Governance",
+        "order": 60,
+        "status": "requirement"
+      }
+    },
+    {
+      "id": "unsupported",
+      "type": "Guardrail",
+      "properties": {
+        "name": "Report unsupported requirements",
+        "description": "Report unsupported requirements rather than weakening the contract.",
+        "section": "Governance",
+        "order": 61,
+        "status": "requirement"
+      }
+    },
+    {
+      "id": "result-flow",
+      "type": "SemanticRule",
+      "properties": {
+        "name": "Resulting architecture flow",
+        "description": "Domain meaning and invariants \u2192 system responsibilities and contracts \u2192 realization bindings \u2192 behavior subject to verification. This model does not claim that candidate behavior is already verified.",
+        "section": "Governance",
+        "order": 62,
+        "status": "requirement"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "expressed_as:experience:representation",
+      "type": "expressed_as",
+      "source": "experience",
+      "target": "representation"
+    },
+    {
+      "id": "consumes:production:representation",
+      "type": "consumes",
+      "source": "production",
+      "target": "representation"
+    },
+    {
+      "id": "produces:production:representation",
+      "type": "produces",
+      "source": "production",
+      "target": "representation"
+    },
+    {
+      "id": "yields:production:presentation",
+      "type": "yields",
+      "source": "production",
+      "target": "presentation"
+    },
+    {
+      "id": "realizes:presentation:experience",
+      "type": "realizes",
+      "source": "presentation",
+      "target": "experience"
+    },
+    {
+      "id": "constrains:objective:intervention",
+      "type": "constrains",
+      "source": "objective",
+      "target": "intervention"
+    },
+    {
+      "id": "modifies:intervention:production",
+      "type": "modifies",
+      "source": "intervention",
+      "target": "production"
+    },
+    {
+      "id": "modifies:intervention:presentation",
+      "type": "modifies",
+      "source": "intervention",
+      "target": "presentation"
+    },
+    {
+      "id": "controls_conditions_for:experience:counterfactual",
+      "type": "controls_conditions_for",
+      "source": "experience",
+      "target": "counterfactual"
+    },
+    {
+      "id": "grounds:counterfactual:evidence",
+      "type": "grounds",
+      "source": "counterfactual",
+      "target": "evidence"
+    },
+    {
+      "id": "informs:evidence:policy",
+      "type": "informs",
+      "source": "evidence",
+      "target": "policy"
+    },
+    {
+      "id": "guides:objective:policy",
+      "type": "guides",
+      "source": "objective",
+      "target": "policy"
+    },
+    {
+      "id": "selects:policy:intervention",
+      "type": "selects",
+      "source": "policy",
+      "target": "intervention"
+    },
+    {
+      "id": "owns:S1:S1-responsibility",
+      "type": "owns",
+      "source": "S1",
+      "target": "S1-responsibility"
+    },
+    {
+      "id": "specified_by:S1-responsibility:S1-contract",
+      "type": "specified_by",
+      "source": "S1-responsibility",
+      "target": "S1-contract"
+    },
+    {
+      "id": "concerns:S1-responsibility:experience",
+      "type": "concerns",
+      "source": "S1-responsibility",
+      "target": "experience"
+    },
+    {
+      "id": "defined_in_terms_of:S1-contract:experience",
+      "type": "defined_in_terms_of",
+      "source": "S1-contract",
+      "target": "experience"
+    },
+    {
+      "id": "concerns:S1-responsibility:counterfactual",
+      "type": "concerns",
+      "source": "S1-responsibility",
+      "target": "counterfactual"
+    },
+    {
+      "id": "defined_in_terms_of:S1-contract:counterfactual",
+      "type": "defined_in_terms_of",
+      "source": "S1-contract",
+      "target": "counterfactual"
+    },
+    {
+      "id": "concerns:S1-responsibility:evidence",
+      "type": "concerns",
+      "source": "S1-responsibility",
+      "target": "evidence"
+    },
+    {
+      "id": "defined_in_terms_of:S1-contract:evidence",
+      "type": "defined_in_terms_of",
+      "source": "S1-contract",
+      "target": "evidence"
+    },
+    {
+      "id": "owns:S2:S2-responsibility",
+      "type": "owns",
+      "source": "S2",
+      "target": "S2-responsibility"
+    },
+    {
+      "id": "specified_by:S2-responsibility:S2-contract",
+      "type": "specified_by",
+      "source": "S2-responsibility",
+      "target": "S2-contract"
+    },
+    {
+      "id": "concerns:S2-responsibility:policy",
+      "type": "concerns",
+      "source": "S2-responsibility",
+      "target": "policy"
+    },
+    {
+      "id": "defined_in_terms_of:S2-contract:policy",
+      "type": "defined_in_terms_of",
+      "source": "S2-contract",
+      "target": "policy"
+    },
+    {
+      "id": "concerns:S2-responsibility:intervention",
+      "type": "concerns",
+      "source": "S2-responsibility",
+      "target": "intervention"
+    },
+    {
+      "id": "defined_in_terms_of:S2-contract:intervention",
+      "type": "defined_in_terms_of",
+      "source": "S2-contract",
+      "target": "intervention"
+    },
+    {
+      "id": "concerns:S2-responsibility:evidence",
+      "type": "concerns",
+      "source": "S2-responsibility",
+      "target": "evidence"
+    },
+    {
+      "id": "defined_in_terms_of:S2-contract:evidence",
+      "type": "defined_in_terms_of",
+      "source": "S2-contract",
+      "target": "evidence"
+    },
+    {
+      "id": "concerns:S2-responsibility:objective",
+      "type": "concerns",
+      "source": "S2-responsibility",
+      "target": "objective"
+    },
+    {
+      "id": "defined_in_terms_of:S2-contract:objective",
+      "type": "defined_in_terms_of",
+      "source": "S2-contract",
+      "target": "objective"
+    },
+    {
+      "id": "owns:S3:S3-responsibility",
+      "type": "owns",
+      "source": "S3",
+      "target": "S3-responsibility"
+    },
+    {
+      "id": "specified_by:S3-responsibility:S3-contract",
+      "type": "specified_by",
+      "source": "S3-responsibility",
+      "target": "S3-contract"
+    },
+    {
+      "id": "concerns:S3-responsibility:presentation",
+      "type": "concerns",
+      "source": "S3-responsibility",
+      "target": "presentation"
+    },
+    {
+      "id": "defined_in_terms_of:S3-contract:presentation",
+      "type": "defined_in_terms_of",
+      "source": "S3-contract",
+      "target": "presentation"
+    },
+    {
+      "id": "concerns:S3-responsibility:production",
+      "type": "concerns",
+      "source": "S3-responsibility",
+      "target": "production"
+    },
+    {
+      "id": "defined_in_terms_of:S3-contract:production",
+      "type": "defined_in_terms_of",
+      "source": "S3-contract",
+      "target": "production"
+    },
+    {
+      "id": "concerns:S3-responsibility:intervention",
+      "type": "concerns",
+      "source": "S3-responsibility",
+      "target": "intervention"
+    },
+    {
+      "id": "defined_in_terms_of:S3-contract:intervention",
+      "type": "defined_in_terms_of",
+      "source": "S3-contract",
+      "target": "intervention"
+    },
+    {
+      "id": "concerns:S3-responsibility:objective",
+      "type": "concerns",
+      "source": "S3-responsibility",
+      "target": "objective"
+    },
+    {
+      "id": "defined_in_terms_of:S3-contract:objective",
+      "type": "defined_in_terms_of",
+      "source": "S3-contract",
+      "target": "objective"
+    },
+    {
+      "id": "owns:S4:S4-responsibility",
+      "type": "owns",
+      "source": "S4",
+      "target": "S4-responsibility"
+    },
+    {
+      "id": "specified_by:S4-responsibility:S4-contract",
+      "type": "specified_by",
+      "source": "S4-responsibility",
+      "target": "S4-contract"
+    },
+    {
+      "id": "concerns:S4-responsibility:objective",
+      "type": "concerns",
+      "source": "S4-responsibility",
+      "target": "objective"
+    },
+    {
+      "id": "defined_in_terms_of:S4-contract:objective",
+      "type": "defined_in_terms_of",
+      "source": "S4-contract",
+      "target": "objective"
+    },
+    {
+      "id": "concerns:S4-responsibility:experience",
+      "type": "concerns",
+      "source": "S4-responsibility",
+      "target": "experience"
+    },
+    {
+      "id": "defined_in_terms_of:S4-contract:experience",
+      "type": "defined_in_terms_of",
+      "source": "S4-contract",
+      "target": "experience"
+    },
+    {
+      "id": "supplies_objective:S4:S2",
+      "type": "supplies_objective",
+      "source": "S4",
+      "target": "S2"
+    },
+    {
+      "id": "supplies_evidence:S1:S2",
+      "type": "supplies_evidence",
+      "source": "S1",
+      "target": "S2"
+    },
+    {
+      "id": "supplies_policy:S2:S3",
+      "type": "supplies_policy",
+      "source": "S2",
+      "target": "S3"
+    },
+    {
+      "id": "supplies_preference_activation:S4:S3",
+      "type": "supplies_preference_activation",
+      "source": "S4",
+      "target": "S3"
+    },
+    {
+      "id": "mediates:S3:presentation",
+      "type": "mediates",
+      "source": "S3",
+      "target": "presentation"
+    },
+    {
+      "id": "exposes:unreal:unreal-boundary",
+      "type": "exposes",
+      "source": "unreal",
+      "target": "unreal-boundary"
+    },
+    {
+      "id": "classified_by:unreal-boundary:L1",
+      "type": "classified_by",
+      "source": "unreal-boundary",
+      "target": "L1"
+    },
+    {
+      "id": "classified_by:unreal-boundary:L2",
+      "type": "classified_by",
+      "source": "unreal-boundary",
+      "target": "L2"
+    },
+    {
+      "id": "classified_by:unreal-boundary:L3",
+      "type": "classified_by",
+      "source": "unreal-boundary",
+      "target": "L3"
+    },
+    {
+      "id": "classified_by:unreal-boundary:L4",
+      "type": "classified_by",
+      "source": "unreal-boundary",
+      "target": "L4"
+    },
+    {
+      "id": "exposes:godot:godot-boundary",
+      "type": "exposes",
+      "source": "godot",
+      "target": "godot-boundary"
+    },
+    {
+      "id": "classified_by:godot-boundary:L1",
+      "type": "classified_by",
+      "source": "godot-boundary",
+      "target": "L1"
+    },
+    {
+      "id": "classified_by:godot-boundary:L2",
+      "type": "classified_by",
+      "source": "godot-boundary",
+      "target": "L2"
+    },
+    {
+      "id": "classified_by:godot-boundary:L3",
+      "type": "classified_by",
+      "source": "godot-boundary",
+      "target": "L3"
+    },
+    {
+      "id": "classified_by:godot-boundary:L4",
+      "type": "classified_by",
+      "source": "godot-boundary",
+      "target": "L4"
+    },
+    {
+      "id": "classified_by:vulkan-boundary:L3",
+      "type": "classified_by",
+      "source": "vulkan-boundary",
+      "target": "L3"
+    },
+    {
+      "id": "classified_by:wayland-boundary:L4",
+      "type": "classified_by",
+      "source": "wayland-boundary",
+      "target": "L4"
+    },
+    {
+      "id": "classified_by:drm-boundary:L5",
+      "type": "classified_by",
+      "source": "drm-boundary",
+      "target": "L5"
+    },
+    {
+      "id": "instantiates:example-objective:objective",
+      "type": "instantiates",
+      "source": "example-objective",
+      "target": "objective"
+    },
+    {
+      "id": "constrains:example-objective:S3-contract",
+      "type": "constrains",
+      "source": "example-objective",
+      "target": "S3-contract"
+    },
+    {
+      "id": "uses:engine-binding:unreal-boundary",
+      "type": "uses",
+      "source": "engine-binding",
+      "target": "unreal-boundary"
+    },
+    {
+      "id": "satisfies:engine-binding:S3-contract",
+      "type": "satisfies",
+      "source": "engine-binding",
+      "target": "S3-contract"
+    },
+    {
+      "id": "preserves:engine-binding:causal",
+      "type": "preserves",
+      "source": "engine-binding",
+      "target": "causal"
+    },
+    {
+      "id": "preserves:engine-binding:provenance",
+      "type": "preserves",
+      "source": "engine-binding",
+      "target": "provenance"
+    },
+    {
+      "id": "preserves:engine-binding:semantic",
+      "type": "preserves",
+      "source": "engine-binding",
+      "target": "semantic"
+    },
+    {
+      "id": "preserves:engine-binding:integrity",
+      "type": "preserves",
+      "source": "engine-binding",
+      "target": "integrity"
+    },
+    {
+      "id": "preserves:engine-binding:performance",
+      "type": "preserves",
+      "source": "engine-binding",
+      "target": "performance"
+    },
+    {
+      "id": "requires_capability:engine-binding:targeting",
+      "type": "requires_capability",
+      "source": "engine-binding",
+      "target": "targeting"
+    },
+    {
+      "id": "requires_capability:engine-binding:modification",
+      "type": "requires_capability",
+      "source": "engine-binding",
+      "target": "modification"
+    },
+    {
+      "id": "requires_capability:engine-binding:preservation",
+      "type": "requires_capability",
+      "source": "engine-binding",
+      "target": "preservation"
+    },
+    {
+      "id": "requires_capability:engine-binding:timing",
+      "type": "requires_capability",
+      "source": "engine-binding",
+      "target": "timing"
+    },
+    {
+      "id": "requires_capability:engine-binding:exposure",
+      "type": "requires_capability",
+      "source": "engine-binding",
+      "target": "exposure"
+    },
+    {
+      "id": "uses:graphics-binding:vulkan-boundary",
+      "type": "uses",
+      "source": "graphics-binding",
+      "target": "vulkan-boundary"
+    },
+    {
+      "id": "satisfies:graphics-binding:S3-contract",
+      "type": "satisfies",
+      "source": "graphics-binding",
+      "target": "S3-contract"
+    },
+    {
+      "id": "preserves:graphics-binding:causal",
+      "type": "preserves",
+      "source": "graphics-binding",
+      "target": "causal"
+    },
+    {
+      "id": "preserves:graphics-binding:provenance",
+      "type": "preserves",
+      "source": "graphics-binding",
+      "target": "provenance"
+    },
+    {
+      "id": "preserves:graphics-binding:semantic",
+      "type": "preserves",
+      "source": "graphics-binding",
+      "target": "semantic"
+    },
+    {
+      "id": "preserves:graphics-binding:integrity",
+      "type": "preserves",
+      "source": "graphics-binding",
+      "target": "integrity"
+    },
+    {
+      "id": "preserves:graphics-binding:performance",
+      "type": "preserves",
+      "source": "graphics-binding",
+      "target": "performance"
+    },
+    {
+      "id": "requires_capability:graphics-binding:targeting",
+      "type": "requires_capability",
+      "source": "graphics-binding",
+      "target": "targeting"
+    },
+    {
+      "id": "requires_capability:graphics-binding:modification",
+      "type": "requires_capability",
+      "source": "graphics-binding",
+      "target": "modification"
+    },
+    {
+      "id": "requires_capability:graphics-binding:preservation",
+      "type": "requires_capability",
+      "source": "graphics-binding",
+      "target": "preservation"
+    },
+    {
+      "id": "requires_capability:graphics-binding:timing",
+      "type": "requires_capability",
+      "source": "graphics-binding",
+      "target": "timing"
+    },
+    {
+      "id": "requires_capability:graphics-binding:exposure",
+      "type": "requires_capability",
+      "source": "graphics-binding",
+      "target": "exposure"
+    },
+    {
+      "id": "uses:compositor-binding:wayland-boundary",
+      "type": "uses",
+      "source": "compositor-binding",
+      "target": "wayland-boundary"
+    },
+    {
+      "id": "satisfies:compositor-binding:S3-contract",
+      "type": "satisfies",
+      "source": "compositor-binding",
+      "target": "S3-contract"
+    },
+    {
+      "id": "preserves:compositor-binding:causal",
+      "type": "preserves",
+      "source": "compositor-binding",
+      "target": "causal"
+    },
+    {
+      "id": "preserves:compositor-binding:provenance",
+      "type": "preserves",
+      "source": "compositor-binding",
+      "target": "provenance"
+    },
+    {
+      "id": "preserves:compositor-binding:semantic",
+      "type": "preserves",
+      "source": "compositor-binding",
+      "target": "semantic"
+    },
+    {
+      "id": "preserves:compositor-binding:integrity",
+      "type": "preserves",
+      "source": "compositor-binding",
+      "target": "integrity"
+    },
+    {
+      "id": "preserves:compositor-binding:performance",
+      "type": "preserves",
+      "source": "compositor-binding",
+      "target": "performance"
+    },
+    {
+      "id": "requires_capability:compositor-binding:targeting",
+      "type": "requires_capability",
+      "source": "compositor-binding",
+      "target": "targeting"
+    },
+    {
+      "id": "requires_capability:compositor-binding:modification",
+      "type": "requires_capability",
+      "source": "compositor-binding",
+      "target": "modification"
+    },
+    {
+      "id": "requires_capability:compositor-binding:preservation",
+      "type": "requires_capability",
+      "source": "compositor-binding",
+      "target": "preservation"
+    },
+    {
+      "id": "requires_capability:compositor-binding:timing",
+      "type": "requires_capability",
+      "source": "compositor-binding",
+      "target": "timing"
+    },
+    {
+      "id": "requires_capability:compositor-binding:recognition",
+      "type": "requires_capability",
+      "source": "compositor-binding",
+      "target": "recognition"
+    },
+    {
+      "id": "requires_capability:compositor-binding:exposure",
+      "type": "requires_capability",
+      "source": "compositor-binding",
+      "target": "exposure"
+    }
+  ]
+}

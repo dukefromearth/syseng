@@ -1,0 +1,905 @@
+{
+  "schema": {
+    "version": "1.0",
+    "node_types": {
+      "AbstractionLayer": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string"
+          },
+          "section": {
+            "enum": [
+              "Purpose",
+              "Domain",
+              "Systems",
+              "Realization",
+              "Example",
+              "Governance"
+            ]
+          },
+          "order": {
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "definition",
+              "requirement",
+              "candidate",
+              "unknown"
+            ]
+          }
+        },
+        "required": [
+          "name",
+          "description",
+          "section",
+          "order",
+          "status"
+        ],
+        "additionalProperties": false
+      },
+      "Binding": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string"
+          },
+          "section": {
+            "enum": [
+              "Purpose",
+              "Domain",
+              "Systems",
+              "Realization",
+              "Example",
+              "Governance"
+            ]
+          },
+          "order": {
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "definition",
+              "requirement",
+              "candidate",
+              "unknown"
+            ]
+          }
+        },
+        "required": [
+          "name",
+          "description",
+          "section",
+          "order",
+          "status"
+        ],
+        "additionalProperties": false
+      },
+      "Capability": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string"
+          },
+          "section": {
+            "enum": [
+              "Purpose",
+              "Domain",
+              "Systems",
+              "Realization",
+              "Example",
+              "Governance"
+            ]
+          },
+          "order": {
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "definition",
+              "requirement",
+              "candidate",
+              "unknown"
+            ]
+          }
+        },
+        "required": [
+          "name",
+          "description",
+          "section",
+          "order",
+          "status"
+        ],
+        "additionalProperties": false
+      },
+      "Contract": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string"
+          },
+          "section": {
+            "enum": [
+              "Purpose",
+              "Domain",
+              "Systems",
+              "Realization",
+              "Example",
+              "Governance"
+            ]
+          },
+          "order": {
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "definition",
+              "requirement",
+              "candidate",
+              "unknown"
+            ]
+          }
+        },
+        "required": [
+          "name",
+          "description",
+          "section",
+          "order",
+          "status"
+        ],
+        "additionalProperties": false
+      },
+      "DomainConcept": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string"
+          },
+          "section": {
+            "enum": [
+              "Purpose",
+              "Domain",
+              "Systems",
+              "Realization",
+              "Example",
+              "Governance"
+            ]
+          },
+          "order": {
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "definition",
+              "requirement",
+              "candidate",
+              "unknown"
+            ]
+          }
+        },
+        "required": [
+          "name",
+          "description",
+          "section",
+          "order",
+          "status"
+        ],
+        "additionalProperties": false
+      },
+      "Environment": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string"
+          },
+          "section": {
+            "enum": [
+              "Purpose",
+              "Domain",
+              "Systems",
+              "Realization",
+              "Example",
+              "Governance"
+            ]
+          },
+          "order": {
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "definition",
+              "requirement",
+              "candidate",
+              "unknown"
+            ]
+          }
+        },
+        "required": [
+          "name",
+          "description",
+          "section",
+          "order",
+          "status"
+        ],
+        "additionalProperties": false
+      },
+      "Guardrail": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string"
+          },
+          "section": {
+            "enum": [
+              "Purpose",
+              "Domain",
+              "Systems",
+              "Realization",
+              "Example",
+              "Governance"
+            ]
+          },
+          "order": {
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "definition",
+              "requirement",
+              "candidate",
+              "unknown"
+            ]
+          }
+        },
+        "required": [
+          "name",
+          "description",
+          "section",
+          "order",
+          "status"
+        ],
+        "additionalProperties": false
+      },
+      "InteractionBoundary": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string"
+          },
+          "section": {
+            "enum": [
+              "Purpose",
+              "Domain",
+              "Systems",
+              "Realization",
+              "Example",
+              "Governance"
+            ]
+          },
+          "order": {
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "definition",
+              "requirement",
+              "candidate",
+              "unknown"
+            ]
+          }
+        },
+        "required": [
+          "name",
+          "description",
+          "section",
+          "order",
+          "status"
+        ],
+        "additionalProperties": false
+      },
+      "Invariant": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string"
+          },
+          "section": {
+            "enum": [
+              "Purpose",
+              "Domain",
+              "Systems",
+              "Realization",
+              "Example",
+              "Governance"
+            ]
+          },
+          "order": {
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "definition",
+              "requirement",
+              "candidate",
+              "unknown"
+            ]
+          }
+        },
+        "required": [
+          "name",
+          "description",
+          "section",
+          "order",
+          "status"
+        ],
+        "additionalProperties": false
+      },
+      "ModelPurpose": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string"
+          },
+          "section": {
+            "enum": [
+              "Purpose",
+              "Domain",
+              "Systems",
+              "Realization",
+              "Example",
+              "Governance"
+            ]
+          },
+          "order": {
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "definition",
+              "requirement",
+              "candidate",
+              "unknown"
+            ]
+          }
+        },
+        "required": [
+          "name",
+          "description",
+          "section",
+          "order",
+          "status"
+        ],
+        "additionalProperties": false
+      },
+      "Objective": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string"
+          },
+          "section": {
+            "enum": [
+              "Purpose",
+              "Domain",
+              "Systems",
+              "Realization",
+              "Example",
+              "Governance"
+            ]
+          },
+          "order": {
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "definition",
+              "requirement",
+              "candidate",
+              "unknown"
+            ]
+          }
+        },
+        "required": [
+          "name",
+          "description",
+          "section",
+          "order",
+          "status"
+        ],
+        "additionalProperties": false
+      },
+      "RealizationConcept": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string"
+          },
+          "section": {
+            "enum": [
+              "Purpose",
+              "Domain",
+              "Systems",
+              "Realization",
+              "Example",
+              "Governance"
+            ]
+          },
+          "order": {
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "definition",
+              "requirement",
+              "candidate",
+              "unknown"
+            ]
+          }
+        },
+        "required": [
+          "name",
+          "description",
+          "section",
+          "order",
+          "status"
+        ],
+        "additionalProperties": false
+      },
+      "Responsibility": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string"
+          },
+          "section": {
+            "enum": [
+              "Purpose",
+              "Domain",
+              "Systems",
+              "Realization",
+              "Example",
+              "Governance"
+            ]
+          },
+          "order": {
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "definition",
+              "requirement",
+              "candidate",
+              "unknown"
+            ]
+          }
+        },
+        "required": [
+          "name",
+          "description",
+          "section",
+          "order",
+          "status"
+        ],
+        "additionalProperties": false
+      },
+      "SemanticRule": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string"
+          },
+          "section": {
+            "enum": [
+              "Purpose",
+              "Domain",
+              "Systems",
+              "Realization",
+              "Example",
+              "Governance"
+            ]
+          },
+          "order": {
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "definition",
+              "requirement",
+              "candidate",
+              "unknown"
+            ]
+          }
+        },
+        "required": [
+          "name",
+          "description",
+          "section",
+          "order",
+          "status"
+        ],
+        "additionalProperties": false
+      },
+      "System": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string"
+          },
+          "section": {
+            "enum": [
+              "Purpose",
+              "Domain",
+              "Systems",
+              "Realization",
+              "Example",
+              "Governance"
+            ]
+          },
+          "order": {
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "definition",
+              "requirement",
+              "candidate",
+              "unknown"
+            ]
+          }
+        },
+        "required": [
+          "name",
+          "description",
+          "section",
+          "order",
+          "status"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "relations": {
+      "owns": {
+        "source": [
+          "System"
+        ],
+        "target": [
+          "Responsibility"
+        ],
+        "impact": "target_to_source"
+      },
+      "specified_by": {
+        "source": [
+          "Responsibility"
+        ],
+        "target": [
+          "Contract"
+        ],
+        "impact": "target_to_source"
+      },
+      "concerns": {
+        "source": [
+          "Responsibility"
+        ],
+        "target": [
+          "DomainConcept"
+        ],
+        "impact": "target_to_source"
+      },
+      "defined_in_terms_of": {
+        "source": [
+          "Contract"
+        ],
+        "target": [
+          "DomainConcept"
+        ],
+        "impact": "target_to_source"
+      },
+      "exposes": {
+        "source": [
+          "Environment"
+        ],
+        "target": [
+          "InteractionBoundary"
+        ],
+        "impact": "target_to_source"
+      },
+      "provides": {
+        "source": [
+          "InteractionBoundary"
+        ],
+        "target": [
+          "Capability"
+        ],
+        "impact": "target_to_source"
+      },
+      "classified_by": {
+        "source": [
+          "InteractionBoundary"
+        ],
+        "target": [
+          "AbstractionLayer"
+        ],
+        "impact": "target_to_source"
+      },
+      "uses": {
+        "source": [
+          "Binding"
+        ],
+        "target": [
+          "InteractionBoundary"
+        ],
+        "impact": "target_to_source"
+      },
+      "satisfies": {
+        "source": [
+          "Binding"
+        ],
+        "target": [
+          "Contract"
+        ],
+        "impact": "target_to_source"
+      },
+      "preserves": {
+        "source": [
+          "Binding"
+        ],
+        "target": [
+          "Invariant"
+        ],
+        "impact": "target_to_source"
+      },
+      "expressed_as": {
+        "source": [
+          "DomainConcept"
+        ],
+        "target": [
+          "DomainConcept"
+        ],
+        "impact": "target_to_source"
+      },
+      "consumes": {
+        "source": [
+          "DomainConcept"
+        ],
+        "target": [
+          "DomainConcept"
+        ],
+        "impact": "target_to_source"
+      },
+      "produces": {
+        "source": [
+          "DomainConcept"
+        ],
+        "target": [
+          "DomainConcept"
+        ],
+        "impact": "target_to_source"
+      },
+      "yields": {
+        "source": [
+          "DomainConcept"
+        ],
+        "target": [
+          "DomainConcept"
+        ],
+        "impact": "target_to_source"
+      },
+      "realizes": {
+        "source": [
+          "DomainConcept"
+        ],
+        "target": [
+          "DomainConcept"
+        ],
+        "impact": "target_to_source"
+      },
+      "constrains": {
+        "source": [
+          "DomainConcept",
+          "Objective"
+        ],
+        "target": [
+          "DomainConcept",
+          "Contract"
+        ],
+        "impact": "target_to_source"
+      },
+      "modifies": {
+        "source": [
+          "DomainConcept"
+        ],
+        "target": [
+          "DomainConcept"
+        ],
+        "impact": "target_to_source"
+      },
+      "controls_conditions_for": {
+        "source": [
+          "DomainConcept"
+        ],
+        "target": [
+          "DomainConcept"
+        ],
+        "impact": "target_to_source"
+      },
+      "grounds": {
+        "source": [
+          "DomainConcept"
+        ],
+        "target": [
+          "DomainConcept"
+        ],
+        "impact": "target_to_source"
+      },
+      "informs": {
+        "source": [
+          "DomainConcept"
+        ],
+        "target": [
+          "DomainConcept"
+        ],
+        "impact": "target_to_source"
+      },
+      "guides": {
+        "source": [
+          "DomainConcept"
+        ],
+        "target": [
+          "DomainConcept"
+        ],
+        "impact": "target_to_source"
+      },
+      "selects": {
+        "source": [
+          "DomainConcept"
+        ],
+        "target": [
+          "DomainConcept"
+        ],
+        "impact": "target_to_source"
+      },
+      "supplies_objective": {
+        "source": [
+          "System"
+        ],
+        "target": [
+          "System"
+        ],
+        "impact": "target_to_source"
+      },
+      "supplies_evidence": {
+        "source": [
+          "System"
+        ],
+        "target": [
+          "System"
+        ],
+        "impact": "target_to_source"
+      },
+      "supplies_policy": {
+        "source": [
+          "System"
+        ],
+        "target": [
+          "System"
+        ],
+        "impact": "target_to_source"
+      },
+      "supplies_preference_activation": {
+        "source": [
+          "System"
+        ],
+        "target": [
+          "System"
+        ],
+        "impact": "target_to_source"
+      },
+      "mediates": {
+        "source": [
+          "System"
+        ],
+        "target": [
+          "DomainConcept"
+        ],
+        "impact": "target_to_source"
+      },
+      "instantiates": {
+        "source": [
+          "Objective"
+        ],
+        "target": [
+          "DomainConcept"
+        ],
+        "impact": "target_to_source"
+      },
+      "requires_capability": {
+        "source": [
+          "Binding"
+        ],
+        "target": [
+          "Capability"
+        ],
+        "impact": "target_to_source"
+      }
+    },
+    "invariants": [],
+    "interceptors": [
+      {
+        "id": "candidate-contract-and-invariants",
+        "target_type": "Binding",
+        "handler": "pending",
+        "version": "1",
+        "trigger": "dependency_changed",
+        "evidence_required": [
+          "contract-conformance",
+          "required-invariant-preservation",
+          "capability-availability",
+          "latency-throughput-measurements"
+        ]
+      }
+    ]
+  },
+  "nodes": [],
+  "edges": []
+}

@@ -1,0 +1,11 @@
+{
+  "name": "typed-reactive-graph-reader",
+  "private": true,
+  "scripts": {
+    "lint": "eslint src/typed_graph/adapters/static/app.js",
+    "dev": ".venv/bin/python scripts/preview.py"
+  },
+  "devDependencies": {
+    "eslint": "^10.14.0"
+  }
+}

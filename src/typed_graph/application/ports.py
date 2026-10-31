@@ -3,6 +3,7 @@
 from typing import Protocol
 
 from typed_graph.application.contracts import SearchResult
+from typed_graph.application.specification import SpecificationState
 from typed_graph.domain.models import Assessment, Identifier, JsonObject, Revision, Snapshot
 
 
@@ -17,3 +18,11 @@ class Repository(Protocol):
     ) -> SearchResult: ...
     def assessments(self, revision: Revision) -> list[Assessment]: ...
     def record_assessment(self, assessment: Assessment) -> None: ...
+
+
+type SpecificationToken = str
+
+
+class SpecificationSource(Protocol):
+    def specification_token(self) -> SpecificationToken: ...
+    def specification_state(self) -> SpecificationState: ...
