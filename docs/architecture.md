@@ -10,6 +10,31 @@
   operator-configured external MCP handlers. The workspace adapter is the composition
   root. Tests enforce import direction.
 
+## Define once, derive the boundaries
+
+`domain/models.py` owns strict Pydantic v2 engine contracts: identities/revisions,
+nodes/edges, registered schema structure, operations, impacts, assessment results and
+provenance. User-authored node property schemas remain arbitrary supported JSON Schema;
+the engine's closed vocabulary does not hardcode a user's architecture ontology.
+
+`application/contracts.py` registers each tool once with its request/result model and
+handler binding. Dispatch, MCP discovery, static schemas and runtime validation derive
+from that catalog. Dynamic mutation schemas specialize the canonical operation models
+with registered types and authored property schemas; no parallel handwritten tool shapes
+are maintained. Strict validation rejects coercion, extra fields and malformed operations
+even when a later operation would erase them.
+
+`domain/resources.py` owns resource identities, URI codecs, templates and resolver
+bindings. Persistence uses the same typed Snapshot/Assessment models as the application;
+SQLite and authored JSON codecs do not independently define their semantic contracts.
+Typed repository ports and model attributes retain these guarantees inside the core,
+rather than applying a typed facade around untyped dictionaries. JSON values remain only
+at actual extensibility boundaries (authored schemas, user properties and finding data).
+
+This refactor improves maintainability and change scalability. It does **not** claim to
+remove full-snapshot IO or in-memory graph traversal costs; large-graph performance limits
+remain listed in the acceptance document.
+
 The five primitives are Node (identity, registered type, validated properties),
 Edge (identity, declared relation and endpoints), Schema (authoring vocabulary),
 Interceptor (typed target and handler contract), and Assessment (derived revision-
@@ -67,3 +92,56 @@ pass requires schema-declared obligations and matching evidence entries. Evidenc
 references are provenance supplied by the reviewer/handler, not independently proved
 by this server. An older revision's result remains stale even if it arrives later.
 No implicit model mutation or external invocation follows from a model definition.
+
+## Extending the engine without parallel definitions
+
+- Add a tool's strict request/result classes and one `_register(ToolSpec(...))`
+  declaration in the tool catalog; implement the correspondingly typed application
+  method. Startup checks its request/result annotations against that registration.
+  MCP listing, validation and output schemas need no separate entry. If a tool needs
+  authored-schema specialization, register its schema callback with the same ToolSpec.
+- Add a resource's identity category and resolver binding in ResourceSpec. Parsing,
+  rendering, accepted identity shape and URI templates consume that registration.
+- Add registered model node types or relations only to authored schema files. The
+  mutation compiler specializes canonical operation models automatically.
+- Engine status/direction vocabularies are explicit StrEnums; operation/invariant
+  tags are discriminated unions. The shared omission-only field convention permits
+  omitted optional fields without silently accepting explicit JSON null or coercion.
+- History derives its change union from the mutation union plus the import event.
+  Assessment identity, empty relation-property defaults, dependency adjacency and
+  changed-node calculation each have one implementation reused by their consumers.
+
+## ADR 004: the specification reader is a projection
+
+The tools continue to author the graph. A pure typed projector reads one Snapshot plus
+that revision's Assessments and produces canonical Markdown with outline/provenance.
+The HTTP adapter renders that exact Markdown through a non-HTML Markdown parser and
+sanitizer; the thin browser receives the result and adds no graph rules.
+
+A SpecificationSource port exposes an opaque cheap change token and a consistent state
+read. The file adapter centralizes paths, compares manifest/assessment-log metadata and
+reads both under the writer lock. One shared server cache performs projection only after
+change, compares semantic digests and broadcasts to subscribers. Reconnect sends the
+latest state; polling errors preserve the last valid document and remain visible.
+Presentation profiles select grouping and graph-derived summaries but never author
+another model or copy contract prose into frontend code. All HTTP controls remain
+read-only and loopback-bound.
+
+## ADR 005: architectural meaning, fixed specification grammar
+
+Architecture authoring is an optional application above the generic graph engine.
+A canonical typed role/relation catalog defines its schema and semantic authoring
+contracts. Publication checks apply equally to high-order authoring tools and generic
+imports/mutations; the latter cannot bypass architectural consistency.
+
+The specification compiler intentionally understands architectural roles, but never
+particular platform names or facts. Its seven-section grammar is fixed. Agents define
+meaning, not an ordered tree of document blocks. Responsibilities, contract obligations,
+requirements and candidate realizations are joined into coherent system sections.
+Metamodel diagrams derive from role definitions; instance diagrams derive from edges.
+The generic graph inspector remains separate and available for arbitrary schemas.
+
+A binding's candidate lifecycle is not verification. Revisioned assessments carry
+proof obligations, evidence and explicit pending/stale states. Structural validation
+can reject malformed references and incompatible contracts, but cannot establish the
+truth of an authored causal, semantic or performance claim.

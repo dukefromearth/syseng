@@ -16,27 +16,90 @@ import tempfile
 from collections.abc import Iterator
 from contextlib import contextmanager
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
+
+from pydantic import Field, JsonValue
 
 if TYPE_CHECKING:
     from typed_graph.application.service import GraphService
 
 import yaml
 
-from typed_graph.application.ports import Document
+from typed_graph.application.contracts import SearchResult
+from typed_graph.application.ports import SpecificationToken
+from typed_graph.application.specification import SpecificationState
+from typed_graph.domain.models import (
+    Assessment,
+    AssessmentState,
+    Edge,
+    GraphSchema,
+    Identifier,
+    JsonObject,
+    ModelDocument,
+    Node,
+    Revision,
+    Snapshot,
+    StrictModel,
+    dump_wire,
+)
 from typed_graph.domain.schema import compile_schema
 
-EMPTY_SCHEMA: Document = {
-    "version": "0",
-    "node_types": {},
-    "relations": {},
-    "interceptors": [],
-    "invariants": [],
-}
+EMPTY_SCHEMA = GraphSchema(version="0", node_types={}, relations={})
 
 
-def canonical(value: Any) -> str:
-    return json.dumps(value, sort_keys=True, separators=(",", ":"), allow_nan=False)
+class Manifest(StrictModel):
+    revision: Revision
+    source_baseline: ModelDocument | None = None
+    source_fingerprints: dict[str, str] | None = None
+
+
+class SourceFragment(StrictModel):
+    schema_definition: GraphSchema | None = Field(default=None, alias="schema")
+    nodes: list[Node] = Field(default_factory=list)
+    edges: list[Edge] = Field(default_factory=list)
+
+
+def canonical(value: StrictModel | JsonValue) -> str:
+    return json.dumps(
+        dump_wire(value) if isinstance(value, StrictModel) else value,
+        sort_keys=True,
+        separators=(",", ":"),
+        allow_nan=False,
+    )
+
+
+def manifest_for(document: Snapshot) -> Manifest:
+    return Manifest(
+        revision=document.revision,
+        source_baseline=document.source_baseline,
+        source_fingerprints=document.source_fingerprints,
+    )
+
+
+def reconcile[T: Node | Edge](base: list[T], authored: list[T], live: list[T]) -> list[T]:
+    def keyed(items: list[T]) -> dict[str, T]:
+        mapping = {item.id: item for item in items}
+        if len(mapping) != len(items):
+            raise ValueError("duplicate identities across sources")
+        return mapping
+
+    before_map, after_map, live_map = (keyed(items) for items in (base, authored, live))
+    result = dict(live_map)
+    for identity in before_map.keys() | after_map.keys():
+        before, after, present = (
+            before_map.get(identity),
+            after_map.get(identity),
+            live_map.get(identity),
+        )
+        if before == after:
+            continue
+        if present != before and present != after:
+            raise ValueError(f"source/tool conflict for {identity}")
+        if after is None:
+            result.pop(identity, None)
+        else:
+            result[identity] = after
+    return sorted(result.values(), key=lambda item: item.id)
 
 
 class WorkspaceRepository:
@@ -48,11 +111,22 @@ class WorkspaceRepository:
             raise ValueError(".graph must not be a symlink")
         self.state.mkdir(exist_ok=True)
         self.snapshots = self.state / "snapshots"
+        self.manifest_path = self.state / "manifest.json"
+        self.index_path = self.state / "index.sqlite3"
+        self.lock_path = self.state / "lock"
+        self.assessment_path = self.state / "assessments.jsonl"
+        self.source_path = self.root / "model"
         self.snapshots.mkdir(exist_ok=True)
-        for name in ("snapshots", "manifest.json", "index.sqlite3", "lock", "assessments.jsonl"):
-            if (self.state / name).is_symlink():
+        for path in (
+            self.snapshots,
+            self.manifest_path,
+            self.index_path,
+            self.lock_path,
+            self.assessment_path,
+        ):
+            if path.is_symlink():
                 raise ValueError("symlinks forbidden in graph state")
-        self.db = sqlite3.connect(self.state / "index.sqlite3", check_same_thread=False)
+        self.db = sqlite3.connect(self.index_path, check_same_thread=False)
         self.db.executescript("""
           CREATE TABLE IF NOT EXISTS revisions(
             revision INTEGER PRIMARY KEY, document TEXT NOT NULL);
@@ -66,22 +140,17 @@ class WorkspaceRepository:
             PRIMARY KEY(revision,interceptor_id,target_id));
         """)
         with self.lock():
-            if not (self.state / "manifest.json").exists():
-                initial = {
-                    "revision": 0,
-                    "schema": EMPTY_SCHEMA,
-                    "nodes": [],
-                    "edges": [],
-                    "impact": [],
-                    "changes": [],
-                }
+            if not (self.manifest_path).exists():
+                initial = Snapshot(
+                    revision=0, schema=EMPTY_SCHEMA, nodes=[], edges=[], impact=[], changes=[]
+                )
                 self._write(self.snapshots / "0.json", canonical(initial))
-                self._write(self.state / "manifest.json", canonical({"revision": 0}))
+                self._write(self.manifest_path, canonical(Manifest(revision=0)))
             self._recover()
 
     @contextmanager
     def lock(self) -> Iterator[None]:
-        with (self.state / "lock").open("a") as stream:
+        with (self.lock_path).open("a") as stream:
             fcntl.flock(stream.fileno(), fcntl.LOCK_EX)
             try:
                 yield
@@ -105,59 +174,66 @@ class WorkspaceRepository:
             if os.path.exists(temporary):
                 os.unlink(temporary)
 
-    def current(self) -> Document:
-        manifest = json.loads((self.state / "manifest.json").read_text())
-        return {
-            **self.read_revision(int(manifest["revision"])),
-            **{k: v for k, v in manifest.items() if k.startswith("source_")},
-        }
+    def _manifest(self) -> Manifest:
+        return Manifest.model_validate_json((self.manifest_path).read_text())
 
-    def read_revision(self, revision: int) -> Document:
-        if revision < 0:
-            raise ValueError("revision must be nonnegative")
-        manifest = self.state / "manifest.json"
-        if manifest.exists() and revision > json.loads(manifest.read_text())["revision"]:
+    def current(self) -> Snapshot:
+        manifest = self._manifest()
+        return self.read_revision(manifest.revision).model_copy(
+            update={
+                "source_baseline": manifest.source_baseline,
+                "source_fingerprints": manifest.source_fingerprints,
+            }
+        )
+
+    def read_revision(self, revision: Revision) -> Snapshot:
+        if type(revision) is not int or revision < 0:
+            raise ValueError("revision must be a nonnegative integer")
+        manifest = self.manifest_path
+        if manifest.exists() and revision > self._manifest().revision:
             raise ValueError(f"uncommitted revision {revision}")
         path = self.snapshots / f"{revision}.json"
         if path.is_symlink():
             raise ValueError("snapshot symlinks are forbidden")
         if not path.exists():
             raise ValueError(f"unknown revision {revision}")
-        result: Document = json.loads(path.read_text())
-        return result
+        return Snapshot.model_validate_json(path.read_text())
 
     def _recover(self) -> None:
         current = self.current()
         with self.db:
             self.db.execute("DELETE FROM revisions")
-            for revision in range(current["revision"] + 1):
+            for revision in range(current.revision + 1):
                 doc = self.read_revision(revision)
                 self.db.execute("INSERT INTO revisions VALUES (?,?)", (revision, canonical(doc)))
             self.db.execute("DELETE FROM nodes")
             self.db.executemany(
                 "INSERT INTO nodes VALUES (?,?,?)",
-                [(n["id"], n["type"], canonical(n["properties"])) for n in current["nodes"]],
+                [(n.id, n.type, canonical(n.properties)) for n in current.nodes],
             )
             self.db.execute("DELETE FROM edges")
             self.db.executemany(
                 "INSERT INTO edges VALUES (?,?,?,?)",
-                [(e["id"], e["type"], e["source"], e["target"]) for e in current["edges"]],
+                [(e.id, e.type, e.source, e.target) for e in current.edges],
             )
             self.db.execute("DELETE FROM assessments")
-            log = self.state / "assessments.jsonl"
+            log = self.assessment_path
             if log.exists():
                 for line in log.read_text().splitlines():
-                    assessment = json.loads(line)
+                    assessment = Assessment.model_validate_json(line)
                     self._index_assessment(assessment)
 
-    def import_document(self) -> Document:
-        """Import schema.json/yaml plus model files; after apply, manifest is canonical."""
-        source = self.root / "model"
-        if not source.exists() and "source_baseline" not in self.current():
-            return self.current()
+    def import_document(self) -> Snapshot:
+        """Three-way reconcile authored fragments through canonical typed codecs."""
+        current = self.current()
+        source = self.source_path
+        if not source.exists() and current.source_baseline is None:
+            return current
         if source.is_symlink():
             raise ValueError("model directory must not be a symlink")
-        merged: Document = {"nodes": [], "edges": []}
+        schema: GraphSchema | None = None
+        nodes: list[Node] = []
+        edges: list[Edge] = []
         files: dict[str, str] = {}
         for path in sorted(source.rglob("*")):
             if path.is_symlink():
@@ -166,132 +242,96 @@ class WorkspaceRepository:
                 continue
             raw = path.read_text()
             files[str(path.relative_to(source))] = hashlib.sha256(raw.encode()).hexdigest()
-            blocks = [raw]
-            if path.suffix == ".md":
-                blocks = re.findall(r"\x60\x60\x60graph\s*\n(.*?)\x60\x60\x60", raw, re.S)
+            blocks = (
+                re.findall(r"```graph\s*\n(.*?)```", raw, re.S) if path.suffix == ".md" else [raw]
+            )
             for block in blocks:
                 data = json.loads(block) if path.suffix == ".json" else yaml.safe_load(block)
                 if not isinstance(data, dict):
                     raise ValueError(f"model document must be a mapping: {path.name}")
                 if isinstance(data.get("schema"), str):
                     data = {"schema": compile_schema(data)}
-                if set(data) - {"schema", "nodes", "edges"}:
-                    raise ValueError("unknown model document keys")
-                if "schema" in data:
-                    if "schema" in merged:
+                fragment = SourceFragment.model_validate(data)
+                if fragment.schema_definition is not None:
+                    if schema is not None:
                         raise ValueError("multiple schema sources")
-                    merged["schema"] = data["schema"]
-                merged["nodes"].extend(data.get("nodes", []))
-                merged["edges"].extend(data.get("edges", []))
-        current = self.current()
-        # Unchanged imported files must not overwrite subsequent tool-authored edits.
-        if files == current.get("source_fingerprints"):
+                    schema = fragment.schema_definition
+                nodes.extend(fragment.nodes)
+                edges.extend(fragment.edges)
+        if files == current.source_fingerprints:
             return current
-        merged["schema"] = merged.get("schema", current["schema"])
-        baseline = current.get(
-            "source_baseline", {"schema": EMPTY_SCHEMA, "nodes": [], "edges": []}
+        authored = ModelDocument(
+            schema=schema or current.schema_definition, nodes=nodes, edges=edges
         )
-        result: Document = {"source_fingerprints": files, "source_baseline": merged}
-        # Three-way reconcile authored imports against the last import and current
-        # canonical snapshot. Disjoint source/tool edits survive; overlap conflicts.
-        for kind in ("nodes", "edges"):
-
-            def keyed(items: list[Document]) -> dict[str, Document]:
-                mapping = {item["id"]: item for item in items}
-                if len(mapping) != len(items):
-                    raise ValueError("duplicate identities across sources")
-                return mapping
-
-            base, authored, live = (keyed(doc[kind]) for doc in (baseline, merged, current))
-            reconciled = dict(live)
-            for identity in base.keys() | authored.keys():
-                before, after, present = (
-                    base.get(identity),
-                    authored.get(identity),
-                    live.get(identity),
-                )
-                if before == after:
-                    continue
-                if present != before and present != after:
-                    raise ValueError(f"source/tool conflict for {kind}/{identity}")
-                if after is None:
-                    reconciled.pop(identity, None)
-                else:
-                    reconciled[identity] = after
-            result[kind] = sorted(reconciled.values(), key=lambda item: item["id"])
-        if merged["schema"] != baseline["schema"]:
-            if current["schema"] not in (baseline["schema"], merged["schema"]):
+        baseline = current.source_baseline or ModelDocument(schema=EMPTY_SCHEMA, nodes=[], edges=[])
+        resulting_schema = current.schema_definition
+        if authored.schema_definition != baseline.schema_definition:
+            if current.schema_definition not in (
+                baseline.schema_definition,
+                authored.schema_definition,
+            ):
                 raise ValueError("source/tool schema conflict")
-            result["schema"] = merged["schema"]
-        else:
-            result["schema"] = current["schema"]
-        return result
+            resulting_schema = authored.schema_definition
+        return Snapshot(
+            revision=current.revision,
+            schema=resulting_schema,
+            nodes=reconcile(baseline.nodes, authored.nodes, current.nodes),
+            edges=reconcile(baseline.edges, authored.edges, current.edges),
+            impact=[],
+            changes=[],
+            source_baseline=authored,
+            source_fingerprints=files,
+        )
 
-    def accept_import(self, document: Document, expected_revision: int) -> None:
+    def accept_import(self, document: Snapshot, expected_revision: Revision) -> None:
         with self.lock():
-            if self.current()["revision"] != expected_revision:
+            if self.current().revision != expected_revision:
                 raise ValueError("revision conflict")
-            manifest = {
-                "revision": expected_revision,
-                **{k: v for k, v in document.items() if k.startswith("source_")},
-            }
-            self._write(self.state / "manifest.json", canonical(manifest))
+            self._write(self.manifest_path, canonical(manifest_for(document)))
 
-    def commit(self, document: Document, expected_revision: int) -> Document:
+    def commit(self, document: Snapshot, expected_revision: Revision) -> Snapshot:
         with self.lock():
             current = self.current()
-            if current["revision"] != expected_revision:
+            if current.revision != expected_revision:
                 raise ValueError(
-                    f"revision conflict: expected {expected_revision}, current "
-                    f"{current['revision']}"
+                    f"revision conflict: expected {expected_revision}, current {current.revision}"
                 )
-            revision = expected_revision + 1
-            result = {**document, "revision": revision}
-            self._write(self.snapshots / f"{revision}.json", canonical(result))
-            self._write(
-                self.state / "manifest.json",
-                canonical(
-                    {
-                        "revision": revision,
-                        **{k: v for k, v in result.items() if k.startswith("source_")},
-                    }
-                ),
-            )
+            result = document.model_copy(update={"revision": expected_revision + 1})
+            self._write(self.snapshots / f"{result.revision}.json", canonical(result))
+            self._write(self.manifest_path, canonical(manifest_for(result)))
             self._index_delta(current, result)
             return result
 
-    def _index_delta(self, old: Document, new: Document) -> None:
+    def _index_delta(self, old: Snapshot, new: Snapshot) -> None:
         with self.db:
             self.db.execute(
-                "INSERT OR REPLACE INTO revisions VALUES (?,?)", (new["revision"], canonical(new))
+                "INSERT OR REPLACE INTO revisions VALUES (?,?)", (new.revision, canonical(new))
             )
-            for kind in ("nodes", "edges"):
-                before = {item["id"]: item for item in old[kind]}
-                after = {item["id"]: item for item in new[kind]}
-                # Table names are fixed application constants, never tool input.
-                for identity in before.keys() - after.keys():
-                    self.db.execute(f"DELETE FROM {kind} WHERE id=?", (identity,))
-                for identity, item in after.items():
-                    if before.get(identity) == item:
-                        continue
-                    if kind == "nodes":
-                        self.db.execute(
-                            "INSERT OR REPLACE INTO nodes VALUES (?,?,?)",
-                            (identity, item["type"], canonical(item["properties"])),
-                        )
-                    else:
-                        self.db.execute(
-                            "INSERT OR REPLACE INTO edges VALUES (?,?,?,?)",
-                            (identity, item["type"], item["source"], item["target"]),
-                        )
+            old_nodes, new_nodes = ({node.id: node for node in doc.nodes} for doc in (old, new))
+            for identity in old_nodes.keys() - new_nodes.keys():
+                self.db.execute("DELETE FROM nodes WHERE id=?", (identity,))
+            for identity, node in new_nodes.items():
+                if old_nodes.get(identity) != node:
+                    self.db.execute(
+                        "INSERT OR REPLACE INTO nodes VALUES (?,?,?)",
+                        (node.id, node.type, canonical(node.properties)),
+                    )
+            old_edges, new_edges = ({edge.id: edge for edge in doc.edges} for doc in (old, new))
+            for identity in old_edges.keys() - new_edges.keys():
+                self.db.execute("DELETE FROM edges WHERE id=?", (identity,))
+            for identity, edge in new_edges.items():
+                if old_edges.get(identity) != edge:
+                    self.db.execute(
+                        "INSERT OR REPLACE INTO edges VALUES (?,?,?,?)",
+                        (edge.id, edge.type, edge.source, edge.target),
+                    )
 
     def search_nodes(
-        self, node_type: str | None, where: Document, text: str, limit: int
-    ) -> Document:
+        self, node_type: Identifier | None, where: JsonObject, text: str, limit: int
+    ) -> SearchResult:
         with self.lock():
-            # A different process or a post-manifest crash can leave this projection behind.
             indexed = self.db.execute("SELECT MAX(revision) FROM revisions").fetchone()[0]
-            if indexed != self.current()["revision"]:
+            if indexed != self.current().revision:
                 self._recover()
             sql = "SELECT id,type,properties FROM nodes"
             parameters: tuple[str, ...] = ()
@@ -299,47 +339,52 @@ class WorkspaceRepository:
                 sql += " WHERE type=?"
                 parameters = (node_type,)
             sql += " ORDER BY id"
-            result: list[Document] = []
+            result: list[Node] = []
             for identity, kind, raw in self.db.execute(sql, parameters):
-                node = {"id": identity, "type": kind, "properties": json.loads(raw)}
+                node = Node(id=identity, type=kind, properties=json.loads(raw))
                 if not all(
-                    k in node["properties"] and node["properties"][k] == v for k, v in where.items()
+                    k in node.properties and node.properties[k] == v for k, v in where.items()
                 ):
                     continue
-                if text and text.casefold() not in json.dumps(node, sort_keys=True).casefold():
+                if (
+                    text
+                    and text.casefold()
+                    not in json.dumps(dump_wire(node), sort_keys=True).casefold()
+                ):
                     continue
                 result.append(node)
                 if len(result) == limit:
                     break
-            return {"revision": self.current()["revision"], "nodes": result}
+            return SearchResult(revision=self.current().revision, nodes=result)
 
-    def _index_assessment(self, assessment: Document) -> None:
+    def _index_assessment(self, assessment: Assessment) -> None:
         self.db.execute(
             "INSERT OR REPLACE INTO assessments VALUES (?,?,?,?)",
             (
-                assessment["revision"],
-                assessment["interceptor_id"],
-                assessment["target_id"],
+                assessment.revision,
+                assessment.interceptor_id,
+                assessment.target_id,
                 canonical(assessment),
             ),
         )
 
-    def record_assessment(self, assessment: Document) -> None:
+    def record_assessment(self, assessment: Assessment) -> None:
         with self.lock():
-            log = self.state / "assessments.jsonl"
-            if assessment["state"] == "pending" and log.exists():
-                identity = ("revision", "interceptor_id", "target_id")
-                existing = (json.loads(line) for line in log.read_text().splitlines())
-                if any(all(item[k] == assessment[k] for k in identity) for item in existing):
+            log = self.assessment_path
+            if assessment.state == AssessmentState.PENDING and log.exists():
+                existing = (
+                    Assessment.model_validate_json(line) for line in log.read_text().splitlines()
+                )
+                if any(item.key == assessment.key for item in existing):
                     return
             contents = log.read_text() if log.exists() else ""
             self._write(log, contents + canonical(assessment) + "\n")
             with self.db:
                 self._index_assessment(assessment)
 
-    def assessments(self, revision: int) -> list[Document]:
+    def assessments(self, revision: Revision) -> list[Assessment]:
         return [
-            json.loads(row[0])
+            Assessment.model_validate_json(row[0])
             for row in self.db.execute(
                 "SELECT payload FROM assessments WHERE revision=? "
                 "ORDER BY interceptor_id,target_id",
@@ -347,8 +392,52 @@ class WorkspaceRepository:
             )
         ]
 
+    def close(self) -> None:
+        self.db.close()
+
+    def specification_token(self) -> SpecificationToken:
+        """Cheap filesystem token; projection semantics never depend on timestamps."""
+        manifest = self.manifest_path.stat()
+        if self.assessment_path.exists():
+            assessment = self.assessment_path.stat()
+            return (
+                f"{manifest.st_mtime_ns}:{manifest.st_size}:"
+                f"{assessment.st_mtime_ns}:{assessment.st_size}"
+            )
+        return f"{manifest.st_mtime_ns}:{manifest.st_size}:0:0"
+
+    def specification_state(self) -> SpecificationState:
+        """Read one snapshot and latest recorded assessments, retaining original revisions.
+
+        An unrelated commit must not erase unresolved findings. Older records remain
+        explicitly stale in the reader, never carried forward as current verification.
+        MCP revision-specific retrieval is intentionally unchanged.
+        """
+        with self.lock():
+            snapshot = self.current()
+            # Read the authoritative assessment log, not a possibly lagging SQLite projection.
+            latest: dict[tuple[Identifier, Identifier], Assessment] = {}
+            if self.assessment_path.exists():
+                for line in self.assessment_path.read_text().splitlines():
+                    assessment = Assessment.model_validate_json(line)
+                    if assessment.revision > snapshot.revision:
+                        continue
+                    subject = assessment.interceptor_id, assessment.target_id
+                    prior = latest.get(subject)
+                    # A late completion for an old revision must not replace a newer
+                    # pending/completed record. Same-revision append order is authoritative.
+                    if prior is None or assessment.revision >= prior.revision:
+                        latest[subject] = assessment
+            return SpecificationState(
+                snapshot=snapshot, assessments=[latest[key] for key in sorted(latest)]
+            )
+
 
 def open_service(workspace: Path) -> GraphService:
     from typed_graph.application.service import GraphService
+    from typed_graph.architecture.tools import ArchitectureTools
+    from typed_graph.architecture.validation import validate_architecture
 
-    return GraphService(WorkspaceRepository(workspace))
+    return GraphService(
+        WorkspaceRepository(workspace), (validate_architecture,), (ArchitectureTools(),)
+    )

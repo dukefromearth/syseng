@@ -54,6 +54,9 @@ types are not hardcoded by the engine.
   canonical JSON; missing values are not silently skipped.
 - `requires_edge` invariant:
   `{"kind":"requires_edge","node_type":"Item","relation":"depends_on","direction":"out","min":1}`.
+  The node type must be a legal endpoint for the selected relation direction, and
+  the required minimum cannot exceed that direction's declared maximum cardinality.
+  Contradictory declarations are rejected even before any nodes are authored.
   Direction defaults to `out`; `min` defaults to 1.
 - No arbitrary expressions, SQL invariants, scripts, or general-purpose rule
   language are accepted. Unknown schema fields and invariant kinds fail closed.

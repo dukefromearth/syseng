@@ -1,359 +1,407 @@
-"""Deterministic use cases, depending only on domain and IO ports."""
+"""Typed graph use cases. Wire codecs live at the public dispatch boundary."""
 
 from __future__ import annotations
 
-import copy
 import hashlib
+import inspect
 import json
 from collections import deque
-from typing import Any
-from urllib.parse import unquote
+from collections.abc import Callable
+from typing import cast, get_type_hints
 
 from jsonschema import Draft202012Validator
+from jsonschema.exceptions import ValidationError
 from referencing import Registry
 
-from typed_graph.application.ports import Document, Repository
-from typed_graph.domain.engine import apply_operations, compute_impact, validate_graph
-from typed_graph.domain.schema import validate_schema
+from typed_graph.application.contracts import (
+    TOOL_CATALOG,
+    ApplyRequest,
+    AssessmentsRequest,
+    AssessmentsResult,
+    AssessmentSubmissionResult,
+    CompareRequest,
+    CompareResult,
+    DetectResult,
+    Diff,
+    EmptyRequest,
+    GraphSchemaResult,
+    ImpactResourceResult,
+    NodeResourceResult,
+    QueryRequest,
+    SearchRequest,
+    SearchResult,
+    SubmitAssessmentRequest,
+    ToolSpec,
+    TraceRequest,
+    TraceResult,
+    tool_spec,
+    validate_request,
+    validate_response,
+)
+from typed_graph.application.ports import PublicationValidator, Repository, ToolExtension
+from typed_graph.domain.engine import (
+    apply_typed_operations,
+    changed_node_ids,
+    compute_typed_impact,
+    dependency_adjacency,
+    validate_typed_graph,
+)
+from typed_graph.domain.models import (
+    ApplyResult,
+    Assessment,
+    AssessmentResult,
+    AssessmentState,
+    AssessmentStatus,
+    AssessmentView,
+    Edge,
+    GraphSchema,
+    HistoryChange,
+    Identifier,
+    ImpactContext,
+    ImportChange,
+    JsonObject,
+    Node,
+    Revision,
+    Snapshot,
+    StrictModel,
+    assessment_key,
+    dump_wire,
+)
+from typed_graph.domain.resources import ResourceURI
+from typed_graph.domain.schema import validate_typed_schema
 
 
-def fingerprint(value: Any) -> str:
-    return hashlib.sha256(json.dumps(value, sort_keys=True).encode()).hexdigest()
+def fingerprint(value: StrictModel | list[str | int]) -> str:
+    data = dump_wire(value) if isinstance(value, StrictModel) else value
+    return hashlib.sha256(json.dumps(data, sort_keys=True).encode()).hexdigest()
+
+
+def changed_entities(old: Snapshot, new: Snapshot) -> list[Identifier]:
+    return changed_node_ids(old.nodes, old.edges, new.nodes, new.edges)
+
+
+def entity_diff[T: Node | Edge](old: list[T], new: list[T]) -> Diff:
+    before, after = ({item.id: item for item in items} for items in (old, new))
+    return Diff(
+        added=sorted(after.keys() - before.keys()),
+        removed=sorted(before.keys() - after.keys()),
+        updated=sorted(key for key in before.keys() & after.keys() if before[key] != after[key]),
+    )
 
 
 class GraphService:
-    def __init__(self, store: Repository):
+    def __init__(
+        self,
+        store: Repository,
+        publication_validators: tuple[PublicationValidator, ...] = (),
+        tool_extensions: tuple[ToolExtension, ...] = (),
+    ):
         self.store = store
+        self.publication_validators = publication_validators
+        self.tool_extensions = tool_extensions
+        # Fail at composition time if an extension's declared contract and use case drift.
+        for spec in TOOL_CATALOG.values():
+            handler = getattr(self, spec.handler_name, None)
+            if not callable(handler):
+                raise TypeError(f"Missing tool handler: {spec.name}")
+            parameters = list(inspect.signature(handler).parameters.values())
+            hints = get_type_hints(handler)
+            if (
+                len(parameters) != 1
+                or hints.get(parameters[0].name) is not spec.request_model
+                or hints.get("return") is not spec.result_model
+            ):
+                raise TypeError(f"Tool contract/handler signature mismatch: {spec.name}")
 
     @property
-    def schema(self) -> Document:
-        return dict(self.store.current()["schema"])
+    def schema(self) -> JsonObject:
+        return dump_wire(self.store.current().schema_definition)
 
     @property
-    def revision(self) -> int:
-        return int(self.store.current()["revision"])
+    def revision(self) -> Revision:
+        return self.store.current().revision
 
-    def dispatch(self, tool: str, args: Document) -> Document:
-        handlers = {
-            "index_model": self.index_model,
-            "get_graph_schema": self.get_graph_schema,
-            "apply_changes": self.apply_changes,
-            "detect_changes": self.detect_changes,
-            "search_graph": self.search_graph,
-            "query_graph": self.query_graph,
-            "trace_path": self.trace_path,
-            "compare_graphs": self.compare_graphs,
-            "get_assessments": self.get_assessments,
-            "submit_assessment": self.submit_assessment,
-        }
-        if tool not in handlers:
-            raise ValueError(f"unknown tool {tool}")
-        return handlers[tool](args)
+    @property
+    def tool_catalog(self) -> dict[str, ToolSpec]:
+        return self._catalog_for(self.store.current().schema_definition)
 
-    def get_graph_schema(self, args: Document) -> Document:
+    def _catalog_for(self, schema: GraphSchema) -> dict[str, ToolSpec]:
+        catalog = dict(TOOL_CATALOG)
+        for extension in self.tool_extensions:
+            for name, spec in extension.catalog(schema).items():
+                if name in catalog:
+                    raise ValueError(f"Duplicate extension tool: {name}")
+                catalog[name] = spec
+        return catalog
+
+    def dispatch(self, tool: str, args: JsonObject) -> JsonObject:
+        schema = self.store.current().schema_definition
+        catalog = self._catalog_for(schema)
+        spec = tool_spec(tool, catalog)
+        request = validate_request(tool, args, dump_wire(schema), catalog)
+        if tool in TOOL_CATALOG:
+            handler = cast(Callable[[StrictModel], StrictModel], getattr(self, spec.handler_name))
+            result = handler(request)
+        else:
+            extension = next(
+                module for module in self.tool_extensions if tool in module.catalog(schema)
+            )
+            result = self.apply_changes(extension.build(tool, request))
+        return dump_wire(validate_response(tool, result, catalog))
+
+    def get_graph_schema(self, args: EmptyRequest) -> GraphSchemaResult:
         document = self.store.current()
-        return {"revision": document["revision"], "schema": document["schema"]}
+        return GraphSchemaResult(revision=document.revision, schema=document.schema_definition)
 
-    def _validate(self, document: Document) -> None:
-        validate_schema(document["schema"])
-        validate_graph(document["schema"], document["nodes"], document["edges"])
+    def _validate(self, document: Snapshot) -> None:
+        validate_typed_schema(document.schema_definition)
+        validate_typed_graph(document.schema_definition, document.nodes, document.edges)
+        for validator in self.publication_validators:
+            validator(document)
 
     def _commit(
-        self, old: Document, new: Document, changes: list[Document], changed: list[str]
-    ) -> Document:
+        self, old: Snapshot, new: Snapshot, changes: list[HistoryChange], changed: list[Identifier]
+    ) -> ApplyResult:
         self._validate(new)
-        revision = old["revision"] + 1
-        impact = compute_impact(
-            old["schema"],
-            new["schema"],
-            old["nodes"],
-            old["edges"],
-            new["nodes"],
-            new["edges"],
+        revision = old.revision + 1
+        impact = compute_typed_impact(
+            old.schema_definition,
+            new.schema_definition,
+            old.nodes,
+            old.edges,
+            new.nodes,
+            new.edges,
             changed,
             revision,
         )
-        new.update({"impact": impact, "changes": changes})
-        committed = self.store.commit(new, old["revision"])
-        self._schedule(committed)
-        return {"revision": revision, "applied_changes": changes, "invalidations": impact}
-
-    def index_model(self, args: Document) -> Document:
-        old = self.store.current()
-        new = self.store.import_document()
-        self._validate(new)
-        changed = self._changed(old, new)
-        if not changed and old["schema"] == new["schema"]:
-            self.store.accept_import(new, old["revision"])
-            return {"revision": old["revision"], "applied_changes": [], "invalidations": []}
-        if old["schema"] != new["schema"]:
-            changed = sorted({n["id"] for n in old["nodes"] + new["nodes"]})
-        return self._commit(old, new, [{"op": "import"}], changed)
-
-    def apply_changes(self, args: Document) -> Document:
-        old = self.store.current()
-        if args["expected_revision"] != old["revision"]:
-            raise ValueError("revision conflict")
-        nodes, edges, changed = apply_operations(
-            old["schema"], old["nodes"], old["edges"], args["changes"]
+        committed = self.store.commit(
+            new.model_copy(update={"impact": impact, "changes": changes}), old.revision
         )
-        changed = self._changed(old, {"nodes": nodes, "edges": edges})
-        if not changed:
-            return {"revision": old["revision"], "applied_changes": [], "invalidations": []}
-        new = {**copy.deepcopy(old), "nodes": nodes, "edges": edges}
-        return self._commit(old, new, args["changes"], changed)
+        self._schedule(committed)
+        return ApplyResult(revision=revision, applied_changes=changes, invalidations=impact)
 
-    def _changed(self, old: Document, new: Document) -> list[str]:
-        before = {n["id"]: n for n in old["nodes"]}
-        after = {n["id"]: n for n in new["nodes"]}
-        changed = {key for key in before.keys() | after.keys() if before.get(key) != after.get(key)}
-        a = {e["id"]: e for e in old["edges"]}
-        b = {e["id"]: e for e in new["edges"]}
-        for key in a.keys() | b.keys():
-            if a.get(key) != b.get(key):
-                for edge in (a.get(key), b.get(key)):
-                    if edge:
-                        changed.update((edge["source"], edge["target"]))
-        return sorted(changed)
-
-    def detect_changes(self, args: Document) -> Document:
+    def index_model(self, args: EmptyRequest) -> ApplyResult:
         old, new = self.store.current(), self.store.import_document()
         self._validate(new)
-        changed = self._changed(old, new)
-        if old["schema"] != new["schema"]:
-            changed = sorted({n["id"] for n in old["nodes"] + new["nodes"]})
-        impact = compute_impact(
-            old["schema"],
-            new["schema"],
-            old["nodes"],
-            old["edges"],
-            new["nodes"],
-            new["edges"],
-            changed,
-            old["revision"] + 1,
+        changed = changed_entities(old, new)
+        if not changed and old.schema_definition == new.schema_definition:
+            self.store.accept_import(new, old.revision)
+            return ApplyResult(revision=old.revision, applied_changes=[], invalidations=[])
+        if old.schema_definition != new.schema_definition:
+            changed = sorted({node.id for node in old.nodes + new.nodes})
+        return self._commit(old, new, [ImportChange(op="import")], changed)
+
+    def apply_changes(self, args: ApplyRequest) -> ApplyResult:
+        old = self.store.current()
+        if args.expected_revision != old.revision:
+            raise ValueError("revision conflict")
+        nodes, edges, changed = apply_typed_operations(
+            old.schema_definition, old.nodes, old.edges, args.changes
         )
-        return {
-            "revision": old["revision"],
-            "changed_nodes": changed,
-            "schema_changed": old["schema"] != new["schema"],
-            "preview_revision": old["revision"] + 1,
-            "impact": impact,
-        }
+        if not changed:
+            return ApplyResult(revision=old.revision, applied_changes=[], invalidations=[])
+        new = old.model_copy(update={"nodes": nodes, "edges": edges}, deep=True)
+        return self._commit(old, new, list(args.changes), changed)
 
-    def query_graph(self, args: Document) -> Document:
-        if set(args) - {"type", "where", "limit"}:
-            raise ValueError("query accepts only type, where equality filters, and limit")
-        limit = args.get("limit", 100)
-        if not isinstance(limit, int) or not 1 <= limit <= 1000:
-            raise ValueError("limit must be 1..1000")
-        where = args.get("where", {})
-        if not isinstance(where, dict):
-            raise ValueError("where must be a property-equality mapping")
-        return self.store.search_nodes(args.get("type"), where, "", limit)
+    def detect_changes(self, args: EmptyRequest) -> DetectResult:
+        old, new = self.store.current(), self.store.import_document()
+        self._validate(new)
+        changed = changed_entities(old, new)
+        if old.schema_definition != new.schema_definition:
+            changed = sorted({node.id for node in old.nodes + new.nodes})
+        impact = compute_typed_impact(
+            old.schema_definition,
+            new.schema_definition,
+            old.nodes,
+            old.edges,
+            new.nodes,
+            new.edges,
+            changed,
+            old.revision + 1,
+        )
+        return DetectResult(
+            revision=old.revision,
+            changed_nodes=changed,
+            schema_changed=old.schema_definition != new.schema_definition,
+            preview_revision=old.revision + 1,
+            impact=impact,
+        )
 
-    def search_graph(self, args: Document) -> Document:
-        limit = args.get("limit", 100)
-        if type(limit) is not int or not 1 <= limit <= 1000:
-            raise ValueError("limit must be 1..1000")
-        return self.store.search_nodes(args.get("type"), {}, str(args.get("text", "")), limit)
+    def query_graph(self, args: QueryRequest) -> SearchResult:
+        return self.store.search_nodes(args.type, args.where, "", args.limit)
 
-    def trace_path(self, args: Document) -> Document:
-        doc = self.store.current()
-        ids = {n["id"] for n in doc["nodes"]}
-        source, target = args["source"], args["target"]
-        if source not in ids or target not in ids:
+    def search_graph(self, args: SearchRequest) -> SearchResult:
+        return self.store.search_nodes(args.type, {}, args.text, args.limit)
+
+    def trace_path(self, args: TraceRequest) -> TraceResult:
+        document = self.store.current()
+        ids = {node.id for node in document.nodes}
+        if args.source not in ids or args.target not in ids:
             raise ValueError("unknown endpoint")
-        depth = args.get("max_depth", 20)
-        if type(depth) is not int or not 0 <= depth <= 100:
-            raise ValueError("max_depth must be 0..100")
-        mode = args.get("mode", "semantic")
-        if mode not in {"semantic", "dependency"}:
-            raise ValueError("mode must be semantic or dependency")
-        relation = args.get("relation")
-        if relation is not None and (
-            not isinstance(relation, str) or relation not in doc["schema"]["relations"]
-        ):
+        if args.relation is not None and args.relation not in document.schema_definition.relations:
             raise ValueError("unknown relation")
-        adjacency: dict[str, set[str]] = {}
-        for edge in doc["edges"]:
-            if relation is not None and edge["type"] != relation:
-                continue
-            impact = doc["schema"]["relations"][edge["type"]]["impact"]
-            if mode == "semantic" or impact in {"source_to_target", "both"}:
-                adjacency.setdefault(edge["source"], set()).add(edge["target"])
-            if mode == "dependency" and impact in {"target_to_source", "both"}:
-                adjacency.setdefault(edge["target"], set()).add(edge["source"])
-        queue = deque([[source]])
-        seen = {source}
+        adjacency: dict[Identifier, set[Identifier]]
+        if args.mode == "dependency":
+            adjacency = dependency_adjacency(
+                document.schema_definition, document.edges, args.relation
+            )
+        else:
+            adjacency = {}
+            for edge in document.edges:
+                if args.relation is None or edge.type == args.relation:
+                    adjacency.setdefault(edge.source, set()).add(edge.target)
+        queue = deque([[args.source]])
+        seen = {args.source}
         while queue:
             path = queue.popleft()
-            if path[-1] == target:
-                return {"revision": doc["revision"], "path": path}
-            if len(path) - 1 >= depth:
+            if path[-1] == args.target:
+                return TraceResult(revision=document.revision, path=path)
+            if len(path) > args.max_depth:
                 continue
-            for endpoint in sorted(adjacency.get(path[-1], set())):
-                if endpoint not in seen:
-                    seen.add(endpoint)
-                    queue.append([*path, endpoint])
-        return {"revision": doc["revision"], "path": []}
+            for target in sorted(adjacency.get(path[-1], set())):
+                if target not in seen:
+                    seen.add(target)
+                    queue.append([*path, target])
+        return TraceResult(revision=document.revision, path=[])
 
-    def compare_graphs(self, args: Document) -> Document:
-        old = self.store.read_revision(args["from_revision"])
-        new = self.store.read_revision(args["to_revision"])
-        result: Document = {
-            "from_revision": old["revision"],
-            "to_revision": new["revision"],
-            "schema_changed": old["schema"] != new["schema"],
-        }
-        for kind in ("nodes", "edges"):
-            a, b = ({n["id"]: n for n in doc[kind]} for doc in (old, new))
-            result[kind] = {
-                "added": sorted(b.keys() - a.keys()),
-                "removed": sorted(a.keys() - b.keys()),
-                "updated": sorted(k for k in a.keys() & b.keys() if a[k] != b[k]),
-            }
-        return result
+    def compare_graphs(self, args: CompareRequest) -> CompareResult:
+        old, new = (
+            self.store.read_revision(revision)
+            for revision in (args.from_revision, args.to_revision)
+        )
+        return CompareResult(
+            from_revision=old.revision,
+            to_revision=new.revision,
+            schema_changed=old.schema_definition != new.schema_definition,
+            nodes=entity_diff(old.nodes, new.nodes),
+            edges=entity_diff(old.edges, new.edges),
+        )
 
-    def _schedule(self, document: Document) -> None:
-        nodes = {n["id"]: n for n in document["nodes"]}
-        recorded = {
-            (a["interceptor_id"], a["target_id"])
-            for a in self.store.assessments(document["revision"])
-        }
-        for impact in document["impact"]:
-            node = nodes.get(impact["node_id"])
+    def _schedule(self, document: Snapshot) -> None:
+        nodes = {node.id: node for node in document.nodes}
+        recorded = {assessment.key for assessment in self.store.assessments(document.revision)}
+        for impact in document.impact:
+            node = nodes.get(impact.node_id)
             if node is None:
                 continue
-            for interceptor in document["schema"].get("interceptors", []):
-                key = (interceptor["id"], node["id"])
-                if interceptor["target_type"] != node["type"] or key in recorded:
+            for interceptor in document.schema_definition.interceptors:
+                key = assessment_key(document.revision, interceptor.id, node.id)
+                if interceptor.target_type != node.type or key in recorded:
                     continue
-                assessment = {
-                    "revision": document["revision"],
-                    "interceptor_id": interceptor["id"],
-                    "target_id": node["id"],
-                    "handler_version": interceptor["version"],
-                    "target_fingerprint": fingerprint(node),
-                    "state": "pending",
-                    "result": {"status": "indeterminate", "findings": [], "evidence": []},
-                    "context": {
-                        "target": node,
-                        "impact": impact,
-                        "triggering_revision": document["revision"],
-                        "changes": document["changes"],
-                        "handler_version": interceptor["version"],
-                        "invocation_id": fingerprint(
-                            [document["revision"], interceptor["id"], node["id"]]
-                        ),
-                    },
-                }
+                assessment = Assessment(
+                    revision=document.revision,
+                    interceptor_id=interceptor.id,
+                    target_id=node.id,
+                    handler_version=interceptor.version,
+                    target_fingerprint=fingerprint(node),
+                    state=AssessmentState.PENDING,
+                    result=AssessmentResult(
+                        status=AssessmentStatus.INDETERMINATE, findings=[], evidence=[]
+                    ),
+                    context=ImpactContext(
+                        target=node,
+                        impact=impact,
+                        triggering_revision=document.revision,
+                        changes=document.changes,
+                        handler_version=interceptor.version,
+                        invocation_id=fingerprint(list(key)),
+                    ),
+                )
                 self.store.record_assessment(assessment)
-                recorded.add(key)
+                recorded.add(assessment.key)
 
-    def submit_assessment(self, args: Document) -> Document:
-        revision = args["revision"]
-        doc = self.store.read_revision(revision)
-        self._schedule(doc)
-        matches = [
-            a
-            for a in self.store.assessments(revision)
-            if a["interceptor_id"] == args["interceptor_id"] and a["target_id"] == args["target_id"]
-        ]
-        if not matches:
-            raise ValueError("assessment was not scheduled for this revision/target/interceptor")
-        assessment = matches[0]
+    def submit_assessment(self, args: SubmitAssessmentRequest) -> AssessmentSubmissionResult:
+        document = self.store.read_revision(args.revision)
+        self._schedule(document)
+        assessment = self._assessment(args.revision, args.interceptor_id, args.target_id)
         interceptor = next(
-            i for i in doc["schema"]["interceptors"] if i["id"] == args["interceptor_id"]
+            item
+            for item in document.schema_definition.interceptors
+            if item.id == args.interceptor_id
         )
-        result = args["result"]
-        Draft202012Validator(
-            {
-                "type": "object",
-                "required": ["status", "findings", "evidence"],
-                "additionalProperties": False,
-                "properties": {
-                    "status": {"enum": ["pass", "fail", "indeterminate"]},
-                    "findings": {"type": "array", "items": {"type": "object"}},
-                    "evidence": {
-                        "type": "array",
-                        "items": {
-                            "type": "object",
-                            "required": ["obligation", "uri"],
-                            "properties": {
-                                "obligation": {"type": "string"},
-                                "uri": {"type": "string", "minLength": 1},
-                            },
-                        },
-                    },
-                },
-            }
-        ).validate(result)
-        if interceptor.get("result_schema"):
-            Draft202012Validator(interceptor["result_schema"], registry=Registry()).validate(result)
-        supplied = {e["obligation"] for e in result["evidence"]}
-        required = set(interceptor.get("evidence_required", []))
-        if result["status"] == "pass" and (not required or not required <= supplied):
+        if interceptor.result_schema is not None:
+            try:
+                Draft202012Validator(interceptor.result_schema, registry=Registry()).validate(
+                    dump_wire(args.result)
+                )
+            except ValidationError as error:
+                raise ValueError(error.message) from error
+        supplied = {entry.obligation for entry in args.result.evidence}
+        required = set(interceptor.evidence_required)
+        if args.result.status == AssessmentStatus.PASS and (
+            not required or not required <= supplied
+        ):
             raise ValueError("pass requires declared evidence obligations and matching evidence")
-        assessment = {**assessment, "state": "completed", "result": result}
+        assessment = assessment.model_copy(
+            update={"state": AssessmentState.COMPLETED, "result": args.result}
+        )
         self.store.record_assessment(assessment)
-        return {"assessment": self._freshness(assessment)}
+        return AssessmentSubmissionResult(assessment=self._freshness(assessment))
+
+    def _assessment(
+        self, revision: Revision, interceptor_id: Identifier, target_id: Identifier
+    ) -> Assessment:
+        for assessment in self.store.assessments(revision):
+            if assessment.interceptor_id == interceptor_id and assessment.target_id == target_id:
+                return assessment
+        raise ValueError("assessment was not scheduled for this revision/target/interceptor")
 
     def record_handler_failure(
-        self, revision: int, interceptor_id: str, target_id: str, error: str
-    ) -> Document:
-        matches = [
-            a
-            for a in self.store.assessments(revision)
-            if a["interceptor_id"] == interceptor_id and a["target_id"] == target_id
-        ]
-        if not matches:
-            raise ValueError("unknown scheduled handler")
-        assessment = {
-            **matches[0],
-            "state": "completed",
-            "result": {"status": "indeterminate", "findings": [{"error": error}], "evidence": []},
-            "framework_failure": True,
-        }
+        self, revision: Revision, interceptor_id: Identifier, target_id: Identifier, error: str
+    ) -> AssessmentSubmissionResult:
+        assessment = self._assessment(revision, interceptor_id, target_id).model_copy(
+            update={
+                "state": AssessmentState.COMPLETED,
+                "result": AssessmentResult(
+                    status=AssessmentStatus.INDETERMINATE, findings=[{"error": error}], evidence=[]
+                ),
+                "framework_failure": True,
+            }
+        )
         self.store.record_assessment(assessment)
-        return {"assessment": self._freshness(assessment)}
+        return AssessmentSubmissionResult(assessment=self._freshness(assessment))
 
-    def _freshness(self, assessment: Document) -> Document:
-        # Freshness is revision-specific, including dependencies and handler/schema edits.
-        return {**assessment, "stale": assessment["revision"] != self.revision}
+    def _freshness(self, assessment: Assessment) -> AssessmentView:
+        return AssessmentView.model_validate(
+            {**dump_wire(assessment), "stale": assessment.revision != self.revision}
+        )
 
-    def get_assessments(self, args: Document) -> Document:
-        revision = args.get("revision", self.revision)
-        doc = self.store.read_revision(revision)
-        self._schedule(doc)
-        return {
-            "revision": revision,
-            "assessments": [self._freshness(a) for a in self.store.assessments(revision)],
-        }
+    def get_assessments(self, args: AssessmentsRequest) -> AssessmentsResult:
+        revision = self.revision if args.revision is None else args.revision
+        document = self.store.read_revision(revision)
+        self._schedule(document)
+        return AssessmentsResult(
+            revision=revision,
+            assessments=[
+                self._freshness(assessment) for assessment in self.store.assessments(revision)
+            ],
+        )
 
-    def resource(self, uri: str) -> Document:
-        prefix = "graph://model/"
-        if not uri.startswith(prefix):
-            raise ValueError("unknown resource")
-        path = uri[len(prefix) :]
-        if path == "schema":
-            return self.get_graph_schema({})
-        kind, separator, value = path.partition("/")
-        if not separator or "/" in value:
-            raise ValueError("unknown resource")
-        if kind == "nodes":
-            document = self.store.current()
-            node = next((n for n in document["nodes"] if n["id"] == unquote(value)), None)
-            if node is None:
-                raise ValueError("unknown node")
-            return {"revision": document["revision"], "node": node}
-        if not value.isdecimal():
-            raise ValueError("revision must be nonnegative integer")
-        revision = int(value)
-        if kind == "assessments":
-            return self.get_assessments({"revision": revision})
-        doc = self.store.read_revision(revision)
-        if kind == "revisions":
-            return doc
-        if kind == "impact":
-            return {"revision": revision, "impact": doc["impact"]}
-        raise ValueError("unknown resource")
+    def resource(self, uri: str) -> JsonObject:
+        identity = ResourceURI.parse(uri)
+        resolver = cast(
+            Callable[[ResourceURI], StrictModel], getattr(self, identity.spec.resolver_name)
+        )
+        return dump_wire(resolver(identity))
+
+    def resolve_schema_resource(self, identity: ResourceURI) -> GraphSchemaResult:
+        return self.get_graph_schema(EmptyRequest())
+
+    def resolve_node_resource(self, identity: ResourceURI) -> NodeResourceResult:
+        document = self.store.current()
+        node = next((item for item in document.nodes if item.id == identity.node_id), None)
+        if node is None:
+            raise ValueError("unknown node")
+        return NodeResourceResult(revision=document.revision, node=node)
+
+    def resolve_revision_resource(self, identity: ResourceURI) -> Snapshot:
+        assert identity.revision is not None
+        return self.store.read_revision(identity.revision)
+
+    def resolve_impact_resource(self, identity: ResourceURI) -> ImpactResourceResult:
+        document = self.resolve_revision_resource(identity)
+        return ImpactResourceResult(revision=document.revision, impact=document.impact)
+
+    def resolve_assessments_resource(self, identity: ResourceURI) -> AssessmentsResult:
+        assert identity.revision is not None
+        return self.get_assessments(AssessmentsRequest(revision=identity.revision))

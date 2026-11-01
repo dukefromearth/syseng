@@ -1,0 +1,6076 @@
+{
+  "schema": {
+    "version": "typed-graph/architecture/v1",
+    "node_types": {
+      "ArchitectureModel": {
+        "$defs": {
+          "Identifier": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "$ref": "#/$defs/Identifier"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "statements": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Statements",
+            "type": "array"
+          },
+          "version": {
+            "$ref": "#/$defs/Identifier"
+          }
+        },
+        "required": [
+          "name",
+          "description",
+          "version"
+        ],
+        "title": "ModelProperties",
+        "type": "object"
+      },
+      "Ontology": {
+        "$defs": {
+          "Identifier": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "$ref": "#/$defs/Identifier"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "statements": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Statements",
+            "type": "array"
+          },
+          "kind": {
+            "enum": [
+              "domain",
+              "system",
+              "realization"
+            ],
+            "title": "Kind",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "description",
+          "kind"
+        ],
+        "title": "OntologyProperties",
+        "type": "object"
+      },
+      "DomainConcept": {
+        "$defs": {
+          "Identifier": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "$ref": "#/$defs/Identifier"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "statements": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Statements",
+            "type": "array"
+          }
+        },
+        "required": [
+          "name",
+          "description"
+        ],
+        "title": "BaseProperties",
+        "type": "object"
+      },
+      "Invariant": {
+        "$defs": {
+          "Identifier": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "$ref": "#/$defs/Identifier"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "statements": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Statements",
+            "type": "array"
+          }
+        },
+        "required": [
+          "name",
+          "description"
+        ],
+        "title": "BaseProperties",
+        "type": "object"
+      },
+      "System": {
+        "$defs": {
+          "Identifier": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "$ref": "#/$defs/Identifier"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "statements": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Statements",
+            "type": "array"
+          }
+        },
+        "required": [
+          "name",
+          "description"
+        ],
+        "title": "BaseProperties",
+        "type": "object"
+      },
+      "Responsibility": {
+        "$defs": {
+          "Identifier": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "$ref": "#/$defs/Identifier"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "statements": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Statements",
+            "type": "array"
+          }
+        },
+        "required": [
+          "name",
+          "description"
+        ],
+        "title": "BaseProperties",
+        "type": "object"
+      },
+      "BehavioralContract": {
+        "$defs": {
+          "Identifier": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "$ref": "#/$defs/Identifier"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "statements": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Statements",
+            "type": "array"
+          },
+          "version": {
+            "$ref": "#/$defs/Identifier"
+          }
+        },
+        "required": [
+          "name",
+          "description",
+          "version"
+        ],
+        "title": "ContractProperties",
+        "type": "object"
+      },
+      "ExchangeContract": {
+        "$defs": {
+          "Identifier": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "$ref": "#/$defs/Identifier"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "statements": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Statements",
+            "type": "array"
+          },
+          "version": {
+            "$ref": "#/$defs/Identifier"
+          }
+        },
+        "required": [
+          "name",
+          "description",
+          "version"
+        ],
+        "title": "ContractProperties",
+        "type": "object"
+      },
+      "ScopedConcept": {
+        "$defs": {
+          "Identifier": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "$ref": "#/$defs/Identifier"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "statements": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Statements",
+            "type": "array"
+          }
+        },
+        "required": [
+          "name",
+          "description"
+        ],
+        "title": "BaseProperties",
+        "type": "object"
+      },
+      "RealizationConcept": {
+        "$defs": {
+          "Identifier": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "$ref": "#/$defs/Identifier"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "statements": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Statements",
+            "type": "array"
+          }
+        },
+        "required": [
+          "name",
+          "description"
+        ],
+        "title": "BaseProperties",
+        "type": "object"
+      },
+      "Environment": {
+        "$defs": {
+          "Identifier": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "$ref": "#/$defs/Identifier"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "statements": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Statements",
+            "type": "array"
+          }
+        },
+        "required": [
+          "name",
+          "description"
+        ],
+        "title": "BaseProperties",
+        "type": "object"
+      },
+      "Boundary": {
+        "$defs": {
+          "Identifier": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "$ref": "#/$defs/Identifier"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "statements": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Statements",
+            "type": "array"
+          }
+        },
+        "required": [
+          "name",
+          "description"
+        ],
+        "title": "BaseProperties",
+        "type": "object"
+      },
+      "Capability": {
+        "$defs": {
+          "Identifier": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "$ref": "#/$defs/Identifier"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "statements": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Statements",
+            "type": "array"
+          }
+        },
+        "required": [
+          "name",
+          "description"
+        ],
+        "title": "BaseProperties",
+        "type": "object"
+      },
+      "Layer": {
+        "$defs": {
+          "Identifier": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "$ref": "#/$defs/Identifier"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "statements": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Statements",
+            "type": "array"
+          },
+          "rank": {
+            "minimum": 0,
+            "title": "Rank",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "name",
+          "description"
+        ],
+        "title": "LayerProperties",
+        "type": "object"
+      },
+      "Binding": {
+        "$defs": {
+          "Identifier": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "$ref": "#/$defs/Identifier"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "statements": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Statements",
+            "type": "array"
+          },
+          "lifecycle": {
+            "const": "candidate",
+            "default": "candidate",
+            "title": "Lifecycle",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "description"
+        ],
+        "title": "BindingProperties",
+        "type": "object"
+      },
+      "TechnologyCandidate": {
+        "$defs": {
+          "Identifier": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "$ref": "#/$defs/Identifier"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "statements": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Statements",
+            "type": "array"
+          }
+        },
+        "required": [
+          "name",
+          "description"
+        ],
+        "title": "BaseProperties",
+        "type": "object"
+      },
+      "Requirement": {
+        "$defs": {
+          "Identifier": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "$ref": "#/$defs/Identifier"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "statements": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Statements",
+            "type": "array"
+          },
+          "priority": {
+            "default": "required",
+            "enum": [
+              "required",
+              "future"
+            ],
+            "title": "Priority",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "description"
+        ],
+        "title": "RequirementProperties",
+        "type": "object"
+      },
+      "AcceptanceCriterion": {
+        "$defs": {
+          "Identifier": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "$ref": "#/$defs/Identifier"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "statements": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Statements",
+            "type": "array"
+          }
+        },
+        "required": [
+          "name",
+          "description"
+        ],
+        "title": "BaseProperties",
+        "type": "object"
+      },
+      "Scenario": {
+        "$defs": {
+          "Identifier": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "$ref": "#/$defs/Identifier"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "statements": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Statements",
+            "type": "array"
+          },
+          "scope": {
+            "default": "reference",
+            "enum": [
+              "reference",
+              "future"
+            ],
+            "title": "Scope",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "description"
+        ],
+        "title": "ScopedProperties",
+        "type": "object"
+      },
+      "ScenarioStep": {
+        "$defs": {
+          "Identifier": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "$ref": "#/$defs/Identifier"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "statements": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Statements",
+            "type": "array"
+          }
+        },
+        "required": [
+          "name",
+          "description"
+        ],
+        "title": "BaseProperties",
+        "type": "object"
+      },
+      "FailureCase": {
+        "$defs": {
+          "Identifier": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "$ref": "#/$defs/Identifier"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "statements": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Statements",
+            "type": "array"
+          }
+        },
+        "required": [
+          "name",
+          "description"
+        ],
+        "title": "BaseProperties",
+        "type": "object"
+      },
+      "Phase": {
+        "$defs": {
+          "Identifier": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "$ref": "#/$defs/Identifier"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "statements": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Statements",
+            "type": "array"
+          },
+          "scope": {
+            "default": "reference",
+            "enum": [
+              "reference",
+              "future"
+            ],
+            "title": "Scope",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "description"
+        ],
+        "title": "ScopedProperties",
+        "type": "object"
+      },
+      "Exclusion": {
+        "$defs": {
+          "Identifier": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "$ref": "#/$defs/Identifier"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "statements": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Statements",
+            "type": "array"
+          }
+        },
+        "required": [
+          "name",
+          "description"
+        ],
+        "title": "BaseProperties",
+        "type": "object"
+      },
+      "GovernanceRule": {
+        "$defs": {
+          "Identifier": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "$ref": "#/$defs/Identifier"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "statements": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Statements",
+            "type": "array"
+          },
+          "category": {
+            "enum": [
+              "model_invariant",
+              "build_constraint",
+              "runtime_constraint",
+              "measurement",
+              "reuse"
+            ],
+            "title": "Category",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "description",
+          "category"
+        ],
+        "title": "GovernanceProperties",
+        "type": "object"
+      },
+      "GovernanceRole": {
+        "$defs": {
+          "Identifier": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "$ref": "#/$defs/Identifier"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "statements": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Statements",
+            "type": "array"
+          }
+        },
+        "required": [
+          "name",
+          "description"
+        ],
+        "title": "BaseProperties",
+        "type": "object"
+      },
+      "Objective": {
+        "$defs": {
+          "Identifier": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "$ref": "#/$defs/Identifier"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "statements": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Statements",
+            "type": "array"
+          }
+        },
+        "required": [
+          "name",
+          "description"
+        ],
+        "title": "BaseProperties",
+        "type": "object"
+      },
+      "IndependenceExample": {
+        "$defs": {
+          "Identifier": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "$ref": "#/$defs/Identifier"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "statements": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Statements",
+            "type": "array"
+          }
+        },
+        "required": [
+          "name",
+          "description"
+        ],
+        "title": "BaseProperties",
+        "type": "object"
+      }
+    },
+    "relations": {
+      "exchanges": {
+        "source": [
+          "BehavioralContract"
+        ],
+        "target": [
+          "ExchangeContract"
+        ],
+        "impact": "target_to_source"
+      },
+      "constrains_contract": {
+        "source": [
+          "Requirement",
+          "AcceptanceCriterion",
+          "FailureCase",
+          "Objective"
+        ],
+        "target": [
+          "BehavioralContract"
+        ],
+        "impact": "source_to_target"
+      },
+      "owns": {
+        "source": [
+          "System"
+        ],
+        "target": [
+          "Responsibility"
+        ],
+        "impact": "target_to_source",
+        "cardinality": {
+          "out_min": 1,
+          "out_max": 1,
+          "in_min": 1,
+          "in_max": 1
+        }
+      },
+      "specified_by": {
+        "source": [
+          "Responsibility"
+        ],
+        "target": [
+          "BehavioralContract"
+        ],
+        "impact": "target_to_source",
+        "cardinality": {
+          "out_min": 1,
+          "out_max": 1
+        }
+      },
+      "concerns": {
+        "source": [
+          "Responsibility",
+          "Objective"
+        ],
+        "target": [
+          "DomainConcept"
+        ],
+        "impact": "target_to_source"
+      },
+      "defined_in_terms_of": {
+        "source": [
+          "BehavioralContract",
+          "ExchangeContract"
+        ],
+        "target": [
+          "DomainConcept",
+          "RealizationConcept"
+        ],
+        "impact": "target_to_source"
+      },
+      "produces": {
+        "source": [
+          "System",
+          "Binding"
+        ],
+        "target": [
+          "ExchangeContract"
+        ],
+        "impact": "target_to_source"
+      },
+      "consumed_by": {
+        "source": [
+          "ExchangeContract"
+        ],
+        "target": [
+          "System"
+        ],
+        "impact": "source_to_target"
+      },
+      "constrains": {
+        "source": [
+          "Ontology"
+        ],
+        "target": [
+          "Ontology"
+        ],
+        "impact": "source_to_target"
+      },
+      "constrains_concept": {
+        "source": [
+          "Invariant"
+        ],
+        "target": [
+          "DomainConcept"
+        ],
+        "impact": "source_to_target"
+      },
+      "includes": {
+        "source": [
+          "Ontology"
+        ],
+        "target": [
+          "DomainConcept",
+          "Invariant",
+          "System",
+          "RealizationConcept",
+          "Environment",
+          "Boundary",
+          "Capability",
+          "Layer",
+          "Binding",
+          "TechnologyCandidate"
+        ],
+        "impact": "none"
+      },
+      "uses_concept": {
+        "source": [
+          "System"
+        ],
+        "target": [
+          "DomainConcept",
+          "ScopedConcept",
+          "RealizationConcept"
+        ],
+        "impact": "target_to_source"
+      },
+      "specializes": {
+        "source": [
+          "ScopedConcept",
+          "DomainConcept"
+        ],
+        "target": [
+          "DomainConcept",
+          "RealizationConcept"
+        ],
+        "impact": "target_to_source"
+      },
+      "expressed_as": {
+        "source": [
+          "DomainConcept"
+        ],
+        "target": [
+          "DomainConcept"
+        ],
+        "impact": "source_to_target"
+      },
+      "consumes": {
+        "source": [
+          "DomainConcept"
+        ],
+        "target": [
+          "DomainConcept"
+        ],
+        "impact": "target_to_source"
+      },
+      "yields": {
+        "source": [
+          "DomainConcept"
+        ],
+        "target": [
+          "DomainConcept"
+        ],
+        "impact": "source_to_target"
+      },
+      "informs": {
+        "source": [
+          "DomainConcept"
+        ],
+        "target": [
+          "DomainConcept"
+        ],
+        "impact": "source_to_target"
+      },
+      "selects": {
+        "source": [
+          "DomainConcept"
+        ],
+        "target": [
+          "DomainConcept"
+        ],
+        "impact": "source_to_target"
+      },
+      "modifies": {
+        "source": [
+          "DomainConcept"
+        ],
+        "target": [
+          "DomainConcept"
+        ],
+        "impact": "source_to_target"
+      },
+      "attempts_to_fulfill": {
+        "source": [
+          "Binding"
+        ],
+        "target": [
+          "BehavioralContract"
+        ],
+        "impact": "target_to_source",
+        "cardinality": {
+          "out_min": 1,
+          "out_max": 1
+        }
+      },
+      "uses_boundary": {
+        "source": [
+          "Binding"
+        ],
+        "target": [
+          "Boundary"
+        ],
+        "impact": "target_to_source"
+      },
+      "requires_capability": {
+        "source": [
+          "Binding",
+          "BehavioralContract"
+        ],
+        "target": [
+          "Capability"
+        ],
+        "impact": "target_to_source"
+      },
+      "must_preserve": {
+        "source": [
+          "Binding",
+          "BehavioralContract"
+        ],
+        "target": [
+          "Invariant"
+        ],
+        "impact": "target_to_source"
+      },
+      "candidate_for": {
+        "source": [
+          "TechnologyCandidate"
+        ],
+        "target": [
+          "Binding",
+          "Boundary"
+        ],
+        "impact": "source_to_target"
+      },
+      "exposes": {
+        "source": [
+          "Environment"
+        ],
+        "target": [
+          "Boundary"
+        ],
+        "impact": "source_to_target"
+      },
+      "provides": {
+        "source": [
+          "Boundary"
+        ],
+        "target": [
+          "Capability"
+        ],
+        "impact": "target_to_source"
+      },
+      "classified_by": {
+        "source": [
+          "Boundary"
+        ],
+        "target": [
+          "Layer"
+        ],
+        "impact": "target_to_source"
+      },
+      "applies_to": {
+        "source": [
+          "Requirement",
+          "AcceptanceCriterion",
+          "FailureCase",
+          "Objective"
+        ],
+        "target": [
+          "System",
+          "GovernanceRole",
+          "Scenario",
+          "Binding",
+          "Objective"
+        ],
+        "impact": "source_to_target"
+      },
+      "governed_by": {
+        "source": [
+          "Requirement",
+          "AcceptanceCriterion"
+        ],
+        "target": [
+          "Invariant"
+        ],
+        "impact": "target_to_source"
+      },
+      "contains_step": {
+        "source": [
+          "Scenario"
+        ],
+        "target": [
+          "ScenarioStep"
+        ],
+        "impact": "none"
+      },
+      "performed_by": {
+        "source": [
+          "ScenarioStep"
+        ],
+        "target": [
+          "System"
+        ],
+        "impact": "target_to_source"
+      },
+      "next": {
+        "source": [
+          "ScenarioStep",
+          "Phase"
+        ],
+        "target": [
+          "ScenarioStep",
+          "Phase"
+        ],
+        "impact": "none"
+      },
+      "delivers": {
+        "source": [
+          "Phase"
+        ],
+        "target": [
+          "Requirement"
+        ],
+        "impact": "target_to_source"
+      },
+      "evaluates": {
+        "source": [
+          "Phase"
+        ],
+        "target": [
+          "AcceptanceCriterion"
+        ],
+        "impact": "target_to_source"
+      },
+      "supports": {
+        "source": [
+          "Requirement"
+        ],
+        "target": [
+          "Requirement"
+        ],
+        "impact": "target_to_source"
+      },
+      "demonstrates_objective": {
+        "source": [
+          "IndependenceExample"
+        ],
+        "target": [
+          "Objective"
+        ],
+        "impact": "target_to_source",
+        "cardinality": {
+          "out_min": 1,
+          "out_max": 1
+        }
+      },
+      "holds_contract": {
+        "source": [
+          "IndependenceExample"
+        ],
+        "target": [
+          "BehavioralContract"
+        ],
+        "impact": "target_to_source",
+        "cardinality": {
+          "out_min": 1,
+          "out_max": 1
+        }
+      },
+      "compares_binding": {
+        "source": [
+          "IndependenceExample"
+        ],
+        "target": [
+          "Binding"
+        ],
+        "impact": "target_to_source",
+        "cardinality": {
+          "out_min": 2
+        }
+      }
+    },
+    "invariants": [
+      {
+        "kind": "unique",
+        "node_type": "DomainConcept",
+        "property": "name"
+      },
+      {
+        "kind": "unique",
+        "node_type": "RealizationConcept",
+        "property": "name"
+      },
+      {
+        "kind": "unique",
+        "node_type": "System",
+        "property": "name"
+      },
+      {
+        "kind": "unique",
+        "node_type": "ExchangeContract",
+        "property": "name"
+      },
+      {
+        "kind": "unique",
+        "node_type": "Ontology",
+        "property": "kind"
+      },
+      {
+        "kind": "requires_edge",
+        "node_type": "System",
+        "relation": "owns",
+        "direction": "out"
+      },
+      {
+        "kind": "requires_edge",
+        "node_type": "Responsibility",
+        "relation": "specified_by",
+        "direction": "out"
+      },
+      {
+        "kind": "requires_edge",
+        "node_type": "Binding",
+        "relation": "attempts_to_fulfill",
+        "direction": "out"
+      },
+      {
+        "kind": "requires_edge",
+        "node_type": "Binding",
+        "relation": "uses_boundary",
+        "direction": "out"
+      },
+      {
+        "kind": "requires_edge",
+        "node_type": "ExchangeContract",
+        "relation": "consumed_by",
+        "direction": "out"
+      },
+      {
+        "kind": "requires_edge",
+        "node_type": "ExchangeContract",
+        "relation": "produces",
+        "direction": "in"
+      },
+      {
+        "kind": "requires_edge",
+        "node_type": "Requirement",
+        "relation": "applies_to",
+        "direction": "out"
+      },
+      {
+        "kind": "requires_edge",
+        "node_type": "AcceptanceCriterion",
+        "relation": "applies_to",
+        "direction": "out"
+      }
+    ],
+    "interceptors": [
+      {
+        "id": "binding-conformance",
+        "target_type": "Binding",
+        "handler": "pending",
+        "version": "1",
+        "trigger": "dependency_changed",
+        "evidence_required": [
+          "contract-conformance",
+          "capability-availability",
+          "invariant-preservation",
+          "performance-measurements"
+        ]
+      }
+    ]
+  },
+  "nodes": [
+    {
+      "id": "platform",
+      "type": "ArchitectureModel",
+      "properties": {
+        "name": "Presentation Transformation Platform",
+        "description": "Define an unwanted visual experience, learn its desired replacement from controlled examples, and apply a reusable policy inside the application's production process. Reference slice: blood becomes glitter in a controlled Linux/Vulkan-backed game. This is a build specification, not evidence that the platform has been implemented.",
+        "version": "1.0"
+      }
+    },
+    {
+      "id": "architecture",
+      "type": "GovernanceRole",
+      "properties": {
+        "name": "Architecture governance",
+        "description": "Owns cross-system modeling and substitution conformance. This is a governance role, not a fifth independently realizable system."
+      }
+    },
+    {
+      "id": "domain",
+      "type": "Ontology",
+      "properties": {
+        "name": "Domain · Meaning",
+        "description": "Defines concepts, behavior, relationships and invariants independently of systems and technology.",
+        "kind": "domain"
+      }
+    },
+    {
+      "id": "systems",
+      "type": "Ontology",
+      "properties": {
+        "name": "Systems · Responsibility",
+        "description": "Assigns responsibilities and behavioral contracts independently of implementation mechanisms.",
+        "kind": "system"
+      }
+    },
+    {
+      "id": "realization",
+      "type": "Ontology",
+      "properties": {
+        "name": "Realization · Mechanism",
+        "description": "Describes boundaries, capabilities and bindings without redefining system identity.",
+        "kind": "realization"
+      }
+    },
+    {
+      "id": "experience",
+      "type": "DomainConcept",
+      "properties": {
+        "name": "Experience",
+        "description": "An evolving state influenced by inputs and time."
+      }
+    },
+    {
+      "id": "representation",
+      "type": "DomainConcept",
+      "properties": {
+        "name": "Representation",
+        "description": "Information describing some aspect of an experience."
+      }
+    },
+    {
+      "id": "production",
+      "type": "DomainConcept",
+      "properties": {
+        "name": "Production",
+        "description": "A process consuming and producing representations; it may be a graph, not a linear pipeline."
+      }
+    },
+    {
+      "id": "presentation",
+      "type": "DomainConcept",
+      "properties": {
+        "name": "Presentation",
+        "description": "The perceptible result of production."
+      }
+    },
+    {
+      "id": "objective",
+      "type": "DomainConcept",
+      "properties": {
+        "name": "Objective",
+        "description": "A desired change to an experience."
+      }
+    },
+    {
+      "id": "intervention",
+      "type": "DomainConcept",
+      "properties": {
+        "name": "Intervention",
+        "description": "A controlled modification to representation or production."
+      }
+    },
+    {
+      "id": "counterfactual",
+      "type": "DomainConcept",
+      "properties": {
+        "name": "Counterfactual",
+        "description": "An alternative outcome originating from equivalent controlled conditions."
+      }
+    },
+    {
+      "id": "evidence",
+      "type": "DomainConcept",
+      "properties": {
+        "name": "Evidence",
+        "description": "Observations with provenance supporting an inference or evaluation."
+      }
+    },
+    {
+      "id": "policy",
+      "type": "DomainConcept",
+      "properties": {
+        "name": "Policy",
+        "description": "A reusable rule governing interventions."
+      }
+    },
+    {
+      "id": "D1",
+      "type": "Invariant",
+      "properties": {
+        "name": "D1 · Causal correspondence",
+        "description": "Controlled alternatives share identifiable originating conditions."
+      }
+    },
+    {
+      "id": "D2",
+      "type": "Invariant",
+      "properties": {
+        "name": "D2 · Provenance",
+        "description": "Evidence identifies its source and observation boundary."
+      }
+    },
+    {
+      "id": "D3",
+      "type": "Invariant",
+      "properties": {
+        "name": "D3 · Preservation",
+        "description": "Interventions preserve properties not authorized for modification."
+      }
+    },
+    {
+      "id": "D4",
+      "type": "Invariant",
+      "properties": {
+        "name": "D4 · Presentation protection",
+        "description": "No prohibited presentation is allowed in covered production scenarios when strict prevention is promised. Research capture of an original variant is distinct from protected production presentation."
+      }
+    },
+    {
+      "id": "D5",
+      "type": "Invariant",
+      "properties": {
+        "name": "D5 · Performance",
+        "description": "Runtime execution satisfies its declared latency and throughput budget."
+      }
+    },
+    {
+      "id": "D6",
+      "type": "Invariant",
+      "properties": {
+        "name": "D6 · Reproducibility",
+        "description": "Experimental outcomes can be reproduced within declared tolerances."
+      }
+    },
+    {
+      "id": "D7",
+      "type": "Invariant",
+      "properties": {
+        "name": "D7 · Semantic stability",
+        "description": "Representation and implementation changes do not silently redefine objectives."
+      }
+    },
+    {
+      "id": "S1",
+      "type": "System",
+      "properties": {
+        "name": "S1 · Counterfactual Experimentation · Research / capture",
+        "description": "Research / capture"
+      }
+    },
+    {
+      "id": "S1-responsibility",
+      "type": "Responsibility",
+      "properties": {
+        "name": "Counterfactual Experimentation responsibility",
+        "description": "Generate comparable experiences and capture their native representations."
+      }
+    },
+    {
+      "id": "S1-contract",
+      "type": "BehavioralContract",
+      "properties": {
+        "name": "S1 · Behavioral contract",
+        "description": "Attributable counterfactual evidence",
+        "statements": [
+          "Reproduce or align equivalent originating states.",
+          "Apply declared differences between variants.",
+          "Capture available representations at specified observation boundaries.",
+          "Preserve native representation data and necessary references.",
+          "Record correspondence and provenance.",
+          "Make experimental outcomes independently verifiable.",
+          "Parallel rendering branches and sequential deterministic replay are alternatives, not mandatory mechanisms.",
+          "Boundary: produces evidence; does not own interpretation, policy learning or runtime execution."
+        ],
+        "version": "1.0"
+      }
+    },
+    {
+      "id": "S2",
+      "type": "System",
+      "properties": {
+        "name": "S2 · Transformation Synthesis · Offline synthesis",
+        "description": "Offline synthesis"
+      }
+    },
+    {
+      "id": "S2-responsibility",
+      "type": "Responsibility",
+      "properties": {
+        "name": "Transformation Synthesis responsibility",
+        "description": "Turn objectives and experimental evidence into reusable, validated interventions."
+      }
+    },
+    {
+      "id": "S2-contract",
+      "type": "BehavioralContract",
+      "properties": {
+        "name": "S2 · Behavioral contract",
+        "description": "Policies with applicability and validation evidence",
+        "statements": [
+          "Consume evidence without assuming a particular engine or graphics API.",
+          "Identify or synthesize candidate transformations.",
+          "Evaluate desired effects, preservation and cost.",
+          "Describe capabilities needed to execute a candidate.",
+          "Publish versioned policies with explicit applicability and validation evidence.",
+          "Deterministic analysis, statistical learning, neural models and search are replaceable synthesis methods.",
+          "Boundary: produces intervention knowledge; does not own environmental execution."
+        ],
+        "version": "1.0"
+      }
+    },
+    {
+      "id": "S3",
+      "type": "System",
+      "properties": {
+        "name": "S3 · Presentation Mediation · Production runtime",
+        "description": "Production runtime"
+      }
+    },
+    {
+      "id": "S3-responsibility",
+      "type": "Responsibility",
+      "properties": {
+        "name": "Presentation Mediation responsibility",
+        "description": "Apply policies within supported production environments without violating constraints."
+      }
+    },
+    {
+      "id": "S3-contract",
+      "type": "BehavioralContract",
+      "properties": {
+        "name": "S3 · Behavioral contract",
+        "description": "Modified presentation within declared constraints",
+        "statements": [
+          "Identify target capabilities and determine whether a policy can be validly executed.",
+          "Prepare transformations before the critical rendering path whenever possible.",
+          "Execute through the cheapest suitable interaction boundary.",
+          "Enforce required presentation and performance constraints.",
+          "Report unsupported policies rather than claiming weaker guarantees.",
+          "Expose execution evidence for evaluation and feedback.",
+          "Boundary: executes interventions; does not own user objectives or policy learning."
+        ],
+        "version": "1.0"
+      }
+    },
+    {
+      "id": "S4",
+      "type": "System",
+      "properties": {
+        "name": "S4 · Preference Management · User intent and feedback",
+        "description": "User intent and feedback"
+      }
+    },
+    {
+      "id": "S4-responsibility",
+      "type": "Responsibility",
+      "properties": {
+        "name": "Preference Management responsibility",
+        "description": "Express desired changes and collect feedback independently of execution mechanisms."
+      }
+    },
+    {
+      "id": "S4-contract",
+      "type": "BehavioralContract",
+      "properties": {
+        "name": "S4 · Behavioral contract",
+        "description": "Technology-independent objectives",
+        "statements": [
+          "Allow users to identify an undesirable experience or region and express the intended outcome.",
+          "Associate preferences with scope.",
+          "Record corrections and observed failures.",
+          "Request activation of compatible policies.",
+          "Users need not understand shaders, graphics APIs, rendering buffers or model architectures."
+        ],
+        "version": "1.0"
+      }
+    },
+    {
+      "id": "scenario-concept",
+      "type": "ScopedConcept",
+      "properties": {
+        "name": "Scenario",
+        "description": "Initial conditions, inputs, time and environment."
+      }
+    },
+    {
+      "id": "variant",
+      "type": "ScopedConcept",
+      "properties": {
+        "name": "Variant",
+        "description": "A controlled alternative to a scenario."
+      }
+    },
+    {
+      "id": "observation",
+      "type": "ScopedConcept",
+      "properties": {
+        "name": "Observation",
+        "description": "Information captured at a specified boundary."
+      }
+    },
+    {
+      "id": "correspondence",
+      "type": "ScopedConcept",
+      "properties": {
+        "name": "Correspondence",
+        "description": "Relationship between comparable states or observations."
+      }
+    },
+    {
+      "id": "experiment",
+      "type": "ScopedConcept",
+      "properties": {
+        "name": "Experiment",
+        "description": "Collection of variants under controlled conditions."
+      }
+    },
+    {
+      "id": "counterfactual-evidence",
+      "type": "ScopedConcept",
+      "properties": {
+        "name": "Counterfactual Evidence",
+        "description": "Evidence attributed to observations and outcomes from an experiment."
+      }
+    },
+    {
+      "id": "training-case",
+      "type": "ScopedConcept",
+      "properties": {
+        "name": "Training Case",
+        "description": "Evidence associated with an objective."
+      }
+    },
+    {
+      "id": "candidate-intervention",
+      "type": "ScopedConcept",
+      "properties": {
+        "name": "Candidate Intervention",
+        "description": "A proposed intervention whose validity is not yet established."
+      }
+    },
+    {
+      "id": "evaluation",
+      "type": "ScopedConcept",
+      "properties": {
+        "name": "Evaluation",
+        "description": "Evidence evaluating whether a proposal satisfies defined properties."
+      }
+    },
+    {
+      "id": "applicability",
+      "type": "ScopedConcept",
+      "properties": {
+        "name": "Applicability",
+        "description": "Conditions under which a policy is valid."
+      }
+    },
+    {
+      "id": "presentation-target",
+      "type": "ScopedConcept",
+      "properties": {
+        "name": "Presentation Target",
+        "description": "Environment or context whose output is mediated."
+      }
+    },
+    {
+      "id": "policy-binding",
+      "type": "ScopedConcept",
+      "properties": {
+        "name": "Policy Binding",
+        "description": "Association between a policy and supported target capabilities; distinct from an architectural realization Binding."
+      }
+    },
+    {
+      "id": "installation",
+      "type": "ScopedConcept",
+      "properties": {
+        "name": "Installation",
+        "description": "A prepared executable transformation."
+      }
+    },
+    {
+      "id": "execution",
+      "type": "ScopedConcept",
+      "properties": {
+        "name": "Execution",
+        "description": "Application of an intervention."
+      }
+    },
+    {
+      "id": "execution-outcome",
+      "type": "ScopedConcept",
+      "properties": {
+        "name": "Execution Outcome",
+        "description": "Result and evidence of policy execution."
+      }
+    },
+    {
+      "id": "preference",
+      "type": "ScopedConcept",
+      "properties": {
+        "name": "Preference",
+        "description": "Desired behavior expressed by a user."
+      }
+    },
+    {
+      "id": "scope",
+      "type": "ScopedConcept",
+      "properties": {
+        "name": "Scope",
+        "description": "Where a preference applies."
+      }
+    },
+    {
+      "id": "selection",
+      "type": "ScopedConcept",
+      "properties": {
+        "name": "Selection",
+        "description": "User-identified content or experience."
+      }
+    },
+    {
+      "id": "desired-outcome",
+      "type": "ScopedConcept",
+      "properties": {
+        "name": "Desired Outcome",
+        "description": "Requested replacement, suppression or modification."
+      }
+    },
+    {
+      "id": "feedback",
+      "type": "ScopedConcept",
+      "properties": {
+        "name": "Feedback",
+        "description": "Confirmation or correction of behavior."
+      }
+    },
+    {
+      "id": "profile",
+      "type": "ScopedConcept",
+      "properties": {
+        "name": "Profile",
+        "description": "Collection of active preferences."
+      }
+    },
+    {
+      "id": "environment-concept",
+      "type": "RealizationConcept",
+      "properties": {
+        "name": "Environment",
+        "description": "Computing environment responsible for producing an experience."
+      }
+    },
+    {
+      "id": "boundary-concept",
+      "type": "RealizationConcept",
+      "properties": {
+        "name": "Interaction Boundary",
+        "description": "Point where information can be observed or controlled."
+      }
+    },
+    {
+      "id": "capability-concept",
+      "type": "RealizationConcept",
+      "properties": {
+        "name": "Capability",
+        "description": "Available observation or modification operation."
+      }
+    },
+    {
+      "id": "layer-concept",
+      "type": "RealizationConcept",
+      "properties": {
+        "name": "Abstraction Layer",
+        "description": "Classification of a boundary by available information and operations; not a mandatory pipeline stage."
+      }
+    },
+    {
+      "id": "binding-concept",
+      "type": "RealizationConcept",
+      "properties": {
+        "name": "Binding",
+        "description": "Implementation mechanism attempting to satisfy a system contract through sufficient capabilities."
+      }
+    },
+    {
+      "id": "C1",
+      "type": "ExchangeContract",
+      "properties": {
+        "name": "C1 · Transformation Objective",
+        "description": "Portable meaning of the requested change.",
+        "statements": [
+          "Target concept or behavior; desired outcome; applicability scope.",
+          "Preservation requirements; performance constraints; protection requirements."
+        ],
+        "version": "1.0"
+      }
+    },
+    {
+      "id": "C2",
+      "type": "ExchangeContract",
+      "properties": {
+        "name": "C2 · Counterfactual Evidence",
+        "description": "Causally aligned native observations and outcomes.",
+        "statements": [
+          "Shared originating conditions; controlled variants; declared interventions.",
+          "Observation boundaries; native representation references; correspondence and provenance; observed outcomes.",
+          "Observation boundaries identify the stage and interpretation of referenced data.",
+          "Commands must include or reference required resource and execution state for supported analysis or replay."
+        ],
+        "version": "1.0"
+      }
+    },
+    {
+      "id": "C3",
+      "type": "ExchangeContract",
+      "properties": {
+        "name": "C3 · Transformation Policy",
+        "description": "Portable intent and validity; executable realizations may be platform-specific.",
+        "statements": [
+          "Policy identity and version; objective; applicability conditions.",
+          "Required capabilities; executable realizations; evaluation evidence.",
+          "Preservation and performance constraints."
+        ],
+        "version": "1.0"
+      }
+    },
+    {
+      "id": "C4",
+      "type": "ExchangeContract",
+      "properties": {
+        "name": "C4 · Execution Outcome",
+        "description": "Execution observations, supported status and attributable failures.",
+        "statements": [
+          "Executed policy and target; supported or unsupported status; observed modification.",
+          "Preservation results; frame-time and latency measurements; failures and unsupported capabilities."
+        ],
+        "version": "1.0"
+      }
+    },
+    {
+      "id": "C5",
+      "type": "ExchangeContract",
+      "properties": {
+        "name": "C5 · Capability Description",
+        "description": "Discoverable capabilities, not assumptions based on a technology name.",
+        "statements": [
+          "Available observation and control boundaries; supported abstraction layers.",
+          "Representation formats; execution constraints; timing or presentation guarantees."
+        ],
+        "version": "1.0"
+      }
+    },
+    {
+      "id": "L1",
+      "type": "Layer",
+      "properties": {
+        "name": "L1 · State / Semantics",
+        "description": "Entities, behavior and events; candidate boundaries include engine state and application models.",
+        "rank": 1
+      }
+    },
+    {
+      "id": "L2",
+      "type": "Layer",
+      "properties": {
+        "name": "L2 · Presentation Description",
+        "description": "Layout, geometry, materials and visual properties; candidate boundaries include scene graphs and UI layout.",
+        "rank": 2
+      }
+    },
+    {
+      "id": "L3",
+      "type": "Layer",
+      "properties": {
+        "name": "L3 · Rendering Operations",
+        "description": "Draw commands, shaders, resources and buffers; candidate boundaries include Vulkan, Direct3D and rendering backends.",
+        "rank": 3
+      }
+    },
+    {
+      "id": "L4",
+      "type": "Layer",
+      "properties": {
+        "name": "L4 · Composed Representation",
+        "description": "Completed surfaces and pixels; candidate boundaries include compositors and frame buffers.",
+        "rank": 4
+      }
+    },
+    {
+      "id": "L5",
+      "type": "Layer",
+      "properties": {
+        "name": "L5 · Physical Presentation",
+        "description": "Scanout, hardware composition and timing; candidate boundaries include DRM/KMS and display controllers.",
+        "rank": 5
+      }
+    },
+    {
+      "id": "linux-godot",
+      "type": "Environment",
+      "properties": {
+        "name": "Controlled Linux / Godot environment",
+        "description": "Proposed Godot 4 scene on a Linux desktop with a Vulkan-capable GPU and 120 Hz presentation target. Exact hardware, driver, workload and tolerances must be pinned before acceptance measurements."
+      }
+    },
+    {
+      "id": "engine-boundary",
+      "type": "Boundary",
+      "properties": {
+        "name": "Engine state and scene boundary",
+        "description": "Proposed control of scenario state, events, camera, materials and effects."
+      }
+    },
+    {
+      "id": "graphics-boundary",
+      "type": "Boundary",
+      "properties": {
+        "name": "Vulkan operation/resource boundary",
+        "description": "Proposed capture and intervention boundary. Specificity, resource completeness and timing support require evidence."
+      }
+    },
+    {
+      "id": "analysis-boundary",
+      "type": "Boundary",
+      "properties": {
+        "name": "Offline native-evidence analysis boundary",
+        "description": "Reads explicitly typed native representations and their interpretation metadata; no universal intermediate representation is required."
+      }
+    },
+    {
+      "id": "preference-boundary",
+      "type": "Boundary",
+      "properties": {
+        "name": "Local preference interaction boundary",
+        "description": "Proposed user selection, objective and correction interface. User meaning remains independent of graphics representation."
+      }
+    },
+    {
+      "id": "composition-boundary",
+      "type": "Boundary",
+      "properties": {
+        "name": "Compositor boundary",
+        "description": "Replaceable candidate observing composed pixels; semantic identity and pre-exposure guarantees must not be assumed."
+      }
+    },
+    {
+      "id": "replay-capability",
+      "type": "Capability",
+      "properties": {
+        "name": "Controlled state and replay",
+        "description": "Reproduce or align simulation states, inputs, logical time, event identity and camera within declared tolerances."
+      }
+    },
+    {
+      "id": "capture-capability",
+      "type": "Capability",
+      "properties": {
+        "name": "Native capture with resource closure",
+        "description": "Capture commands, resources, shaders and relevant execution state at identified boundaries, retaining necessary references."
+      }
+    },
+    {
+      "id": "correspondence-capability",
+      "type": "Capability",
+      "properties": {
+        "name": "Causal correspondence",
+        "description": "Relate operations and observations to shared originating conditions and controlled differences."
+      }
+    },
+    {
+      "id": "analysis-capability",
+      "type": "Capability",
+      "properties": {
+        "name": "Native transformation analysis",
+        "description": "Interpret native evidence sufficiently to derive candidate changes and validate their applicability."
+      }
+    },
+    {
+      "id": "targeting-capability",
+      "type": "Capability",
+      "properties": {
+        "name": "Specific effect targeting",
+        "description": "Identify the intended semantic target through available observations with enough specificity to preserve unrelated content."
+      }
+    },
+    {
+      "id": "substitution-capability",
+      "type": "Capability",
+      "properties": {
+        "name": "Prepared intervention",
+        "description": "Prepare and apply an authorized intervention at a supported boundary while preserving the applicable contract and invariants."
+      }
+    },
+    {
+      "id": "protection-capability",
+      "type": "Capability",
+      "properties": {
+        "name": "Covered pre-exposure protection",
+        "description": "Prevent prohibited production presentation in covered scenarios, or report unsupported unless an explicit conservative mode is authorized."
+      }
+    },
+    {
+      "id": "measurement-capability",
+      "type": "Capability",
+      "properties": {
+        "name": "Separated timing and outcome measurement",
+        "description": "Measure presentation, GPU execution, CPU submission, input-to-display latency and preservation without confusing offline capture cost with runtime cost."
+      }
+    },
+    {
+      "id": "preference-capability",
+      "type": "Capability",
+      "properties": {
+        "name": "Selection and correction",
+        "description": "Associate a selected region with its observation, express an outcome and scope, request activation and record corrections."
+      }
+    },
+    {
+      "id": "B1",
+      "type": "Binding",
+      "properties": {
+        "name": "S1 · Controlled experiment binding",
+        "description": "Godot simulation with Vulkan capture/replay is proposed. Unreal, custom simulation and browser automation are alternatives only where sufficient capabilities are demonstrated.",
+        "lifecycle": "candidate"
+      }
+    },
+    {
+      "id": "B2",
+      "type": "Binding",
+      "properties": {
+        "name": "S2 · Offline synthesis binding",
+        "description": "Initial deterministic analysis may derive changed resource/shader relationships from paired records; learned synthesis, program synthesis and rule inference may fulfill the same contract.",
+        "lifecycle": "candidate"
+      }
+    },
+    {
+      "id": "B3",
+      "type": "Binding",
+      "properties": {
+        "name": "S3 · Graphics intervention binding",
+        "description": "Proposed Vulkan interception and resource/shader substitution. Engine integration, other graphics APIs and compositor integration require separate conformance evaluation.",
+        "lifecycle": "candidate"
+      }
+    },
+    {
+      "id": "B4",
+      "type": "Binding",
+      "properties": {
+        "name": "S4 · Local preference binding",
+        "description": "Proposed local preference UI with region selection; desktop overlays, mobile applications and other UIs may implement the same responsibility.",
+        "lifecycle": "candidate"
+      }
+    },
+    {
+      "id": "godot",
+      "type": "TechnologyCandidate",
+      "properties": {
+        "name": "Godot",
+        "description": "Reuse interactive simulation; do not build a rendering engine."
+      }
+    },
+    {
+      "id": "vulkan",
+      "type": "TechnologyCandidate",
+      "properties": {
+        "name": "Vulkan",
+        "description": "Reuse graphics API; suitability depends on observed capabilities, not the technology name."
+      }
+    },
+    {
+      "id": "gfxreconstruct",
+      "type": "TechnologyCandidate",
+      "properties": {
+        "name": "GFXReconstruct",
+        "description": "Candidate graphics capture/replay tooling; verify capture completeness and replay support for the selected scene."
+      }
+    },
+    {
+      "id": "renderdoc",
+      "type": "TechnologyCandidate",
+      "properties": {
+        "name": "RenderDoc",
+        "description": "Candidate rendering inspection and pixel provenance diagnostics; inspection is separate from production runtime."
+      }
+    },
+    {
+      "id": "spirv",
+      "type": "TechnologyCandidate",
+      "properties": {
+        "name": "Existing Vulkan / SPIR-V tooling",
+        "description": "Reuse shader compilation and inspection tooling; no custom compiler is required."
+      }
+    },
+    {
+      "id": "driver",
+      "type": "TechnologyCandidate",
+      "properties": {
+        "name": "Mesa or supported vendor driver",
+        "description": "Reuse an existing Linux graphics driver; shader replacement mechanisms are candidates where sufficient."
+      }
+    },
+    {
+      "id": "interception",
+      "type": "TechnologyCandidate",
+      "properties": {
+        "name": "Existing graphics interception mechanisms",
+        "description": "Extend only where capabilities are insufficient; never circumvent protected content or anti-cheat."
+      }
+    },
+    {
+      "id": "learning-infrastructure",
+      "type": "TechnologyCandidate",
+      "properties": {
+        "name": "Existing analysis and learning infrastructure",
+        "description": "Prefer reuse for model architecture and training where compatible with native evidence and contracts."
+      }
+    },
+    {
+      "id": "P1",
+      "type": "Requirement",
+      "properties": {
+        "name": "P1 · Paired comparable observations",
+        "description": "Produce paired observations of equivalent experiences.",
+        "priority": "required"
+      }
+    },
+    {
+      "id": "P2",
+      "type": "Requirement",
+      "properties": {
+        "name": "P2 · Native pre-presentation evidence",
+        "description": "Capture native pre-presentation representations, not only images.",
+        "priority": "required"
+      }
+    },
+    {
+      "id": "P3",
+      "type": "Requirement",
+      "properties": {
+        "name": "P3 · Reusable learned transformations",
+        "description": "Derive reusable transformation policies from paired evidence.",
+        "priority": "required"
+      }
+    },
+    {
+      "id": "P4",
+      "type": "Requirement",
+      "properties": {
+        "name": "P4 · Single runtime production path",
+        "description": "Execute a policy without rendering the entire experience twice.",
+        "priority": "required"
+      }
+    },
+    {
+      "id": "P5",
+      "type": "Requirement",
+      "properties": {
+        "name": "P5 · Real-time performance",
+        "description": "Preserve performance of real-time applications within declared budgets.",
+        "priority": "required"
+      }
+    },
+    {
+      "id": "P6",
+      "type": "Requirement",
+      "properties": {
+        "name": "P6 · Technology-independent meaning",
+        "description": "Keep domain and system ontologies independent of technology.",
+        "priority": "required"
+      }
+    },
+    {
+      "id": "P7",
+      "type": "Requirement",
+      "properties": {
+        "name": "P7 · User-defined transformation",
+        "description": "Allow users to define and correct desired transformations.",
+        "priority": "required"
+      }
+    },
+    {
+      "id": "P8",
+      "type": "Requirement",
+      "properties": {
+        "name": "P8 · Replaceable bindings",
+        "description": "Support different environment bindings without redefining system contracts.",
+        "priority": "required"
+      }
+    },
+    {
+      "id": "P9",
+      "type": "Requirement",
+      "properties": {
+        "name": "P9 · Broader applications and mobile",
+        "description": "Extend to arbitrary applications and mobile operating systems without assuming equivalent capabilities.",
+        "priority": "future"
+      }
+    },
+    {
+      "id": "F01",
+      "type": "Requirement",
+      "properties": {
+        "name": "F01 · Formal architectural definitions",
+        "description": "Define and validate the three architectural ontologies.",
+        "priority": "required"
+      }
+    },
+    {
+      "id": "F02",
+      "type": "Requirement",
+      "properties": {
+        "name": "F02 · Replayable scenarios",
+        "description": "Record deterministic, replayable scenario states and inputs.",
+        "priority": "required"
+      }
+    },
+    {
+      "id": "F03",
+      "type": "Requirement",
+      "properties": {
+        "name": "F03 · Controlled alternatives",
+        "description": "Generate original and transformed variants.",
+        "priority": "required"
+      }
+    },
+    {
+      "id": "F04",
+      "type": "Requirement",
+      "properties": {
+        "name": "F04 · Native capture",
+        "description": "Capture pre-presentation representations with provenance.",
+        "priority": "required"
+      }
+    },
+    {
+      "id": "F05",
+      "type": "Requirement",
+      "properties": {
+        "name": "F05 · Aligned counterfactual evidence",
+        "description": "Assemble causally aligned counterfactual evidence.",
+        "priority": "required"
+      }
+    },
+    {
+      "id": "F06",
+      "type": "Requirement",
+      "properties": {
+        "name": "F06 · Candidate policy derivation",
+        "description": "Derive and evaluate candidate transformation policies.",
+        "priority": "required"
+      }
+    },
+    {
+      "id": "F07",
+      "type": "Requirement",
+      "properties": {
+        "name": "F07 · Scoped policy publication",
+        "description": "Publish policies with capability and applicability requirements.",
+        "priority": "required"
+      }
+    },
+    {
+      "id": "F08",
+      "type": "Requirement",
+      "properties": {
+        "name": "F08 · Capability discovery",
+        "description": "Discover environmental observation/control capabilities.",
+        "priority": "required"
+      }
+    },
+    {
+      "id": "F09",
+      "type": "Requirement",
+      "properties": {
+        "name": "F09 · Prepared compatible transformation",
+        "description": "Prepare and install compatible transformations.",
+        "priority": "required"
+      }
+    },
+    {
+      "id": "F10",
+      "type": "Requirement",
+      "properties": {
+        "name": "F10 · Production-boundary execution",
+        "description": "Apply transformations through supported production boundaries.",
+        "priority": "required"
+      }
+    },
+    {
+      "id": "F11",
+      "type": "Requirement",
+      "properties": {
+        "name": "F11 · Runtime measurements",
+        "description": "Measure runtime presentation and performance behavior.",
+        "priority": "required"
+      }
+    },
+    {
+      "id": "F12",
+      "type": "Requirement",
+      "properties": {
+        "name": "F12 · Preference interaction",
+        "description": "Capture selections, objectives and corrections.",
+        "priority": "required"
+      }
+    },
+    {
+      "id": "F13",
+      "type": "Requirement",
+      "properties": {
+        "name": "F13 · Honest unsupported states",
+        "description": "Reject unsupported bindings without silently weakening guarantees.",
+        "priority": "required"
+      }
+    },
+    {
+      "id": "F14",
+      "type": "Requirement",
+      "properties": {
+        "name": "F14 · Independent substitution",
+        "description": "Demonstrate a second independently implemented binding for relevant contract conformance.",
+        "priority": "required"
+      }
+    },
+    {
+      "id": "reference-scene",
+      "type": "Scenario",
+      "properties": {
+        "name": "Reference · Blood becomes glitter",
+        "description": "A controlled Godot 4 scene on Linux with Vulkan-backed rendering and a 120 Hz presentation target. One authoritative simulation establishes equivalent originating conditions. Original and modified variants may be produced by branches or deterministic replay; equivalence must be verified.",
+        "statements": [
+          "Original: scripted action produces blood; native rendering state and output are recorded for evaluation.",
+          "Modified: equivalent state, inputs, timing and camera produce glitter; capture occurs at the same logical boundary.",
+          "Preserve logical time, event identity, shaders/resources/state, known intervention, correspondence and presentation outcomes.",
+          "Images verify results; upstream native representations are the training/analysis evidence."
+        ],
+        "scope": "reference"
+      }
+    },
+    {
+      "id": "blood-glitter-objective",
+      "type": "Objective",
+      "properties": {
+        "name": "Replace blood with glitter",
+        "description": "Change visible blood into glitter in the supported reference experience while preserving unrelated scene properties and the declared protection and performance constraints."
+      }
+    },
+    {
+      "id": "experiment-step",
+      "type": "ScenarioStep",
+      "properties": {
+        "name": "1 · Capture controlled alternatives",
+        "description": "Scenario → controlled variants → observations → attributed counterfactual evidence. Capture native payload and resource closure; verify originating-state equivalence and presentation correspondence."
+      }
+    },
+    {
+      "id": "synthesis-step",
+      "type": "ScenarioStep",
+      "properties": {
+        "name": "2 · Derive and evaluate policy",
+        "description": "Objective and paired evidence produce a candidate intervention. Initially deterministic analysis may derive the changed shader/resource relationship. Validate by replay or equivalent controlled execution before publication."
+      }
+    },
+    {
+      "id": "runtime-step",
+      "type": "ScenarioStep",
+      "properties": {
+        "name": "Production · Execute in the normal path",
+        "description": "Launch the reference game in its original configuration. Discover compatible capabilities, prepare the policy, and substitute matching operations/resources so covered runtime presentation is modified."
+      }
+    },
+    {
+      "id": "feedback-step",
+      "type": "ScenarioStep",
+      "properties": {
+        "name": "Feedback · Inspect execution and correct",
+        "description": "User inspects the observed execution outcome and gives corrections if behavior is wrong."
+      }
+    },
+    {
+      "id": "preference-step",
+      "type": "ScenarioStep",
+      "properties": {
+        "name": "User expression · Select and request",
+        "description": "Select or circle unwanted content on a captured frame; specify glitter or suppression; associate the selection with its observation and scope; submit an objective. The interface need not interpret native rendering payloads."
+      }
+    },
+    {
+      "id": "activation-step",
+      "type": "ScenarioStep",
+      "properties": {
+        "name": "Activation · Review and enable policy",
+        "description": "Inspect the evaluated policy and its applicability, then request activation before runtime execution."
+      }
+    },
+    {
+      "id": "runtime-restrictions",
+      "type": "GovernanceRule",
+      "properties": {
+        "name": "Reference runtime restrictions",
+        "description": "These restrictions apply to the known reference transformation, not every future policy type.",
+        "statements": [
+          "No two concurrent full renderings in production.",
+          "No mandatory CPU screenshot round trip.",
+          "No full-frame neural classification on every frame for the known resource substitution.",
+          "No continuous training or experimental capture in production runtime."
+        ],
+        "category": "runtime_constraint"
+      }
+    },
+    {
+      "id": "phone-feed",
+      "type": "Scenario",
+      "properties": {
+        "name": "Future experiment · Simulated phone feed",
+        "description": "Generate equivalent scrolling-feed states with advertisements present and absent or replaced. Capture available semantic, presentation-description and graphics representations. Test whether shared contracts remain unchanged; this is planned cross-domain validation, not demonstrated portability.",
+        "scope": "future"
+      }
+    },
+    {
+      "id": "A01",
+      "type": "AcceptanceCriterion",
+      "properties": {
+        "name": "A01 · Additional p99 critical-path cost",
+        "description": "At most 0.5 ms additional p99 critical-path frame cost on declared reference hardware and scene. Measure the combined transformed workload directly; baseline p99 plus overhead p99 does not prove transformed p99."
+      }
+    },
+    {
+      "id": "A02",
+      "type": "AcceptanceCriterion",
+      "properties": {
+        "name": "A02 · Sustained 120 FPS",
+        "description": "At least 120 FPS when the fixed baseline workload has sufficient headroom. 120 FPS corresponds to approximately 8.33 ms per frame; no universal performance guarantee is implied."
+      }
+    },
+    {
+      "id": "A03",
+      "type": "AcceptanceCriterion",
+      "properties": {
+        "name": "A03 · Baseline headroom",
+        "description": "Use a fixed workload with baseline p99 frame time no greater than 7.8 ms. This is workload qualification, not proof that adding the 0.5 ms target preserves all frame deadlines."
+      }
+    },
+    {
+      "id": "A04",
+      "type": "AcceptanceCriterion",
+      "properties": {
+        "name": "A04 · Zero added queued frames",
+        "description": "No additional queued frames from runtime transformation; measure input-to-display latency separately."
+      }
+    },
+    {
+      "id": "A05",
+      "type": "AcceptanceCriterion",
+      "properties": {
+        "name": "A05 · Off-path preparation",
+        "description": "Prepare runtime policies outside the frame-critical path."
+      }
+    },
+    {
+      "id": "A06",
+      "type": "AcceptanceCriterion",
+      "properties": {
+        "name": "A06 · No required full-frame model",
+        "description": "Full-frame model execution is not required for the known resource-substitution policy."
+      }
+    },
+    {
+      "id": "A07",
+      "type": "AcceptanceCriterion",
+      "properties": {
+        "name": "A07 · Zero prohibited presented occurrences",
+        "description": "Zero strictly prohibited presented occurrences in covered production scenarios. If pre-exposure prevention cannot be guaranteed, report unsupported or use an explicitly authorized conservative mode."
+      }
+    },
+    {
+      "id": "A08",
+      "type": "AcceptanceCriterion",
+      "properties": {
+        "name": "A08 · Zero unauthorized negative-case changes",
+        "description": "Zero unauthorized changes in controlled negative cases. Shared-resource effects require specific targeting."
+      }
+    },
+    {
+      "id": "A09",
+      "type": "AcceptanceCriterion",
+      "properties": {
+        "name": "A09 · Valid scope",
+        "description": "The policy applies only within evaluated applicability conditions and produces the specified change."
+      }
+    },
+    {
+      "id": "A10",
+      "type": "AcceptanceCriterion",
+      "properties": {
+        "name": "A10 · Independent evidence",
+        "description": "Captured paired evidence includes attributable originating conditions, representations and observed outcomes that can be independently verified."
+      }
+    },
+    {
+      "id": "A11",
+      "type": "AcceptanceCriterion",
+      "properties": {
+        "name": "A11 · Reproducible experiment",
+        "description": "Experimental outcomes reproduce within explicitly declared tolerances."
+      }
+    },
+    {
+      "id": "A12",
+      "type": "AcceptanceCriterion",
+      "properties": {
+        "name": "A12 · Independent realization substitution",
+        "description": "At least two independently implemented bindings demonstrate the same relevant contract and invariant obligations without redefining meaning."
+      }
+    },
+    {
+      "id": "measurement-protocol",
+      "type": "GovernanceRule",
+      "properties": {
+        "name": "Measurement protocol",
+        "description": "Acceptance targets require recorded measurement evidence. Verification state comes from assessments, not authored status labels.",
+        "statements": [
+          "Pin reference hardware, driver, scene, workload and declared tolerances.",
+          "Disable capture, tracing and offline analysis during production performance measurements.",
+          "Measure frame presentation, GPU execution, CPU submission and input-to-display latency separately.",
+          "Record paired baseline and transformed workload results, including distributions and negative cases.",
+          "A known material replacement may require little recurring computation; an unseen semantic category may not."
+        ],
+        "category": "measurement"
+      }
+    },
+    {
+      "id": "T01",
+      "type": "FailureCase",
+      "properties": {
+        "name": "T01 · Shared resource",
+        "description": "Target effect shares a resource with desirable content; reject unsafe broad replacement."
+      }
+    },
+    {
+      "id": "T02",
+      "type": "FailureCase",
+      "properties": {
+        "name": "T02 · Shader identity changes",
+        "description": "Application update changes shader identity; do not silently reuse an invalid policy."
+      }
+    },
+    {
+      "id": "T03",
+      "type": "FailureCase",
+      "properties": {
+        "name": "T03 · Unavailable capability",
+        "description": "Policy references an unavailable capability; explicitly report unsupported."
+      }
+    },
+    {
+      "id": "T04",
+      "type": "FailureCase",
+      "properties": {
+        "name": "T04 · Dynamic resource recreation",
+        "description": "Resources are dynamically recreated; target tracking and installation must remain valid or fail observably."
+      }
+    },
+    {
+      "id": "T05",
+      "type": "FailureCase",
+      "properties": {
+        "name": "T05 · Unsupported graphics API",
+        "description": "Target uses an unsupported graphics API; do not claim compatibility."
+      }
+    },
+    {
+      "id": "T06",
+      "type": "FailureCase",
+      "properties": {
+        "name": "T06 · Unrelated changes",
+        "description": "Candidate changes unrelated objects; evaluation must reject unauthorized modification."
+      }
+    },
+    {
+      "id": "T07",
+      "type": "FailureCase",
+      "properties": {
+        "name": "T07 · Budget exceeded",
+        "description": "Intervention exceeds frame-time budget; report failed performance conformance."
+      }
+    },
+    {
+      "id": "T08",
+      "type": "FailureCase",
+      "properties": {
+        "name": "T08 · Protected rendering path",
+        "description": "Protected or inaccessible rendering prevents observation; report limitation without circumvention."
+      }
+    },
+    {
+      "id": "E1",
+      "type": "AcceptanceCriterion",
+      "properties": {
+        "name": "E1 · Experimentation acceptance",
+        "description": "Controlled equivalent experiences yield alternative native renderings with preserved causal correspondence."
+      }
+    },
+    {
+      "id": "E2",
+      "type": "AcceptanceCriterion",
+      "properties": {
+        "name": "E2 · Synthesis acceptance",
+        "description": "A policy is derived from evidence, evaluated against the objective, and published with applicability and capability requirements."
+      }
+    },
+    {
+      "id": "E3",
+      "type": "AcceptanceCriterion",
+      "properties": {
+        "name": "E3 · Execution acceptance",
+        "description": "A supported binding modifies normal production behavior without continuous full-frame classification for the reference policy."
+      }
+    },
+    {
+      "id": "E4",
+      "type": "AcceptanceCriterion",
+      "properties": {
+        "name": "E4 · Interaction acceptance",
+        "description": "A user expresses or corrects the transformation without knowing graphics implementation details."
+      }
+    },
+    {
+      "id": "E5",
+      "type": "AcceptanceCriterion",
+      "properties": {
+        "name": "E5 · Substitution acceptance",
+        "description": "Two realization bindings demonstrate compliance with the same relevant domain meanings and system contracts."
+      }
+    },
+    {
+      "id": "E6",
+      "type": "AcceptanceCriterion",
+      "properties": {
+        "name": "E6 · Performance acceptance",
+        "description": "The modified reference workload meets declared 120 FPS frame-time, presentation-latency and correctness requirements."
+      }
+    },
+    {
+      "id": "phase-1",
+      "type": "Phase",
+      "properties": {
+        "name": "1 · Architectural foundation",
+        "description": "Exit: replace a system implementation without changing conceptual responsibility or contract semantics.",
+        "statements": [
+          "Versioned domain ontology and system contracts.",
+          "Realization ontology, capabilities and binding validity rules.",
+          "Contract conformance tests; minimum evidence and policy definitions."
+        ],
+        "scope": "reference"
+      }
+    },
+    {
+      "id": "phase-2",
+      "type": "Phase",
+      "properties": {
+        "name": "2 · Counterfactual experimentation",
+        "description": "Exit: S1 produces comparable causally attributed representations and verifies their presentations.",
+        "statements": [
+          "Controlled game scene and reproducible inputs/state.",
+          "Original and transformed variants with native capture.",
+          "Paired correspondence evidence; replay and verification procedure."
+        ],
+        "scope": "reference"
+      }
+    },
+    {
+      "id": "phase-3",
+      "type": "Phase",
+      "properties": {
+        "name": "3 · Policy synthesis",
+        "description": "Exit: S2 derives an executable policy from evidence and its observed effect is independently verified.",
+        "statements": [
+          "Evidence consumption and replaceable synthesis.",
+          "Candidate generation and controlled evaluation using S1.",
+          "Versioned policy artifacts with validation evidence."
+        ],
+        "scope": "reference"
+      }
+    },
+    {
+      "id": "phase-4",
+      "type": "Phase",
+      "properties": {
+        "name": "4 · Runtime mediation",
+        "description": "Exit: the reference game in its original configuration presents the transformed effect while satisfying correctness and performance targets.",
+        "statements": [
+          "Capability discovery; preparation and installation.",
+          "Shader/resource-level intervention in a single normal production path.",
+          "Performance instrumentation and negative tests."
+        ],
+        "scope": "reference"
+      }
+    },
+    {
+      "id": "phase-5",
+      "type": "Phase",
+      "properties": {
+        "name": "5 · Preference interaction",
+        "description": "Exit: a user identifies unwanted content, requests its replacement and experiences the evaluated transformation without manually editing graphics resources.",
+        "statements": [
+          "Region selection and objective specification.",
+          "Policy association and activation.",
+          "Correction and feedback flow."
+        ],
+        "scope": "reference"
+      }
+    },
+    {
+      "id": "phase-6",
+      "type": "Phase",
+      "properties": {
+        "name": "6 · Architectural substitution",
+        "description": "Exit: unchanged domain and system models operate through different realization technologies for the same relevant contract.",
+        "statements": [
+          "Second independently implemented observation or intervention binding.",
+          "Conformance and capability compatibility tests.",
+          "Explicit supported and unsupported policy scope."
+        ],
+        "scope": "reference"
+      }
+    },
+    {
+      "id": "phase-7",
+      "type": "Phase",
+      "properties": {
+        "name": "7 · Cross-domain validation",
+        "description": "Exit: the simulated phone-feed scenario needs new bindings/policies but no redefinition of shared ontologies; this remains a hypothesis to test.",
+        "statements": [
+          "Equivalent scrolling-feed alternatives with ads present and absent or replaced.",
+          "Capture at available semantic, presentation-description and graphics boundaries.",
+          "Evaluate shared contracts without changing their meaning."
+        ],
+        "scope": "future"
+      }
+    },
+    {
+      "id": "validity",
+      "type": "GovernanceRule",
+      "properties": {
+        "name": "Binding validity",
+        "description": "A binding is valid only when its capabilities fulfill the assigned contract, execution preserves applicable invariants, limitations are explicit and performance is evaluated against declared constraints.",
+        "statements": [
+          "One binding may use several boundaries.",
+          "One technology may realize several systems.",
+          "Different technologies may satisfy the same contract without sharing native representations.",
+          "An attempts_to_fulfill relation is an obligation, not a proof of satisfaction."
+        ],
+        "category": "model_invariant"
+      }
+    },
+    {
+      "id": "independence",
+      "type": "GovernanceRule",
+      "properties": {
+        "name": "Independent meanings and responsibilities",
+        "description": "Domain defines meaning; systems own responsibilities; realizations provide mechanisms.",
+        "statements": [
+          "Changing engine, graphics API or operating system must not redefine domain concepts or the four responsibilities.",
+          "Local system vocabularies reference canonical concepts, specializing only when additional semantics exist.",
+          "Capability is defined once; architectural Binding and runtime Policy Binding have distinct meanings."
+        ],
+        "category": "model_invariant"
+      }
+    },
+    {
+      "id": "interoperability",
+      "type": "GovernanceRule",
+      "properties": {
+        "name": "Boundary contracts and native representations",
+        "description": "Standardize meaning at system boundaries without unnecessarily converting native payloads into a universal representation.",
+        "statements": [
+          "Version system contracts and keep core contracts language-agnostic.",
+          "Keep native payloads accessible and explicitly typed; large binary observations may live separately from metadata.",
+          "C1–C5 specify information exchanged, whereas behavioral contracts specify system obligations."
+        ],
+        "category": "model_invariant"
+      }
+    },
+    {
+      "id": "implementation",
+      "type": "GovernanceRule",
+      "properties": {
+        "name": "Implementation constraints",
+        "description": "Experimental machinery must remain separate from production execution.",
+        "statements": [
+          "Experimental capture is not required in production runtime.",
+          "Prepare policies before activation wherever possible.",
+          "Published executable policies include evidence of validity and supported scope.",
+          "Personal screen captures and preference data remain local by default."
+        ],
+        "category": "build_constraint"
+      }
+    },
+    {
+      "id": "reuse",
+      "type": "GovernanceRule",
+      "properties": {
+        "name": "Project-specific work and reuse",
+        "description": "Build only the semantics and coordination not provided by existing capabilities.",
+        "statements": [
+          "Project-specific: counterfactual evidence semantics, system contracts and binding validity.",
+          "Project-specific: policy-synthesis orchestration and preference semantics.",
+          "Reuse simulation, graphics APIs/drivers, capture/replay, inspection, shader tooling and compatible learning infrastructure.",
+          "Reference documentation categories: Godot rendering architecture, Vulkan Layers, GFXReconstruct, RenderDoc, Mesa SPIR-V replacement and Vulkan profiling. Candidate suitability remains unevaluated."
+        ],
+        "category": "reuse"
+      }
+    },
+    {
+      "id": "investigation",
+      "type": "GovernanceRule",
+      "properties": {
+        "name": "Questions for a new environment",
+        "description": "Investigate capability sufficiency before choosing a realization.",
+        "statements": [
+          "What information does this environment expose?",
+          "What can be changed at each boundary?",
+          "Can those capabilities satisfy an existing system contract?",
+          "Does the intervention preserve correctness and performance?"
+        ],
+        "category": "model_invariant"
+      }
+    },
+    {
+      "id": "validation-limit",
+      "type": "GovernanceRule",
+      "properties": {
+        "name": "What the MCP can establish",
+        "description": "The MCP enforces registered types, legal endpoints, cardinality, required references, uniqueness and evidence structure. It cannot establish causal equivalence, semantic preservation or measured performance from assertions alone.",
+        "statements": [
+          "Structural validation alone cannot establish binding conformance.",
+          "Assessment completion is not proof; a passing result requires declared evidence obligations, whose truth still needs independent evaluation.",
+          "Changes invalidate dependent assessments; explicit unsupported states must not be replaced with weaker promises."
+        ],
+        "category": "model_invariant"
+      }
+    },
+    {
+      "id": "X01",
+      "type": "Exclusion",
+      "properties": {
+        "name": "X01 · Custom operating system or kernel",
+        "description": "Not a prerequisite for the initial architectural proof. A future extension requires its own explicit scope and capability evaluation."
+      }
+    },
+    {
+      "id": "X02",
+      "type": "Exclusion",
+      "properties": {
+        "name": "X02 · New rendering engine",
+        "description": "Not a prerequisite for the initial architectural proof. A future extension requires its own explicit scope and capability evaluation."
+      }
+    },
+    {
+      "id": "X03",
+      "type": "Exclusion",
+      "properties": {
+        "name": "X03 · Universal graphics intermediate representation",
+        "description": "Not a prerequisite for the initial architectural proof. A future extension requires its own explicit scope and capability evaluation."
+      }
+    },
+    {
+      "id": "X04",
+      "type": "Exclusion",
+      "properties": {
+        "name": "X04 · Foundation-model training from scratch",
+        "description": "Not a prerequisite for the initial architectural proof. A future extension requires its own explicit scope and capability evaluation."
+      }
+    },
+    {
+      "id": "X05",
+      "type": "Exclusion",
+      "properties": {
+        "name": "X05 · Dual original/transformed full rendering in production",
+        "description": "Not a prerequisite for the initial architectural proof. A future extension requires its own explicit scope and capability evaluation."
+      }
+    },
+    {
+      "id": "X06",
+      "type": "Exclusion",
+      "properties": {
+        "name": "X06 · Every commercial game compatibility",
+        "description": "Not a prerequisite for the initial architectural proof. A future extension requires its own explicit scope and capability evaluation."
+      }
+    },
+    {
+      "id": "X07",
+      "type": "Exclusion",
+      "properties": {
+        "name": "X07 · Anti-cheat, DRM or protected-content circumvention",
+        "description": "Not a prerequisite for the initial architectural proof. A future extension requires its own explicit scope and capability evaluation."
+      }
+    },
+    {
+      "id": "X08",
+      "type": "Exclusion",
+      "properties": {
+        "name": "X08 · Complete iOS or Android implementation",
+        "description": "Not a prerequisite for the initial architectural proof. A future extension requires its own explicit scope and capability evaluation."
+      }
+    },
+    {
+      "id": "X09",
+      "type": "Exclusion",
+      "properties": {
+        "name": "X09 · Perfect recognition of previously unseen content",
+        "description": "Not a prerequisite for the initial architectural proof. A future extension requires its own explicit scope and capability evaluation."
+      }
+    },
+    {
+      "id": "X10",
+      "type": "Exclusion",
+      "properties": {
+        "name": "X10 · Universal pre-exposure guarantees without environmental support",
+        "description": "Not a prerequisite for the initial architectural proof. A future extension requires its own explicit scope and capability evaluation."
+      }
+    },
+    {
+      "id": "recognition-capability",
+      "type": "Capability",
+      "properties": {
+        "name": "Semantic recognition from composed pixels",
+        "description": "Infer the intended target from composed pixels with sufficient specificity; intrinsic object identity is not assumed. Recognition must satisfy the objective's preservation, latency and exposure constraints."
+      }
+    },
+    {
+      "id": "B3-engine",
+      "type": "Binding",
+      "properties": {
+        "name": "S3 · Engine-level intervention binding",
+        "description": "May modify identified materials or effects before rendering. Validity depends on demonstrated semantic targeting, preservation and performance through available engine controls.",
+        "lifecycle": "candidate"
+      }
+    },
+    {
+      "id": "B3-compositor",
+      "type": "Binding",
+      "properties": {
+        "name": "S3 · Compositor intervention binding",
+        "description": "May modify composed pixels, but has no intrinsic blood-object identity. Additional recognition is required, and latency, preservation and exposure obligations still apply.",
+        "lifecycle": "candidate"
+      }
+    },
+    {
+      "id": "independence-example",
+      "type": "IndependenceExample",
+      "properties": {
+        "name": "One objective and contract, three candidate realizations",
+        "description": "The engine, graphics-API and compositor candidates attempt the same S3 contract. Their available information, control and costs differ; substitutability requires evidence that the unchanged objective, contract and applicable invariants remain satisfied."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "constrains:domain:systems",
+      "type": "constrains",
+      "source": "domain",
+      "target": "systems"
+    },
+    {
+      "id": "constrains:systems:realization",
+      "type": "constrains",
+      "source": "systems",
+      "target": "realization"
+    },
+    {
+      "id": "includes:domain:experience",
+      "type": "includes",
+      "source": "domain",
+      "target": "experience"
+    },
+    {
+      "id": "includes:domain:representation",
+      "type": "includes",
+      "source": "domain",
+      "target": "representation"
+    },
+    {
+      "id": "includes:domain:production",
+      "type": "includes",
+      "source": "domain",
+      "target": "production"
+    },
+    {
+      "id": "includes:domain:presentation",
+      "type": "includes",
+      "source": "domain",
+      "target": "presentation"
+    },
+    {
+      "id": "includes:domain:objective",
+      "type": "includes",
+      "source": "domain",
+      "target": "objective"
+    },
+    {
+      "id": "includes:domain:intervention",
+      "type": "includes",
+      "source": "domain",
+      "target": "intervention"
+    },
+    {
+      "id": "includes:domain:counterfactual",
+      "type": "includes",
+      "source": "domain",
+      "target": "counterfactual"
+    },
+    {
+      "id": "includes:domain:evidence",
+      "type": "includes",
+      "source": "domain",
+      "target": "evidence"
+    },
+    {
+      "id": "includes:domain:policy",
+      "type": "includes",
+      "source": "domain",
+      "target": "policy"
+    },
+    {
+      "id": "expressed_as:experience:representation",
+      "type": "expressed_as",
+      "source": "experience",
+      "target": "representation"
+    },
+    {
+      "id": "consumes:production:representation",
+      "type": "consumes",
+      "source": "production",
+      "target": "representation"
+    },
+    {
+      "id": "yields:production:representation",
+      "type": "yields",
+      "source": "production",
+      "target": "representation"
+    },
+    {
+      "id": "yields:production:presentation",
+      "type": "yields",
+      "source": "production",
+      "target": "presentation"
+    },
+    {
+      "id": "informs:objective:intervention",
+      "type": "informs",
+      "source": "objective",
+      "target": "intervention"
+    },
+    {
+      "id": "modifies:intervention:production",
+      "type": "modifies",
+      "source": "intervention",
+      "target": "production"
+    },
+    {
+      "id": "modifies:intervention:representation",
+      "type": "modifies",
+      "source": "intervention",
+      "target": "representation"
+    },
+    {
+      "id": "yields:counterfactual:evidence",
+      "type": "yields",
+      "source": "counterfactual",
+      "target": "evidence"
+    },
+    {
+      "id": "informs:evidence:policy",
+      "type": "informs",
+      "source": "evidence",
+      "target": "policy"
+    },
+    {
+      "id": "informs:objective:policy",
+      "type": "informs",
+      "source": "objective",
+      "target": "policy"
+    },
+    {
+      "id": "selects:policy:intervention",
+      "type": "selects",
+      "source": "policy",
+      "target": "intervention"
+    },
+    {
+      "id": "includes:domain:D1",
+      "type": "includes",
+      "source": "domain",
+      "target": "D1"
+    },
+    {
+      "id": "includes:domain:D2",
+      "type": "includes",
+      "source": "domain",
+      "target": "D2"
+    },
+    {
+      "id": "includes:domain:D3",
+      "type": "includes",
+      "source": "domain",
+      "target": "D3"
+    },
+    {
+      "id": "includes:domain:D4",
+      "type": "includes",
+      "source": "domain",
+      "target": "D4"
+    },
+    {
+      "id": "includes:domain:D5",
+      "type": "includes",
+      "source": "domain",
+      "target": "D5"
+    },
+    {
+      "id": "includes:domain:D6",
+      "type": "includes",
+      "source": "domain",
+      "target": "D6"
+    },
+    {
+      "id": "includes:domain:D7",
+      "type": "includes",
+      "source": "domain",
+      "target": "D7"
+    },
+    {
+      "id": "constrains_concept:D1:counterfactual",
+      "type": "constrains_concept",
+      "source": "D1",
+      "target": "counterfactual"
+    },
+    {
+      "id": "constrains_concept:D2:evidence",
+      "type": "constrains_concept",
+      "source": "D2",
+      "target": "evidence"
+    },
+    {
+      "id": "constrains_concept:D3:intervention",
+      "type": "constrains_concept",
+      "source": "D3",
+      "target": "intervention"
+    },
+    {
+      "id": "constrains_concept:D3:objective",
+      "type": "constrains_concept",
+      "source": "D3",
+      "target": "objective"
+    },
+    {
+      "id": "constrains_concept:D4:presentation",
+      "type": "constrains_concept",
+      "source": "D4",
+      "target": "presentation"
+    },
+    {
+      "id": "constrains_concept:D5:production",
+      "type": "constrains_concept",
+      "source": "D5",
+      "target": "production"
+    },
+    {
+      "id": "constrains_concept:D6:counterfactual",
+      "type": "constrains_concept",
+      "source": "D6",
+      "target": "counterfactual"
+    },
+    {
+      "id": "constrains_concept:D7:objective",
+      "type": "constrains_concept",
+      "source": "D7",
+      "target": "objective"
+    },
+    {
+      "id": "includes:systems:S1",
+      "type": "includes",
+      "source": "systems",
+      "target": "S1"
+    },
+    {
+      "id": "owns:S1:S1-responsibility",
+      "type": "owns",
+      "source": "S1",
+      "target": "S1-responsibility"
+    },
+    {
+      "id": "specified_by:S1-responsibility:S1-contract",
+      "type": "specified_by",
+      "source": "S1-responsibility",
+      "target": "S1-contract"
+    },
+    {
+      "id": "concerns:S1-responsibility:experience",
+      "type": "concerns",
+      "source": "S1-responsibility",
+      "target": "experience"
+    },
+    {
+      "id": "defined_in_terms_of:S1-contract:experience",
+      "type": "defined_in_terms_of",
+      "source": "S1-contract",
+      "target": "experience"
+    },
+    {
+      "id": "uses_concept:S1:experience",
+      "type": "uses_concept",
+      "source": "S1",
+      "target": "experience"
+    },
+    {
+      "id": "concerns:S1-responsibility:representation",
+      "type": "concerns",
+      "source": "S1-responsibility",
+      "target": "representation"
+    },
+    {
+      "id": "defined_in_terms_of:S1-contract:representation",
+      "type": "defined_in_terms_of",
+      "source": "S1-contract",
+      "target": "representation"
+    },
+    {
+      "id": "uses_concept:S1:representation",
+      "type": "uses_concept",
+      "source": "S1",
+      "target": "representation"
+    },
+    {
+      "id": "concerns:S1-responsibility:counterfactual",
+      "type": "concerns",
+      "source": "S1-responsibility",
+      "target": "counterfactual"
+    },
+    {
+      "id": "defined_in_terms_of:S1-contract:counterfactual",
+      "type": "defined_in_terms_of",
+      "source": "S1-contract",
+      "target": "counterfactual"
+    },
+    {
+      "id": "uses_concept:S1:counterfactual",
+      "type": "uses_concept",
+      "source": "S1",
+      "target": "counterfactual"
+    },
+    {
+      "id": "concerns:S1-responsibility:evidence",
+      "type": "concerns",
+      "source": "S1-responsibility",
+      "target": "evidence"
+    },
+    {
+      "id": "defined_in_terms_of:S1-contract:evidence",
+      "type": "defined_in_terms_of",
+      "source": "S1-contract",
+      "target": "evidence"
+    },
+    {
+      "id": "uses_concept:S1:evidence",
+      "type": "uses_concept",
+      "source": "S1",
+      "target": "evidence"
+    },
+    {
+      "id": "must_preserve:S1-contract:D1",
+      "type": "must_preserve",
+      "source": "S1-contract",
+      "target": "D1"
+    },
+    {
+      "id": "must_preserve:S1-contract:D2",
+      "type": "must_preserve",
+      "source": "S1-contract",
+      "target": "D2"
+    },
+    {
+      "id": "must_preserve:S1-contract:D3",
+      "type": "must_preserve",
+      "source": "S1-contract",
+      "target": "D3"
+    },
+    {
+      "id": "must_preserve:S1-contract:D4",
+      "type": "must_preserve",
+      "source": "S1-contract",
+      "target": "D4"
+    },
+    {
+      "id": "must_preserve:S1-contract:D5",
+      "type": "must_preserve",
+      "source": "S1-contract",
+      "target": "D5"
+    },
+    {
+      "id": "must_preserve:S1-contract:D6",
+      "type": "must_preserve",
+      "source": "S1-contract",
+      "target": "D6"
+    },
+    {
+      "id": "must_preserve:S1-contract:D7",
+      "type": "must_preserve",
+      "source": "S1-contract",
+      "target": "D7"
+    },
+    {
+      "id": "includes:systems:S2",
+      "type": "includes",
+      "source": "systems",
+      "target": "S2"
+    },
+    {
+      "id": "owns:S2:S2-responsibility",
+      "type": "owns",
+      "source": "S2",
+      "target": "S2-responsibility"
+    },
+    {
+      "id": "specified_by:S2-responsibility:S2-contract",
+      "type": "specified_by",
+      "source": "S2-responsibility",
+      "target": "S2-contract"
+    },
+    {
+      "id": "concerns:S2-responsibility:objective",
+      "type": "concerns",
+      "source": "S2-responsibility",
+      "target": "objective"
+    },
+    {
+      "id": "defined_in_terms_of:S2-contract:objective",
+      "type": "defined_in_terms_of",
+      "source": "S2-contract",
+      "target": "objective"
+    },
+    {
+      "id": "uses_concept:S2:objective",
+      "type": "uses_concept",
+      "source": "S2",
+      "target": "objective"
+    },
+    {
+      "id": "concerns:S2-responsibility:evidence",
+      "type": "concerns",
+      "source": "S2-responsibility",
+      "target": "evidence"
+    },
+    {
+      "id": "defined_in_terms_of:S2-contract:evidence",
+      "type": "defined_in_terms_of",
+      "source": "S2-contract",
+      "target": "evidence"
+    },
+    {
+      "id": "uses_concept:S2:evidence",
+      "type": "uses_concept",
+      "source": "S2",
+      "target": "evidence"
+    },
+    {
+      "id": "concerns:S2-responsibility:intervention",
+      "type": "concerns",
+      "source": "S2-responsibility",
+      "target": "intervention"
+    },
+    {
+      "id": "defined_in_terms_of:S2-contract:intervention",
+      "type": "defined_in_terms_of",
+      "source": "S2-contract",
+      "target": "intervention"
+    },
+    {
+      "id": "uses_concept:S2:intervention",
+      "type": "uses_concept",
+      "source": "S2",
+      "target": "intervention"
+    },
+    {
+      "id": "concerns:S2-responsibility:policy",
+      "type": "concerns",
+      "source": "S2-responsibility",
+      "target": "policy"
+    },
+    {
+      "id": "defined_in_terms_of:S2-contract:policy",
+      "type": "defined_in_terms_of",
+      "source": "S2-contract",
+      "target": "policy"
+    },
+    {
+      "id": "uses_concept:S2:policy",
+      "type": "uses_concept",
+      "source": "S2",
+      "target": "policy"
+    },
+    {
+      "id": "must_preserve:S2-contract:D1",
+      "type": "must_preserve",
+      "source": "S2-contract",
+      "target": "D1"
+    },
+    {
+      "id": "must_preserve:S2-contract:D2",
+      "type": "must_preserve",
+      "source": "S2-contract",
+      "target": "D2"
+    },
+    {
+      "id": "must_preserve:S2-contract:D3",
+      "type": "must_preserve",
+      "source": "S2-contract",
+      "target": "D3"
+    },
+    {
+      "id": "must_preserve:S2-contract:D4",
+      "type": "must_preserve",
+      "source": "S2-contract",
+      "target": "D4"
+    },
+    {
+      "id": "must_preserve:S2-contract:D5",
+      "type": "must_preserve",
+      "source": "S2-contract",
+      "target": "D5"
+    },
+    {
+      "id": "must_preserve:S2-contract:D6",
+      "type": "must_preserve",
+      "source": "S2-contract",
+      "target": "D6"
+    },
+    {
+      "id": "must_preserve:S2-contract:D7",
+      "type": "must_preserve",
+      "source": "S2-contract",
+      "target": "D7"
+    },
+    {
+      "id": "includes:systems:S3",
+      "type": "includes",
+      "source": "systems",
+      "target": "S3"
+    },
+    {
+      "id": "owns:S3:S3-responsibility",
+      "type": "owns",
+      "source": "S3",
+      "target": "S3-responsibility"
+    },
+    {
+      "id": "specified_by:S3-responsibility:S3-contract",
+      "type": "specified_by",
+      "source": "S3-responsibility",
+      "target": "S3-contract"
+    },
+    {
+      "id": "concerns:S3-responsibility:policy",
+      "type": "concerns",
+      "source": "S3-responsibility",
+      "target": "policy"
+    },
+    {
+      "id": "defined_in_terms_of:S3-contract:policy",
+      "type": "defined_in_terms_of",
+      "source": "S3-contract",
+      "target": "policy"
+    },
+    {
+      "id": "uses_concept:S3:policy",
+      "type": "uses_concept",
+      "source": "S3",
+      "target": "policy"
+    },
+    {
+      "id": "concerns:S3-responsibility:intervention",
+      "type": "concerns",
+      "source": "S3-responsibility",
+      "target": "intervention"
+    },
+    {
+      "id": "defined_in_terms_of:S3-contract:intervention",
+      "type": "defined_in_terms_of",
+      "source": "S3-contract",
+      "target": "intervention"
+    },
+    {
+      "id": "uses_concept:S3:intervention",
+      "type": "uses_concept",
+      "source": "S3",
+      "target": "intervention"
+    },
+    {
+      "id": "concerns:S3-responsibility:presentation",
+      "type": "concerns",
+      "source": "S3-responsibility",
+      "target": "presentation"
+    },
+    {
+      "id": "defined_in_terms_of:S3-contract:presentation",
+      "type": "defined_in_terms_of",
+      "source": "S3-contract",
+      "target": "presentation"
+    },
+    {
+      "id": "uses_concept:S3:presentation",
+      "type": "uses_concept",
+      "source": "S3",
+      "target": "presentation"
+    },
+    {
+      "id": "concerns:S3-responsibility:evidence",
+      "type": "concerns",
+      "source": "S3-responsibility",
+      "target": "evidence"
+    },
+    {
+      "id": "defined_in_terms_of:S3-contract:evidence",
+      "type": "defined_in_terms_of",
+      "source": "S3-contract",
+      "target": "evidence"
+    },
+    {
+      "id": "uses_concept:S3:evidence",
+      "type": "uses_concept",
+      "source": "S3",
+      "target": "evidence"
+    },
+    {
+      "id": "must_preserve:S3-contract:D1",
+      "type": "must_preserve",
+      "source": "S3-contract",
+      "target": "D1"
+    },
+    {
+      "id": "must_preserve:S3-contract:D2",
+      "type": "must_preserve",
+      "source": "S3-contract",
+      "target": "D2"
+    },
+    {
+      "id": "must_preserve:S3-contract:D3",
+      "type": "must_preserve",
+      "source": "S3-contract",
+      "target": "D3"
+    },
+    {
+      "id": "must_preserve:S3-contract:D4",
+      "type": "must_preserve",
+      "source": "S3-contract",
+      "target": "D4"
+    },
+    {
+      "id": "must_preserve:S3-contract:D5",
+      "type": "must_preserve",
+      "source": "S3-contract",
+      "target": "D5"
+    },
+    {
+      "id": "must_preserve:S3-contract:D6",
+      "type": "must_preserve",
+      "source": "S3-contract",
+      "target": "D6"
+    },
+    {
+      "id": "must_preserve:S3-contract:D7",
+      "type": "must_preserve",
+      "source": "S3-contract",
+      "target": "D7"
+    },
+    {
+      "id": "includes:systems:S4",
+      "type": "includes",
+      "source": "systems",
+      "target": "S4"
+    },
+    {
+      "id": "owns:S4:S4-responsibility",
+      "type": "owns",
+      "source": "S4",
+      "target": "S4-responsibility"
+    },
+    {
+      "id": "specified_by:S4-responsibility:S4-contract",
+      "type": "specified_by",
+      "source": "S4-responsibility",
+      "target": "S4-contract"
+    },
+    {
+      "id": "concerns:S4-responsibility:objective",
+      "type": "concerns",
+      "source": "S4-responsibility",
+      "target": "objective"
+    },
+    {
+      "id": "defined_in_terms_of:S4-contract:objective",
+      "type": "defined_in_terms_of",
+      "source": "S4-contract",
+      "target": "objective"
+    },
+    {
+      "id": "uses_concept:S4:objective",
+      "type": "uses_concept",
+      "source": "S4",
+      "target": "objective"
+    },
+    {
+      "id": "concerns:S4-responsibility:experience",
+      "type": "concerns",
+      "source": "S4-responsibility",
+      "target": "experience"
+    },
+    {
+      "id": "defined_in_terms_of:S4-contract:experience",
+      "type": "defined_in_terms_of",
+      "source": "S4-contract",
+      "target": "experience"
+    },
+    {
+      "id": "uses_concept:S4:experience",
+      "type": "uses_concept",
+      "source": "S4",
+      "target": "experience"
+    },
+    {
+      "id": "concerns:S4-responsibility:presentation",
+      "type": "concerns",
+      "source": "S4-responsibility",
+      "target": "presentation"
+    },
+    {
+      "id": "defined_in_terms_of:S4-contract:presentation",
+      "type": "defined_in_terms_of",
+      "source": "S4-contract",
+      "target": "presentation"
+    },
+    {
+      "id": "uses_concept:S4:presentation",
+      "type": "uses_concept",
+      "source": "S4",
+      "target": "presentation"
+    },
+    {
+      "id": "must_preserve:S4-contract:D1",
+      "type": "must_preserve",
+      "source": "S4-contract",
+      "target": "D1"
+    },
+    {
+      "id": "must_preserve:S4-contract:D2",
+      "type": "must_preserve",
+      "source": "S4-contract",
+      "target": "D2"
+    },
+    {
+      "id": "must_preserve:S4-contract:D3",
+      "type": "must_preserve",
+      "source": "S4-contract",
+      "target": "D3"
+    },
+    {
+      "id": "must_preserve:S4-contract:D4",
+      "type": "must_preserve",
+      "source": "S4-contract",
+      "target": "D4"
+    },
+    {
+      "id": "must_preserve:S4-contract:D5",
+      "type": "must_preserve",
+      "source": "S4-contract",
+      "target": "D5"
+    },
+    {
+      "id": "must_preserve:S4-contract:D6",
+      "type": "must_preserve",
+      "source": "S4-contract",
+      "target": "D6"
+    },
+    {
+      "id": "must_preserve:S4-contract:D7",
+      "type": "must_preserve",
+      "source": "S4-contract",
+      "target": "D7"
+    },
+    {
+      "id": "uses_concept:S1:scenario-concept",
+      "type": "uses_concept",
+      "source": "S1",
+      "target": "scenario-concept"
+    },
+    {
+      "id": "uses_concept:S1:variant",
+      "type": "uses_concept",
+      "source": "S1",
+      "target": "variant"
+    },
+    {
+      "id": "uses_concept:S1:observation",
+      "type": "uses_concept",
+      "source": "S1",
+      "target": "observation"
+    },
+    {
+      "id": "uses_concept:S1:correspondence",
+      "type": "uses_concept",
+      "source": "S1",
+      "target": "correspondence"
+    },
+    {
+      "id": "uses_concept:S1:experiment",
+      "type": "uses_concept",
+      "source": "S1",
+      "target": "experiment"
+    },
+    {
+      "id": "uses_concept:S1:counterfactual-evidence",
+      "type": "uses_concept",
+      "source": "S1",
+      "target": "counterfactual-evidence"
+    },
+    {
+      "id": "specializes:counterfactual-evidence:evidence",
+      "type": "specializes",
+      "source": "counterfactual-evidence",
+      "target": "evidence"
+    },
+    {
+      "id": "uses_concept:S2:training-case",
+      "type": "uses_concept",
+      "source": "S2",
+      "target": "training-case"
+    },
+    {
+      "id": "specializes:training-case:evidence",
+      "type": "specializes",
+      "source": "training-case",
+      "target": "evidence"
+    },
+    {
+      "id": "uses_concept:S2:candidate-intervention",
+      "type": "uses_concept",
+      "source": "S2",
+      "target": "candidate-intervention"
+    },
+    {
+      "id": "specializes:candidate-intervention:intervention",
+      "type": "specializes",
+      "source": "candidate-intervention",
+      "target": "intervention"
+    },
+    {
+      "id": "uses_concept:S2:evaluation",
+      "type": "uses_concept",
+      "source": "S2",
+      "target": "evaluation"
+    },
+    {
+      "id": "specializes:evaluation:evidence",
+      "type": "specializes",
+      "source": "evaluation",
+      "target": "evidence"
+    },
+    {
+      "id": "uses_concept:S2:applicability",
+      "type": "uses_concept",
+      "source": "S2",
+      "target": "applicability"
+    },
+    {
+      "id": "uses_concept:S3:presentation-target",
+      "type": "uses_concept",
+      "source": "S3",
+      "target": "presentation-target"
+    },
+    {
+      "id": "uses_concept:S3:policy-binding",
+      "type": "uses_concept",
+      "source": "S3",
+      "target": "policy-binding"
+    },
+    {
+      "id": "uses_concept:S3:installation",
+      "type": "uses_concept",
+      "source": "S3",
+      "target": "installation"
+    },
+    {
+      "id": "uses_concept:S3:execution",
+      "type": "uses_concept",
+      "source": "S3",
+      "target": "execution"
+    },
+    {
+      "id": "specializes:execution:intervention",
+      "type": "specializes",
+      "source": "execution",
+      "target": "intervention"
+    },
+    {
+      "id": "uses_concept:S3:execution-outcome",
+      "type": "uses_concept",
+      "source": "S3",
+      "target": "execution-outcome"
+    },
+    {
+      "id": "specializes:execution-outcome:evidence",
+      "type": "specializes",
+      "source": "execution-outcome",
+      "target": "evidence"
+    },
+    {
+      "id": "uses_concept:S4:preference",
+      "type": "uses_concept",
+      "source": "S4",
+      "target": "preference"
+    },
+    {
+      "id": "uses_concept:S4:scope",
+      "type": "uses_concept",
+      "source": "S4",
+      "target": "scope"
+    },
+    {
+      "id": "uses_concept:S4:selection",
+      "type": "uses_concept",
+      "source": "S4",
+      "target": "selection"
+    },
+    {
+      "id": "uses_concept:S4:desired-outcome",
+      "type": "uses_concept",
+      "source": "S4",
+      "target": "desired-outcome"
+    },
+    {
+      "id": "specializes:desired-outcome:objective",
+      "type": "specializes",
+      "source": "desired-outcome",
+      "target": "objective"
+    },
+    {
+      "id": "uses_concept:S4:feedback",
+      "type": "uses_concept",
+      "source": "S4",
+      "target": "feedback"
+    },
+    {
+      "id": "specializes:feedback:evidence",
+      "type": "specializes",
+      "source": "feedback",
+      "target": "evidence"
+    },
+    {
+      "id": "uses_concept:S4:profile",
+      "type": "uses_concept",
+      "source": "S4",
+      "target": "profile"
+    },
+    {
+      "id": "includes:realization:environment-concept",
+      "type": "includes",
+      "source": "realization",
+      "target": "environment-concept"
+    },
+    {
+      "id": "includes:realization:boundary-concept",
+      "type": "includes",
+      "source": "realization",
+      "target": "boundary-concept"
+    },
+    {
+      "id": "includes:realization:capability-concept",
+      "type": "includes",
+      "source": "realization",
+      "target": "capability-concept"
+    },
+    {
+      "id": "includes:realization:layer-concept",
+      "type": "includes",
+      "source": "realization",
+      "target": "layer-concept"
+    },
+    {
+      "id": "includes:realization:binding-concept",
+      "type": "includes",
+      "source": "realization",
+      "target": "binding-concept"
+    },
+    {
+      "id": "uses_concept:S3:capability-concept",
+      "type": "uses_concept",
+      "source": "S3",
+      "target": "capability-concept"
+    },
+    {
+      "id": "defined_in_terms_of:C1:objective",
+      "type": "defined_in_terms_of",
+      "source": "C1",
+      "target": "objective"
+    },
+    {
+      "id": "produces:S4:C1",
+      "type": "produces",
+      "source": "S4",
+      "target": "C1"
+    },
+    {
+      "id": "consumed_by:C1:S2",
+      "type": "consumed_by",
+      "source": "C1",
+      "target": "S2"
+    },
+    {
+      "id": "consumed_by:C1:S3",
+      "type": "consumed_by",
+      "source": "C1",
+      "target": "S3"
+    },
+    {
+      "id": "exchanges:S2-contract:C1",
+      "type": "exchanges",
+      "source": "S2-contract",
+      "target": "C1"
+    },
+    {
+      "id": "exchanges:S3-contract:C1",
+      "type": "exchanges",
+      "source": "S3-contract",
+      "target": "C1"
+    },
+    {
+      "id": "exchanges:S4-contract:C1",
+      "type": "exchanges",
+      "source": "S4-contract",
+      "target": "C1"
+    },
+    {
+      "id": "defined_in_terms_of:C2:evidence",
+      "type": "defined_in_terms_of",
+      "source": "C2",
+      "target": "evidence"
+    },
+    {
+      "id": "defined_in_terms_of:C2:counterfactual",
+      "type": "defined_in_terms_of",
+      "source": "C2",
+      "target": "counterfactual"
+    },
+    {
+      "id": "defined_in_terms_of:C2:representation",
+      "type": "defined_in_terms_of",
+      "source": "C2",
+      "target": "representation"
+    },
+    {
+      "id": "produces:S1:C2",
+      "type": "produces",
+      "source": "S1",
+      "target": "C2"
+    },
+    {
+      "id": "consumed_by:C2:S2",
+      "type": "consumed_by",
+      "source": "C2",
+      "target": "S2"
+    },
+    {
+      "id": "exchanges:S1-contract:C2",
+      "type": "exchanges",
+      "source": "S1-contract",
+      "target": "C2"
+    },
+    {
+      "id": "exchanges:S2-contract:C2",
+      "type": "exchanges",
+      "source": "S2-contract",
+      "target": "C2"
+    },
+    {
+      "id": "defined_in_terms_of:C3:policy",
+      "type": "defined_in_terms_of",
+      "source": "C3",
+      "target": "policy"
+    },
+    {
+      "id": "defined_in_terms_of:C3:objective",
+      "type": "defined_in_terms_of",
+      "source": "C3",
+      "target": "objective"
+    },
+    {
+      "id": "produces:S2:C3",
+      "type": "produces",
+      "source": "S2",
+      "target": "C3"
+    },
+    {
+      "id": "consumed_by:C3:S3",
+      "type": "consumed_by",
+      "source": "C3",
+      "target": "S3"
+    },
+    {
+      "id": "exchanges:S2-contract:C3",
+      "type": "exchanges",
+      "source": "S2-contract",
+      "target": "C3"
+    },
+    {
+      "id": "exchanges:S3-contract:C3",
+      "type": "exchanges",
+      "source": "S3-contract",
+      "target": "C3"
+    },
+    {
+      "id": "defined_in_terms_of:C4:evidence",
+      "type": "defined_in_terms_of",
+      "source": "C4",
+      "target": "evidence"
+    },
+    {
+      "id": "defined_in_terms_of:C4:presentation",
+      "type": "defined_in_terms_of",
+      "source": "C4",
+      "target": "presentation"
+    },
+    {
+      "id": "defined_in_terms_of:C4:policy",
+      "type": "defined_in_terms_of",
+      "source": "C4",
+      "target": "policy"
+    },
+    {
+      "id": "produces:S3:C4",
+      "type": "produces",
+      "source": "S3",
+      "target": "C4"
+    },
+    {
+      "id": "consumed_by:C4:S1",
+      "type": "consumed_by",
+      "source": "C4",
+      "target": "S1"
+    },
+    {
+      "id": "consumed_by:C4:S2",
+      "type": "consumed_by",
+      "source": "C4",
+      "target": "S2"
+    },
+    {
+      "id": "consumed_by:C4:S4",
+      "type": "consumed_by",
+      "source": "C4",
+      "target": "S4"
+    },
+    {
+      "id": "exchanges:S1-contract:C4",
+      "type": "exchanges",
+      "source": "S1-contract",
+      "target": "C4"
+    },
+    {
+      "id": "exchanges:S2-contract:C4",
+      "type": "exchanges",
+      "source": "S2-contract",
+      "target": "C4"
+    },
+    {
+      "id": "exchanges:S3-contract:C4",
+      "type": "exchanges",
+      "source": "S3-contract",
+      "target": "C4"
+    },
+    {
+      "id": "exchanges:S4-contract:C4",
+      "type": "exchanges",
+      "source": "S4-contract",
+      "target": "C4"
+    },
+    {
+      "id": "defined_in_terms_of:C5:capability-concept",
+      "type": "defined_in_terms_of",
+      "source": "C5",
+      "target": "capability-concept"
+    },
+    {
+      "id": "defined_in_terms_of:C5:boundary-concept",
+      "type": "defined_in_terms_of",
+      "source": "C5",
+      "target": "boundary-concept"
+    },
+    {
+      "id": "consumed_by:C5:S1",
+      "type": "consumed_by",
+      "source": "C5",
+      "target": "S1"
+    },
+    {
+      "id": "consumed_by:C5:S2",
+      "type": "consumed_by",
+      "source": "C5",
+      "target": "S2"
+    },
+    {
+      "id": "consumed_by:C5:S3",
+      "type": "consumed_by",
+      "source": "C5",
+      "target": "S3"
+    },
+    {
+      "id": "consumed_by:C5:S4",
+      "type": "consumed_by",
+      "source": "C5",
+      "target": "S4"
+    },
+    {
+      "id": "exchanges:S1-contract:C5",
+      "type": "exchanges",
+      "source": "S1-contract",
+      "target": "C5"
+    },
+    {
+      "id": "exchanges:S2-contract:C5",
+      "type": "exchanges",
+      "source": "S2-contract",
+      "target": "C5"
+    },
+    {
+      "id": "exchanges:S3-contract:C5",
+      "type": "exchanges",
+      "source": "S3-contract",
+      "target": "C5"
+    },
+    {
+      "id": "exchanges:S4-contract:C5",
+      "type": "exchanges",
+      "source": "S4-contract",
+      "target": "C5"
+    },
+    {
+      "id": "classified_by:engine-boundary:L1",
+      "type": "classified_by",
+      "source": "engine-boundary",
+      "target": "L1"
+    },
+    {
+      "id": "classified_by:engine-boundary:L2",
+      "type": "classified_by",
+      "source": "engine-boundary",
+      "target": "L2"
+    },
+    {
+      "id": "classified_by:graphics-boundary:L3",
+      "type": "classified_by",
+      "source": "graphics-boundary",
+      "target": "L3"
+    },
+    {
+      "id": "classified_by:preference-boundary:L1",
+      "type": "classified_by",
+      "source": "preference-boundary",
+      "target": "L1"
+    },
+    {
+      "id": "classified_by:preference-boundary:L2",
+      "type": "classified_by",
+      "source": "preference-boundary",
+      "target": "L2"
+    },
+    {
+      "id": "classified_by:composition-boundary:L4",
+      "type": "classified_by",
+      "source": "composition-boundary",
+      "target": "L4"
+    },
+    {
+      "id": "exposes:linux-godot:engine-boundary",
+      "type": "exposes",
+      "source": "linux-godot",
+      "target": "engine-boundary"
+    },
+    {
+      "id": "exposes:linux-godot:graphics-boundary",
+      "type": "exposes",
+      "source": "linux-godot",
+      "target": "graphics-boundary"
+    },
+    {
+      "id": "attempts_to_fulfill:B1:S1-contract",
+      "type": "attempts_to_fulfill",
+      "source": "B1",
+      "target": "S1-contract"
+    },
+    {
+      "id": "produces:B1:C5",
+      "type": "produces",
+      "source": "B1",
+      "target": "C5"
+    },
+    {
+      "id": "uses_boundary:B1:engine-boundary",
+      "type": "uses_boundary",
+      "source": "B1",
+      "target": "engine-boundary"
+    },
+    {
+      "id": "uses_boundary:B1:graphics-boundary",
+      "type": "uses_boundary",
+      "source": "B1",
+      "target": "graphics-boundary"
+    },
+    {
+      "id": "requires_capability:B1:replay-capability",
+      "type": "requires_capability",
+      "source": "B1",
+      "target": "replay-capability"
+    },
+    {
+      "id": "requires_capability:S1-contract:replay-capability",
+      "type": "requires_capability",
+      "source": "S1-contract",
+      "target": "replay-capability"
+    },
+    {
+      "id": "requires_capability:B1:capture-capability",
+      "type": "requires_capability",
+      "source": "B1",
+      "target": "capture-capability"
+    },
+    {
+      "id": "requires_capability:S1-contract:capture-capability",
+      "type": "requires_capability",
+      "source": "S1-contract",
+      "target": "capture-capability"
+    },
+    {
+      "id": "requires_capability:B1:correspondence-capability",
+      "type": "requires_capability",
+      "source": "B1",
+      "target": "correspondence-capability"
+    },
+    {
+      "id": "requires_capability:S1-contract:correspondence-capability",
+      "type": "requires_capability",
+      "source": "S1-contract",
+      "target": "correspondence-capability"
+    },
+    {
+      "id": "must_preserve:B1:D1",
+      "type": "must_preserve",
+      "source": "B1",
+      "target": "D1"
+    },
+    {
+      "id": "must_preserve:B1:D2",
+      "type": "must_preserve",
+      "source": "B1",
+      "target": "D2"
+    },
+    {
+      "id": "must_preserve:B1:D3",
+      "type": "must_preserve",
+      "source": "B1",
+      "target": "D3"
+    },
+    {
+      "id": "must_preserve:B1:D4",
+      "type": "must_preserve",
+      "source": "B1",
+      "target": "D4"
+    },
+    {
+      "id": "must_preserve:B1:D5",
+      "type": "must_preserve",
+      "source": "B1",
+      "target": "D5"
+    },
+    {
+      "id": "must_preserve:B1:D6",
+      "type": "must_preserve",
+      "source": "B1",
+      "target": "D6"
+    },
+    {
+      "id": "must_preserve:B1:D7",
+      "type": "must_preserve",
+      "source": "B1",
+      "target": "D7"
+    },
+    {
+      "id": "attempts_to_fulfill:B2:S2-contract",
+      "type": "attempts_to_fulfill",
+      "source": "B2",
+      "target": "S2-contract"
+    },
+    {
+      "id": "produces:B2:C5",
+      "type": "produces",
+      "source": "B2",
+      "target": "C5"
+    },
+    {
+      "id": "uses_boundary:B2:analysis-boundary",
+      "type": "uses_boundary",
+      "source": "B2",
+      "target": "analysis-boundary"
+    },
+    {
+      "id": "requires_capability:B2:analysis-capability",
+      "type": "requires_capability",
+      "source": "B2",
+      "target": "analysis-capability"
+    },
+    {
+      "id": "requires_capability:S2-contract:analysis-capability",
+      "type": "requires_capability",
+      "source": "S2-contract",
+      "target": "analysis-capability"
+    },
+    {
+      "id": "requires_capability:B2:measurement-capability",
+      "type": "requires_capability",
+      "source": "B2",
+      "target": "measurement-capability"
+    },
+    {
+      "id": "requires_capability:S2-contract:measurement-capability",
+      "type": "requires_capability",
+      "source": "S2-contract",
+      "target": "measurement-capability"
+    },
+    {
+      "id": "must_preserve:B2:D1",
+      "type": "must_preserve",
+      "source": "B2",
+      "target": "D1"
+    },
+    {
+      "id": "must_preserve:B2:D2",
+      "type": "must_preserve",
+      "source": "B2",
+      "target": "D2"
+    },
+    {
+      "id": "must_preserve:B2:D3",
+      "type": "must_preserve",
+      "source": "B2",
+      "target": "D3"
+    },
+    {
+      "id": "must_preserve:B2:D4",
+      "type": "must_preserve",
+      "source": "B2",
+      "target": "D4"
+    },
+    {
+      "id": "must_preserve:B2:D5",
+      "type": "must_preserve",
+      "source": "B2",
+      "target": "D5"
+    },
+    {
+      "id": "must_preserve:B2:D6",
+      "type": "must_preserve",
+      "source": "B2",
+      "target": "D6"
+    },
+    {
+      "id": "must_preserve:B2:D7",
+      "type": "must_preserve",
+      "source": "B2",
+      "target": "D7"
+    },
+    {
+      "id": "attempts_to_fulfill:B3:S3-contract",
+      "type": "attempts_to_fulfill",
+      "source": "B3",
+      "target": "S3-contract"
+    },
+    {
+      "id": "produces:B3:C5",
+      "type": "produces",
+      "source": "B3",
+      "target": "C5"
+    },
+    {
+      "id": "uses_boundary:B3:graphics-boundary",
+      "type": "uses_boundary",
+      "source": "B3",
+      "target": "graphics-boundary"
+    },
+    {
+      "id": "requires_capability:B3:targeting-capability",
+      "type": "requires_capability",
+      "source": "B3",
+      "target": "targeting-capability"
+    },
+    {
+      "id": "requires_capability:S3-contract:targeting-capability",
+      "type": "requires_capability",
+      "source": "S3-contract",
+      "target": "targeting-capability"
+    },
+    {
+      "id": "requires_capability:B3:substitution-capability",
+      "type": "requires_capability",
+      "source": "B3",
+      "target": "substitution-capability"
+    },
+    {
+      "id": "requires_capability:S3-contract:substitution-capability",
+      "type": "requires_capability",
+      "source": "S3-contract",
+      "target": "substitution-capability"
+    },
+    {
+      "id": "requires_capability:B3:protection-capability",
+      "type": "requires_capability",
+      "source": "B3",
+      "target": "protection-capability"
+    },
+    {
+      "id": "requires_capability:S3-contract:protection-capability",
+      "type": "requires_capability",
+      "source": "S3-contract",
+      "target": "protection-capability"
+    },
+    {
+      "id": "requires_capability:B3:measurement-capability",
+      "type": "requires_capability",
+      "source": "B3",
+      "target": "measurement-capability"
+    },
+    {
+      "id": "requires_capability:S3-contract:measurement-capability",
+      "type": "requires_capability",
+      "source": "S3-contract",
+      "target": "measurement-capability"
+    },
+    {
+      "id": "must_preserve:B3:D1",
+      "type": "must_preserve",
+      "source": "B3",
+      "target": "D1"
+    },
+    {
+      "id": "must_preserve:B3:D2",
+      "type": "must_preserve",
+      "source": "B3",
+      "target": "D2"
+    },
+    {
+      "id": "must_preserve:B3:D3",
+      "type": "must_preserve",
+      "source": "B3",
+      "target": "D3"
+    },
+    {
+      "id": "must_preserve:B3:D4",
+      "type": "must_preserve",
+      "source": "B3",
+      "target": "D4"
+    },
+    {
+      "id": "must_preserve:B3:D5",
+      "type": "must_preserve",
+      "source": "B3",
+      "target": "D5"
+    },
+    {
+      "id": "must_preserve:B3:D6",
+      "type": "must_preserve",
+      "source": "B3",
+      "target": "D6"
+    },
+    {
+      "id": "must_preserve:B3:D7",
+      "type": "must_preserve",
+      "source": "B3",
+      "target": "D7"
+    },
+    {
+      "id": "attempts_to_fulfill:B4:S4-contract",
+      "type": "attempts_to_fulfill",
+      "source": "B4",
+      "target": "S4-contract"
+    },
+    {
+      "id": "produces:B4:C5",
+      "type": "produces",
+      "source": "B4",
+      "target": "C5"
+    },
+    {
+      "id": "uses_boundary:B4:preference-boundary",
+      "type": "uses_boundary",
+      "source": "B4",
+      "target": "preference-boundary"
+    },
+    {
+      "id": "requires_capability:B4:preference-capability",
+      "type": "requires_capability",
+      "source": "B4",
+      "target": "preference-capability"
+    },
+    {
+      "id": "requires_capability:S4-contract:preference-capability",
+      "type": "requires_capability",
+      "source": "S4-contract",
+      "target": "preference-capability"
+    },
+    {
+      "id": "must_preserve:B4:D1",
+      "type": "must_preserve",
+      "source": "B4",
+      "target": "D1"
+    },
+    {
+      "id": "must_preserve:B4:D2",
+      "type": "must_preserve",
+      "source": "B4",
+      "target": "D2"
+    },
+    {
+      "id": "must_preserve:B4:D3",
+      "type": "must_preserve",
+      "source": "B4",
+      "target": "D3"
+    },
+    {
+      "id": "must_preserve:B4:D4",
+      "type": "must_preserve",
+      "source": "B4",
+      "target": "D4"
+    },
+    {
+      "id": "must_preserve:B4:D5",
+      "type": "must_preserve",
+      "source": "B4",
+      "target": "D5"
+    },
+    {
+      "id": "must_preserve:B4:D6",
+      "type": "must_preserve",
+      "source": "B4",
+      "target": "D6"
+    },
+    {
+      "id": "must_preserve:B4:D7",
+      "type": "must_preserve",
+      "source": "B4",
+      "target": "D7"
+    },
+    {
+      "id": "candidate_for:godot:B1",
+      "type": "candidate_for",
+      "source": "godot",
+      "target": "B1"
+    },
+    {
+      "id": "candidate_for:vulkan:graphics-boundary",
+      "type": "candidate_for",
+      "source": "vulkan",
+      "target": "graphics-boundary"
+    },
+    {
+      "id": "candidate_for:gfxreconstruct:B1",
+      "type": "candidate_for",
+      "source": "gfxreconstruct",
+      "target": "B1"
+    },
+    {
+      "id": "candidate_for:renderdoc:B1",
+      "type": "candidate_for",
+      "source": "renderdoc",
+      "target": "B1"
+    },
+    {
+      "id": "candidate_for:spirv:B3",
+      "type": "candidate_for",
+      "source": "spirv",
+      "target": "B3"
+    },
+    {
+      "id": "candidate_for:driver:B3",
+      "type": "candidate_for",
+      "source": "driver",
+      "target": "B3"
+    },
+    {
+      "id": "candidate_for:interception:B3",
+      "type": "candidate_for",
+      "source": "interception",
+      "target": "B3"
+    },
+    {
+      "id": "candidate_for:learning-infrastructure:B2",
+      "type": "candidate_for",
+      "source": "learning-infrastructure",
+      "target": "B2"
+    },
+    {
+      "id": "applies_to:P1:S1",
+      "type": "applies_to",
+      "source": "P1",
+      "target": "S1"
+    },
+    {
+      "id": "constrains_contract:P1:S1-contract",
+      "type": "constrains_contract",
+      "source": "P1",
+      "target": "S1-contract"
+    },
+    {
+      "id": "applies_to:P2:S1",
+      "type": "applies_to",
+      "source": "P2",
+      "target": "S1"
+    },
+    {
+      "id": "constrains_contract:P2:S1-contract",
+      "type": "constrains_contract",
+      "source": "P2",
+      "target": "S1-contract"
+    },
+    {
+      "id": "applies_to:P3:S2",
+      "type": "applies_to",
+      "source": "P3",
+      "target": "S2"
+    },
+    {
+      "id": "constrains_contract:P3:S2-contract",
+      "type": "constrains_contract",
+      "source": "P3",
+      "target": "S2-contract"
+    },
+    {
+      "id": "applies_to:P4:S3",
+      "type": "applies_to",
+      "source": "P4",
+      "target": "S3"
+    },
+    {
+      "id": "constrains_contract:P4:S3-contract",
+      "type": "constrains_contract",
+      "source": "P4",
+      "target": "S3-contract"
+    },
+    {
+      "id": "applies_to:P5:S3",
+      "type": "applies_to",
+      "source": "P5",
+      "target": "S3"
+    },
+    {
+      "id": "constrains_contract:P5:S3-contract",
+      "type": "constrains_contract",
+      "source": "P5",
+      "target": "S3-contract"
+    },
+    {
+      "id": "applies_to:P6:architecture",
+      "type": "applies_to",
+      "source": "P6",
+      "target": "architecture"
+    },
+    {
+      "id": "applies_to:P7:S4",
+      "type": "applies_to",
+      "source": "P7",
+      "target": "S4"
+    },
+    {
+      "id": "constrains_contract:P7:S4-contract",
+      "type": "constrains_contract",
+      "source": "P7",
+      "target": "S4-contract"
+    },
+    {
+      "id": "applies_to:P8:architecture",
+      "type": "applies_to",
+      "source": "P8",
+      "target": "architecture"
+    },
+    {
+      "id": "applies_to:P9:architecture",
+      "type": "applies_to",
+      "source": "P9",
+      "target": "architecture"
+    },
+    {
+      "id": "applies_to:F01:architecture",
+      "type": "applies_to",
+      "source": "F01",
+      "target": "architecture"
+    },
+    {
+      "id": "supports:F01:P6",
+      "type": "supports",
+      "source": "F01",
+      "target": "P6"
+    },
+    {
+      "id": "applies_to:F02:S1",
+      "type": "applies_to",
+      "source": "F02",
+      "target": "S1"
+    },
+    {
+      "id": "constrains_contract:F02:S1-contract",
+      "type": "constrains_contract",
+      "source": "F02",
+      "target": "S1-contract"
+    },
+    {
+      "id": "supports:F02:P1",
+      "type": "supports",
+      "source": "F02",
+      "target": "P1"
+    },
+    {
+      "id": "applies_to:F03:S1",
+      "type": "applies_to",
+      "source": "F03",
+      "target": "S1"
+    },
+    {
+      "id": "constrains_contract:F03:S1-contract",
+      "type": "constrains_contract",
+      "source": "F03",
+      "target": "S1-contract"
+    },
+    {
+      "id": "supports:F03:P1",
+      "type": "supports",
+      "source": "F03",
+      "target": "P1"
+    },
+    {
+      "id": "applies_to:F04:S1",
+      "type": "applies_to",
+      "source": "F04",
+      "target": "S1"
+    },
+    {
+      "id": "constrains_contract:F04:S1-contract",
+      "type": "constrains_contract",
+      "source": "F04",
+      "target": "S1-contract"
+    },
+    {
+      "id": "supports:F04:P2",
+      "type": "supports",
+      "source": "F04",
+      "target": "P2"
+    },
+    {
+      "id": "applies_to:F05:S1",
+      "type": "applies_to",
+      "source": "F05",
+      "target": "S1"
+    },
+    {
+      "id": "constrains_contract:F05:S1-contract",
+      "type": "constrains_contract",
+      "source": "F05",
+      "target": "S1-contract"
+    },
+    {
+      "id": "supports:F05:P1",
+      "type": "supports",
+      "source": "F05",
+      "target": "P1"
+    },
+    {
+      "id": "applies_to:F06:S2",
+      "type": "applies_to",
+      "source": "F06",
+      "target": "S2"
+    },
+    {
+      "id": "constrains_contract:F06:S2-contract",
+      "type": "constrains_contract",
+      "source": "F06",
+      "target": "S2-contract"
+    },
+    {
+      "id": "supports:F06:P3",
+      "type": "supports",
+      "source": "F06",
+      "target": "P3"
+    },
+    {
+      "id": "applies_to:F07:S2",
+      "type": "applies_to",
+      "source": "F07",
+      "target": "S2"
+    },
+    {
+      "id": "constrains_contract:F07:S2-contract",
+      "type": "constrains_contract",
+      "source": "F07",
+      "target": "S2-contract"
+    },
+    {
+      "id": "supports:F07:P3",
+      "type": "supports",
+      "source": "F07",
+      "target": "P3"
+    },
+    {
+      "id": "applies_to:F08:S3",
+      "type": "applies_to",
+      "source": "F08",
+      "target": "S3"
+    },
+    {
+      "id": "constrains_contract:F08:S3-contract",
+      "type": "constrains_contract",
+      "source": "F08",
+      "target": "S3-contract"
+    },
+    {
+      "id": "supports:F08:P8",
+      "type": "supports",
+      "source": "F08",
+      "target": "P8"
+    },
+    {
+      "id": "applies_to:F09:S3",
+      "type": "applies_to",
+      "source": "F09",
+      "target": "S3"
+    },
+    {
+      "id": "constrains_contract:F09:S3-contract",
+      "type": "constrains_contract",
+      "source": "F09",
+      "target": "S3-contract"
+    },
+    {
+      "id": "supports:F09:P4",
+      "type": "supports",
+      "source": "F09",
+      "target": "P4"
+    },
+    {
+      "id": "applies_to:F10:S3",
+      "type": "applies_to",
+      "source": "F10",
+      "target": "S3"
+    },
+    {
+      "id": "constrains_contract:F10:S3-contract",
+      "type": "constrains_contract",
+      "source": "F10",
+      "target": "S3-contract"
+    },
+    {
+      "id": "supports:F10:P4",
+      "type": "supports",
+      "source": "F10",
+      "target": "P4"
+    },
+    {
+      "id": "applies_to:F11:S3",
+      "type": "applies_to",
+      "source": "F11",
+      "target": "S3"
+    },
+    {
+      "id": "constrains_contract:F11:S3-contract",
+      "type": "constrains_contract",
+      "source": "F11",
+      "target": "S3-contract"
+    },
+    {
+      "id": "supports:F11:P5",
+      "type": "supports",
+      "source": "F11",
+      "target": "P5"
+    },
+    {
+      "id": "applies_to:F12:S4",
+      "type": "applies_to",
+      "source": "F12",
+      "target": "S4"
+    },
+    {
+      "id": "constrains_contract:F12:S4-contract",
+      "type": "constrains_contract",
+      "source": "F12",
+      "target": "S4-contract"
+    },
+    {
+      "id": "supports:F12:P7",
+      "type": "supports",
+      "source": "F12",
+      "target": "P7"
+    },
+    {
+      "id": "applies_to:F13:S3",
+      "type": "applies_to",
+      "source": "F13",
+      "target": "S3"
+    },
+    {
+      "id": "constrains_contract:F13:S3-contract",
+      "type": "constrains_contract",
+      "source": "F13",
+      "target": "S3-contract"
+    },
+    {
+      "id": "supports:F13:P8",
+      "type": "supports",
+      "source": "F13",
+      "target": "P8"
+    },
+    {
+      "id": "applies_to:F14:architecture",
+      "type": "applies_to",
+      "source": "F14",
+      "target": "architecture"
+    },
+    {
+      "id": "supports:F14:P8",
+      "type": "supports",
+      "source": "F14",
+      "target": "P8"
+    },
+    {
+      "id": "governed_by:P5:D5",
+      "type": "governed_by",
+      "source": "P5",
+      "target": "D5"
+    },
+    {
+      "id": "governed_by:P6:D7",
+      "type": "governed_by",
+      "source": "P6",
+      "target": "D7"
+    },
+    {
+      "id": "governed_by:F02:D6",
+      "type": "governed_by",
+      "source": "F02",
+      "target": "D6"
+    },
+    {
+      "id": "governed_by:F04:D2",
+      "type": "governed_by",
+      "source": "F04",
+      "target": "D2"
+    },
+    {
+      "id": "governed_by:F05:D1",
+      "type": "governed_by",
+      "source": "F05",
+      "target": "D1"
+    },
+    {
+      "id": "governed_by:F13:D4",
+      "type": "governed_by",
+      "source": "F13",
+      "target": "D4"
+    },
+    {
+      "id": "contains_step:reference-scene:experiment-step",
+      "type": "contains_step",
+      "source": "reference-scene",
+      "target": "experiment-step"
+    },
+    {
+      "id": "performed_by:experiment-step:S1",
+      "type": "performed_by",
+      "source": "experiment-step",
+      "target": "S1"
+    },
+    {
+      "id": "contains_step:reference-scene:synthesis-step",
+      "type": "contains_step",
+      "source": "reference-scene",
+      "target": "synthesis-step"
+    },
+    {
+      "id": "performed_by:synthesis-step:S2",
+      "type": "performed_by",
+      "source": "synthesis-step",
+      "target": "S2"
+    },
+    {
+      "id": "contains_step:reference-scene:runtime-step",
+      "type": "contains_step",
+      "source": "reference-scene",
+      "target": "runtime-step"
+    },
+    {
+      "id": "performed_by:runtime-step:S3",
+      "type": "performed_by",
+      "source": "runtime-step",
+      "target": "S3"
+    },
+    {
+      "id": "contains_step:reference-scene:feedback-step",
+      "type": "contains_step",
+      "source": "reference-scene",
+      "target": "feedback-step"
+    },
+    {
+      "id": "performed_by:feedback-step:S4",
+      "type": "performed_by",
+      "source": "feedback-step",
+      "target": "S4"
+    },
+    {
+      "id": "contains_step:reference-scene:preference-step",
+      "type": "contains_step",
+      "source": "reference-scene",
+      "target": "preference-step"
+    },
+    {
+      "id": "performed_by:preference-step:S4",
+      "type": "performed_by",
+      "source": "preference-step",
+      "target": "S4"
+    },
+    {
+      "id": "contains_step:reference-scene:activation-step",
+      "type": "contains_step",
+      "source": "reference-scene",
+      "target": "activation-step"
+    },
+    {
+      "id": "performed_by:activation-step:S4",
+      "type": "performed_by",
+      "source": "activation-step",
+      "target": "S4"
+    },
+    {
+      "id": "next:experiment-step:synthesis-step",
+      "type": "next",
+      "source": "experiment-step",
+      "target": "synthesis-step"
+    },
+    {
+      "id": "next:preference-step:synthesis-step",
+      "type": "next",
+      "source": "preference-step",
+      "target": "synthesis-step"
+    },
+    {
+      "id": "next:synthesis-step:activation-step",
+      "type": "next",
+      "source": "synthesis-step",
+      "target": "activation-step"
+    },
+    {
+      "id": "next:activation-step:runtime-step",
+      "type": "next",
+      "source": "activation-step",
+      "target": "runtime-step"
+    },
+    {
+      "id": "next:runtime-step:feedback-step",
+      "type": "next",
+      "source": "runtime-step",
+      "target": "feedback-step"
+    },
+    {
+      "id": "applies_to:A01:reference-scene",
+      "type": "applies_to",
+      "source": "A01",
+      "target": "reference-scene"
+    },
+    {
+      "id": "applies_to:A01:B3",
+      "type": "applies_to",
+      "source": "A01",
+      "target": "B3"
+    },
+    {
+      "id": "applies_to:A01:blood-glitter-objective",
+      "type": "applies_to",
+      "source": "A01",
+      "target": "blood-glitter-objective"
+    },
+    {
+      "id": "governed_by:A01:D5",
+      "type": "governed_by",
+      "source": "A01",
+      "target": "D5"
+    },
+    {
+      "id": "applies_to:A02:reference-scene",
+      "type": "applies_to",
+      "source": "A02",
+      "target": "reference-scene"
+    },
+    {
+      "id": "applies_to:A02:B3",
+      "type": "applies_to",
+      "source": "A02",
+      "target": "B3"
+    },
+    {
+      "id": "applies_to:A02:blood-glitter-objective",
+      "type": "applies_to",
+      "source": "A02",
+      "target": "blood-glitter-objective"
+    },
+    {
+      "id": "governed_by:A02:D5",
+      "type": "governed_by",
+      "source": "A02",
+      "target": "D5"
+    },
+    {
+      "id": "applies_to:A03:reference-scene",
+      "type": "applies_to",
+      "source": "A03",
+      "target": "reference-scene"
+    },
+    {
+      "id": "applies_to:A03:B3",
+      "type": "applies_to",
+      "source": "A03",
+      "target": "B3"
+    },
+    {
+      "id": "governed_by:A03:D5",
+      "type": "governed_by",
+      "source": "A03",
+      "target": "D5"
+    },
+    {
+      "id": "applies_to:A04:reference-scene",
+      "type": "applies_to",
+      "source": "A04",
+      "target": "reference-scene"
+    },
+    {
+      "id": "applies_to:A04:B3",
+      "type": "applies_to",
+      "source": "A04",
+      "target": "B3"
+    },
+    {
+      "id": "governed_by:A04:D5",
+      "type": "governed_by",
+      "source": "A04",
+      "target": "D5"
+    },
+    {
+      "id": "applies_to:A05:reference-scene",
+      "type": "applies_to",
+      "source": "A05",
+      "target": "reference-scene"
+    },
+    {
+      "id": "applies_to:A05:B3",
+      "type": "applies_to",
+      "source": "A05",
+      "target": "B3"
+    },
+    {
+      "id": "governed_by:A05:D5",
+      "type": "governed_by",
+      "source": "A05",
+      "target": "D5"
+    },
+    {
+      "id": "applies_to:A06:reference-scene",
+      "type": "applies_to",
+      "source": "A06",
+      "target": "reference-scene"
+    },
+    {
+      "id": "applies_to:A06:B3",
+      "type": "applies_to",
+      "source": "A06",
+      "target": "B3"
+    },
+    {
+      "id": "governed_by:A06:D5",
+      "type": "governed_by",
+      "source": "A06",
+      "target": "D5"
+    },
+    {
+      "id": "applies_to:A07:reference-scene",
+      "type": "applies_to",
+      "source": "A07",
+      "target": "reference-scene"
+    },
+    {
+      "id": "applies_to:A07:B3",
+      "type": "applies_to",
+      "source": "A07",
+      "target": "B3"
+    },
+    {
+      "id": "applies_to:A07:blood-glitter-objective",
+      "type": "applies_to",
+      "source": "A07",
+      "target": "blood-glitter-objective"
+    },
+    {
+      "id": "governed_by:A07:D4",
+      "type": "governed_by",
+      "source": "A07",
+      "target": "D4"
+    },
+    {
+      "id": "applies_to:A08:reference-scene",
+      "type": "applies_to",
+      "source": "A08",
+      "target": "reference-scene"
+    },
+    {
+      "id": "applies_to:A08:B3",
+      "type": "applies_to",
+      "source": "A08",
+      "target": "B3"
+    },
+    {
+      "id": "applies_to:A08:blood-glitter-objective",
+      "type": "applies_to",
+      "source": "A08",
+      "target": "blood-glitter-objective"
+    },
+    {
+      "id": "governed_by:A08:D3",
+      "type": "governed_by",
+      "source": "A08",
+      "target": "D3"
+    },
+    {
+      "id": "applies_to:A09:reference-scene",
+      "type": "applies_to",
+      "source": "A09",
+      "target": "reference-scene"
+    },
+    {
+      "id": "applies_to:A09:B3",
+      "type": "applies_to",
+      "source": "A09",
+      "target": "B3"
+    },
+    {
+      "id": "applies_to:A09:blood-glitter-objective",
+      "type": "applies_to",
+      "source": "A09",
+      "target": "blood-glitter-objective"
+    },
+    {
+      "id": "governed_by:A09:D7",
+      "type": "governed_by",
+      "source": "A09",
+      "target": "D7"
+    },
+    {
+      "id": "applies_to:A10:reference-scene",
+      "type": "applies_to",
+      "source": "A10",
+      "target": "reference-scene"
+    },
+    {
+      "id": "applies_to:A10:S1",
+      "type": "applies_to",
+      "source": "A10",
+      "target": "S1"
+    },
+    {
+      "id": "constrains_contract:A10:S1-contract",
+      "type": "constrains_contract",
+      "source": "A10",
+      "target": "S1-contract"
+    },
+    {
+      "id": "governed_by:A10:D1",
+      "type": "governed_by",
+      "source": "A10",
+      "target": "D1"
+    },
+    {
+      "id": "applies_to:A11:reference-scene",
+      "type": "applies_to",
+      "source": "A11",
+      "target": "reference-scene"
+    },
+    {
+      "id": "applies_to:A11:S1",
+      "type": "applies_to",
+      "source": "A11",
+      "target": "S1"
+    },
+    {
+      "id": "constrains_contract:A11:S1-contract",
+      "type": "constrains_contract",
+      "source": "A11",
+      "target": "S1-contract"
+    },
+    {
+      "id": "governed_by:A11:D6",
+      "type": "governed_by",
+      "source": "A11",
+      "target": "D6"
+    },
+    {
+      "id": "applies_to:A12:reference-scene",
+      "type": "applies_to",
+      "source": "A12",
+      "target": "reference-scene"
+    },
+    {
+      "id": "applies_to:A12:architecture",
+      "type": "applies_to",
+      "source": "A12",
+      "target": "architecture"
+    },
+    {
+      "id": "governed_by:A12:D7",
+      "type": "governed_by",
+      "source": "A12",
+      "target": "D7"
+    },
+    {
+      "id": "applies_to:T01:S3",
+      "type": "applies_to",
+      "source": "T01",
+      "target": "S3"
+    },
+    {
+      "id": "constrains_contract:T01:S3-contract",
+      "type": "constrains_contract",
+      "source": "T01",
+      "target": "S3-contract"
+    },
+    {
+      "id": "applies_to:T02:S3",
+      "type": "applies_to",
+      "source": "T02",
+      "target": "S3"
+    },
+    {
+      "id": "constrains_contract:T02:S3-contract",
+      "type": "constrains_contract",
+      "source": "T02",
+      "target": "S3-contract"
+    },
+    {
+      "id": "applies_to:T03:S3",
+      "type": "applies_to",
+      "source": "T03",
+      "target": "S3"
+    },
+    {
+      "id": "constrains_contract:T03:S3-contract",
+      "type": "constrains_contract",
+      "source": "T03",
+      "target": "S3-contract"
+    },
+    {
+      "id": "applies_to:T04:S3",
+      "type": "applies_to",
+      "source": "T04",
+      "target": "S3"
+    },
+    {
+      "id": "constrains_contract:T04:S3-contract",
+      "type": "constrains_contract",
+      "source": "T04",
+      "target": "S3-contract"
+    },
+    {
+      "id": "applies_to:T05:S3",
+      "type": "applies_to",
+      "source": "T05",
+      "target": "S3"
+    },
+    {
+      "id": "constrains_contract:T05:S3-contract",
+      "type": "constrains_contract",
+      "source": "T05",
+      "target": "S3-contract"
+    },
+    {
+      "id": "applies_to:T06:S2",
+      "type": "applies_to",
+      "source": "T06",
+      "target": "S2"
+    },
+    {
+      "id": "constrains_contract:T06:S2-contract",
+      "type": "constrains_contract",
+      "source": "T06",
+      "target": "S2-contract"
+    },
+    {
+      "id": "applies_to:T07:S3",
+      "type": "applies_to",
+      "source": "T07",
+      "target": "S3"
+    },
+    {
+      "id": "constrains_contract:T07:S3-contract",
+      "type": "constrains_contract",
+      "source": "T07",
+      "target": "S3-contract"
+    },
+    {
+      "id": "applies_to:T08:S1",
+      "type": "applies_to",
+      "source": "T08",
+      "target": "S1"
+    },
+    {
+      "id": "constrains_contract:T08:S1-contract",
+      "type": "constrains_contract",
+      "source": "T08",
+      "target": "S1-contract"
+    },
+    {
+      "id": "applies_to:E1:S1",
+      "type": "applies_to",
+      "source": "E1",
+      "target": "S1"
+    },
+    {
+      "id": "constrains_contract:E1:S1-contract",
+      "type": "constrains_contract",
+      "source": "E1",
+      "target": "S1-contract"
+    },
+    {
+      "id": "applies_to:E2:S2",
+      "type": "applies_to",
+      "source": "E2",
+      "target": "S2"
+    },
+    {
+      "id": "constrains_contract:E2:S2-contract",
+      "type": "constrains_contract",
+      "source": "E2",
+      "target": "S2-contract"
+    },
+    {
+      "id": "applies_to:E3:S3",
+      "type": "applies_to",
+      "source": "E3",
+      "target": "S3"
+    },
+    {
+      "id": "constrains_contract:E3:S3-contract",
+      "type": "constrains_contract",
+      "source": "E3",
+      "target": "S3-contract"
+    },
+    {
+      "id": "applies_to:E4:S4",
+      "type": "applies_to",
+      "source": "E4",
+      "target": "S4"
+    },
+    {
+      "id": "constrains_contract:E4:S4-contract",
+      "type": "constrains_contract",
+      "source": "E4",
+      "target": "S4-contract"
+    },
+    {
+      "id": "applies_to:E5:architecture",
+      "type": "applies_to",
+      "source": "E5",
+      "target": "architecture"
+    },
+    {
+      "id": "applies_to:E6:S3",
+      "type": "applies_to",
+      "source": "E6",
+      "target": "S3"
+    },
+    {
+      "id": "constrains_contract:E6:S3-contract",
+      "type": "constrains_contract",
+      "source": "E6",
+      "target": "S3-contract"
+    },
+    {
+      "id": "delivers:phase-1:F01",
+      "type": "delivers",
+      "source": "phase-1",
+      "target": "F01"
+    },
+    {
+      "id": "evaluates:phase-1:A12",
+      "type": "evaluates",
+      "source": "phase-1",
+      "target": "A12"
+    },
+    {
+      "id": "delivers:phase-2:F02",
+      "type": "delivers",
+      "source": "phase-2",
+      "target": "F02"
+    },
+    {
+      "id": "delivers:phase-2:F03",
+      "type": "delivers",
+      "source": "phase-2",
+      "target": "F03"
+    },
+    {
+      "id": "delivers:phase-2:F04",
+      "type": "delivers",
+      "source": "phase-2",
+      "target": "F04"
+    },
+    {
+      "id": "delivers:phase-2:F05",
+      "type": "delivers",
+      "source": "phase-2",
+      "target": "F05"
+    },
+    {
+      "id": "evaluates:phase-2:A10",
+      "type": "evaluates",
+      "source": "phase-2",
+      "target": "A10"
+    },
+    {
+      "id": "evaluates:phase-2:A11",
+      "type": "evaluates",
+      "source": "phase-2",
+      "target": "A11"
+    },
+    {
+      "id": "evaluates:phase-2:E1",
+      "type": "evaluates",
+      "source": "phase-2",
+      "target": "E1"
+    },
+    {
+      "id": "delivers:phase-3:F06",
+      "type": "delivers",
+      "source": "phase-3",
+      "target": "F06"
+    },
+    {
+      "id": "delivers:phase-3:F07",
+      "type": "delivers",
+      "source": "phase-3",
+      "target": "F07"
+    },
+    {
+      "id": "evaluates:phase-3:E2",
+      "type": "evaluates",
+      "source": "phase-3",
+      "target": "E2"
+    },
+    {
+      "id": "evaluates:phase-3:A09",
+      "type": "evaluates",
+      "source": "phase-3",
+      "target": "A09"
+    },
+    {
+      "id": "delivers:phase-4:F08",
+      "type": "delivers",
+      "source": "phase-4",
+      "target": "F08"
+    },
+    {
+      "id": "delivers:phase-4:F09",
+      "type": "delivers",
+      "source": "phase-4",
+      "target": "F09"
+    },
+    {
+      "id": "delivers:phase-4:F10",
+      "type": "delivers",
+      "source": "phase-4",
+      "target": "F10"
+    },
+    {
+      "id": "delivers:phase-4:F11",
+      "type": "delivers",
+      "source": "phase-4",
+      "target": "F11"
+    },
+    {
+      "id": "delivers:phase-4:F13",
+      "type": "delivers",
+      "source": "phase-4",
+      "target": "F13"
+    },
+    {
+      "id": "evaluates:phase-4:E3",
+      "type": "evaluates",
+      "source": "phase-4",
+      "target": "E3"
+    },
+    {
+      "id": "evaluates:phase-4:E6",
+      "type": "evaluates",
+      "source": "phase-4",
+      "target": "E6"
+    },
+    {
+      "id": "evaluates:phase-4:A01",
+      "type": "evaluates",
+      "source": "phase-4",
+      "target": "A01"
+    },
+    {
+      "id": "evaluates:phase-4:A02",
+      "type": "evaluates",
+      "source": "phase-4",
+      "target": "A02"
+    },
+    {
+      "id": "evaluates:phase-4:A07",
+      "type": "evaluates",
+      "source": "phase-4",
+      "target": "A07"
+    },
+    {
+      "id": "evaluates:phase-4:A08",
+      "type": "evaluates",
+      "source": "phase-4",
+      "target": "A08"
+    },
+    {
+      "id": "delivers:phase-5:F12",
+      "type": "delivers",
+      "source": "phase-5",
+      "target": "F12"
+    },
+    {
+      "id": "evaluates:phase-5:E4",
+      "type": "evaluates",
+      "source": "phase-5",
+      "target": "E4"
+    },
+    {
+      "id": "delivers:phase-6:F14",
+      "type": "delivers",
+      "source": "phase-6",
+      "target": "F14"
+    },
+    {
+      "id": "evaluates:phase-6:E5",
+      "type": "evaluates",
+      "source": "phase-6",
+      "target": "E5"
+    },
+    {
+      "id": "evaluates:phase-6:A12",
+      "type": "evaluates",
+      "source": "phase-6",
+      "target": "A12"
+    },
+    {
+      "id": "delivers:phase-7:P9",
+      "type": "delivers",
+      "source": "phase-7",
+      "target": "P9"
+    },
+    {
+      "id": "next:phase-1:phase-2",
+      "type": "next",
+      "source": "phase-1",
+      "target": "phase-2"
+    },
+    {
+      "id": "next:phase-2:phase-3",
+      "type": "next",
+      "source": "phase-2",
+      "target": "phase-3"
+    },
+    {
+      "id": "next:phase-3:phase-4",
+      "type": "next",
+      "source": "phase-3",
+      "target": "phase-4"
+    },
+    {
+      "id": "next:phase-4:phase-5",
+      "type": "next",
+      "source": "phase-4",
+      "target": "phase-5"
+    },
+    {
+      "id": "next:phase-5:phase-6",
+      "type": "next",
+      "source": "phase-5",
+      "target": "phase-6"
+    },
+    {
+      "id": "next:phase-6:phase-7",
+      "type": "next",
+      "source": "phase-6",
+      "target": "phase-7"
+    },
+    {
+      "id": "attempts_to_fulfill:B3-engine:S3-contract",
+      "type": "attempts_to_fulfill",
+      "source": "B3-engine",
+      "target": "S3-contract"
+    },
+    {
+      "id": "uses_boundary:B3-engine:engine-boundary",
+      "type": "uses_boundary",
+      "source": "B3-engine",
+      "target": "engine-boundary"
+    },
+    {
+      "id": "produces:B3-engine:C5",
+      "type": "produces",
+      "source": "B3-engine",
+      "target": "C5"
+    },
+    {
+      "id": "requires_capability:B3-engine:targeting-capability",
+      "type": "requires_capability",
+      "source": "B3-engine",
+      "target": "targeting-capability"
+    },
+    {
+      "id": "requires_capability:B3-engine:substitution-capability",
+      "type": "requires_capability",
+      "source": "B3-engine",
+      "target": "substitution-capability"
+    },
+    {
+      "id": "requires_capability:B3-engine:protection-capability",
+      "type": "requires_capability",
+      "source": "B3-engine",
+      "target": "protection-capability"
+    },
+    {
+      "id": "requires_capability:B3-engine:measurement-capability",
+      "type": "requires_capability",
+      "source": "B3-engine",
+      "target": "measurement-capability"
+    },
+    {
+      "id": "must_preserve:B3-engine:D1",
+      "type": "must_preserve",
+      "source": "B3-engine",
+      "target": "D1"
+    },
+    {
+      "id": "must_preserve:B3-engine:D2",
+      "type": "must_preserve",
+      "source": "B3-engine",
+      "target": "D2"
+    },
+    {
+      "id": "must_preserve:B3-engine:D3",
+      "type": "must_preserve",
+      "source": "B3-engine",
+      "target": "D3"
+    },
+    {
+      "id": "must_preserve:B3-engine:D4",
+      "type": "must_preserve",
+      "source": "B3-engine",
+      "target": "D4"
+    },
+    {
+      "id": "must_preserve:B3-engine:D5",
+      "type": "must_preserve",
+      "source": "B3-engine",
+      "target": "D5"
+    },
+    {
+      "id": "must_preserve:B3-engine:D6",
+      "type": "must_preserve",
+      "source": "B3-engine",
+      "target": "D6"
+    },
+    {
+      "id": "must_preserve:B3-engine:D7",
+      "type": "must_preserve",
+      "source": "B3-engine",
+      "target": "D7"
+    },
+    {
+      "id": "attempts_to_fulfill:B3-compositor:S3-contract",
+      "type": "attempts_to_fulfill",
+      "source": "B3-compositor",
+      "target": "S3-contract"
+    },
+    {
+      "id": "uses_boundary:B3-compositor:composition-boundary",
+      "type": "uses_boundary",
+      "source": "B3-compositor",
+      "target": "composition-boundary"
+    },
+    {
+      "id": "produces:B3-compositor:C5",
+      "type": "produces",
+      "source": "B3-compositor",
+      "target": "C5"
+    },
+    {
+      "id": "requires_capability:B3-compositor:targeting-capability",
+      "type": "requires_capability",
+      "source": "B3-compositor",
+      "target": "targeting-capability"
+    },
+    {
+      "id": "requires_capability:B3-compositor:substitution-capability",
+      "type": "requires_capability",
+      "source": "B3-compositor",
+      "target": "substitution-capability"
+    },
+    {
+      "id": "requires_capability:B3-compositor:protection-capability",
+      "type": "requires_capability",
+      "source": "B3-compositor",
+      "target": "protection-capability"
+    },
+    {
+      "id": "requires_capability:B3-compositor:measurement-capability",
+      "type": "requires_capability",
+      "source": "B3-compositor",
+      "target": "measurement-capability"
+    },
+    {
+      "id": "requires_capability:B3-compositor:recognition-capability",
+      "type": "requires_capability",
+      "source": "B3-compositor",
+      "target": "recognition-capability"
+    },
+    {
+      "id": "must_preserve:B3-compositor:D1",
+      "type": "must_preserve",
+      "source": "B3-compositor",
+      "target": "D1"
+    },
+    {
+      "id": "must_preserve:B3-compositor:D2",
+      "type": "must_preserve",
+      "source": "B3-compositor",
+      "target": "D2"
+    },
+    {
+      "id": "must_preserve:B3-compositor:D3",
+      "type": "must_preserve",
+      "source": "B3-compositor",
+      "target": "D3"
+    },
+    {
+      "id": "must_preserve:B3-compositor:D4",
+      "type": "must_preserve",
+      "source": "B3-compositor",
+      "target": "D4"
+    },
+    {
+      "id": "must_preserve:B3-compositor:D5",
+      "type": "must_preserve",
+      "source": "B3-compositor",
+      "target": "D5"
+    },
+    {
+      "id": "must_preserve:B3-compositor:D6",
+      "type": "must_preserve",
+      "source": "B3-compositor",
+      "target": "D6"
+    },
+    {
+      "id": "must_preserve:B3-compositor:D7",
+      "type": "must_preserve",
+      "source": "B3-compositor",
+      "target": "D7"
+    },
+    {
+      "id": "demonstrates_objective:independence-example:blood-glitter-objective",
+      "type": "demonstrates_objective",
+      "source": "independence-example",
+      "target": "blood-glitter-objective"
+    },
+    {
+      "id": "holds_contract:independence-example:S3-contract",
+      "type": "holds_contract",
+      "source": "independence-example",
+      "target": "S3-contract"
+    },
+    {
+      "id": "compares_binding:independence-example:B3-engine",
+      "type": "compares_binding",
+      "source": "independence-example",
+      "target": "B3-engine"
+    },
+    {
+      "id": "applies_to:blood-glitter-objective:B3-engine",
+      "type": "applies_to",
+      "source": "blood-glitter-objective",
+      "target": "B3-engine"
+    },
+    {
+      "id": "compares_binding:independence-example:B3",
+      "type": "compares_binding",
+      "source": "independence-example",
+      "target": "B3"
+    },
+    {
+      "id": "applies_to:blood-glitter-objective:B3",
+      "type": "applies_to",
+      "source": "blood-glitter-objective",
+      "target": "B3"
+    },
+    {
+      "id": "compares_binding:independence-example:B3-compositor",
+      "type": "compares_binding",
+      "source": "independence-example",
+      "target": "B3-compositor"
+    },
+    {
+      "id": "applies_to:blood-glitter-objective:B3-compositor",
+      "type": "applies_to",
+      "source": "blood-glitter-objective",
+      "target": "B3-compositor"
+    }
+  ]
+}

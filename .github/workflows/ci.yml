@@ -11,8 +11,16 @@ jobs:
         with:
           python-version: '3.12'
       - run: python -m pip install -r requirements.lock && python -m pip install --no-build-isolation --no-deps -e '.[dev]'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npm run lint
+      - run: npm run check:reader
       - run: ruff format --check .
       - run: ruff check .
-      - run: mypy src
+      - run: mypy src scripts/preview.py examples/architectural_metamodel/author.py
+      - run: mypy examples/presentation_transformation/author.py
       - run: pytest
       - run: python -m build --no-isolation

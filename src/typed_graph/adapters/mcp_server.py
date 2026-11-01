@@ -5,15 +5,13 @@ from __future__ import annotations
 import argparse
 import asyncio
 import json
-import re
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Any
-from urllib.parse import quote
 
 import anyio
-from jsonschema import Draft202012Validator
+from jsonschema.exceptions import ValidationError
 from mcp import types
 from mcp.server import Server
 from mcp.server.stdio import stdio_server
@@ -23,135 +21,42 @@ from mcp.server.subscriptions import (
     ResourceUpdated,
     ToolsListChanged,
 )
-from referencing import Registry
 
 from typed_graph.adapters.external_handlers import ExternalHandlers
 from typed_graph.adapters.workspace import open_service
+from typed_graph.application.contracts import (
+    DETECT_CHANGES,
+    GET_ASSESSMENTS,
+    INDEX_MODEL,
+    SUBMIT_ASSESSMENT,
+    TOOL_CATALOG,
+    ApplyRequest,
+    AssessmentsResult,
+    DetectResult,
+    SubmitAssessmentRequest,
+    request_schema,
+    response_schema,
+    validate_request,
+    validate_response,
+)
 from typed_graph.application.service import GraphService
-from typed_graph.domain.schema import RESULT_SCHEMA, apply_input_schema
-
-JSON = dict[str, Any]
-RESOURCE_PATTERN = re.compile(
-    r"graph://model/(?:schema|nodes/[^/]+|(?:revisions|impact|assessments)/[0-9]+)\Z"
+from typed_graph.domain.models import (
+    ApplyResult,
+    CreateNode,
+    DeleteNode,
+    GraphSchema,
+    JsonObject,
+    UpdateNode,
+    dump_wire,
 )
+from typed_graph.domain.resources import ResourceKind, ResourceURI
 
 
-def object_schema(properties: JSON, required: list[str] | None = None) -> JSON:
-    return {
-        "type": "object",
-        "properties": properties,
-        "required": required or [],
-        "additionalProperties": False,
-    }
+def tool_schemas(schema: JsonObject) -> dict[str, JsonObject]:
+    return {name: request_schema(name, schema) for name in TOOL_CATALOG}
 
 
-def tool_schemas(schema: JSON) -> dict[str, JSON]:
-    integer = {"type": "integer", "minimum": 0}
-    string = {"type": "string", "minLength": 1}
-    limit = {"type": "integer", "minimum": 1, "maximum": 1000}
-    result = RESULT_SCHEMA
-    return {
-        "index_model": object_schema({}),
-        "get_graph_schema": object_schema({}),
-        "search_graph": object_schema({"text": {"type": "string"}, "type": string, "limit": limit}),
-        "query_graph": object_schema({"type": string, "where": {"type": "object"}, "limit": limit}),
-        "trace_path": object_schema(
-            {
-                "source": string,
-                "target": string,
-                "relation": {"enum": sorted(schema.get("relations", {}))}
-                if schema.get("relations")
-                else {"type": "string"},
-                "mode": {"enum": ["semantic", "dependency"]},
-                "max_depth": {"type": "integer", "minimum": 0, "maximum": 100},
-            },
-            ["source", "target"],
-        ),
-        "apply_changes": apply_input_schema(schema),
-        "detect_changes": object_schema({}),
-        "get_assessments": object_schema({"revision": integer}),
-        "compare_graphs": object_schema(
-            {"from_revision": integer, "to_revision": integer}, ["from_revision", "to_revision"]
-        ),
-        "submit_assessment": object_schema(
-            {"revision": integer, "interceptor_id": string, "target_id": string, "result": result},
-            ["revision", "interceptor_id", "target_id", "result"],
-        ),
-    }
-
-
-REVISION = {"type": "integer", "minimum": 0}
-STRINGS = {"type": "array", "items": {"type": "string"}}
-NODE = object_schema(
-    {"id": {"type": "string"}, "type": {"type": "string"}, "properties": {"type": "object"}},
-    ["id", "type", "properties"],
-)
-IMPACT = object_schema(
-    {
-        "node_id": {"type": "string"},
-        "paths": {"type": "array", "items": STRINGS},
-        "triggering_revision": REVISION,
-        "component": STRINGS,
-        "component_id": {"type": "string"},
-    },
-    ["node_id", "paths", "triggering_revision"],
-)
-APPLY_OUTPUT_SCHEMA = object_schema(
-    {
-        "revision": REVISION,
-        "applied_changes": {"type": "array", "items": {"type": "object"}},
-        "invalidations": {"type": "array", "items": IMPACT},
-    },
-    ["revision", "applied_changes", "invalidations"],
-)
-DIFF = object_schema(
-    {"added": STRINGS, "removed": STRINGS, "updated": STRINGS}, ["added", "removed", "updated"]
-)
-ASSESSMENT = {
-    "type": "object",
-    "properties": {
-        "revision": REVISION,
-        "interceptor_id": {"type": "string"},
-        "target_id": {"type": "string"},
-        "state": {"enum": ["pending", "completed"]},
-        "stale": {"type": "boolean"},
-        "result": RESULT_SCHEMA,
-    },
-    "required": ["revision", "interceptor_id", "target_id", "state", "stale", "result"],
-}
-OUTPUT_SCHEMAS = {
-    "index_model": APPLY_OUTPUT_SCHEMA,
-    "apply_changes": APPLY_OUTPUT_SCHEMA,
-    "get_graph_schema": object_schema(
-        {"revision": REVISION, "schema": {"type": "object"}}, ["revision", "schema"]
-    ),
-    "search_graph": object_schema(
-        {"revision": REVISION, "nodes": {"type": "array", "items": NODE}}, ["revision", "nodes"]
-    ),
-    "query_graph": object_schema(
-        {"revision": REVISION, "nodes": {"type": "array", "items": NODE}}, ["revision", "nodes"]
-    ),
-    "trace_path": object_schema({"revision": REVISION, "path": STRINGS}, ["revision", "path"]),
-    "detect_changes": object_schema(
-        {"revision": REVISION, "changed_nodes": STRINGS, "schema_changed": {"type": "boolean"}},
-        ["revision", "changed_nodes", "schema_changed"],
-    ),
-    "get_assessments": object_schema(
-        {"revision": REVISION, "assessments": {"type": "array", "items": ASSESSMENT}},
-        ["revision", "assessments"],
-    ),
-    "submit_assessment": object_schema({"assessment": ASSESSMENT}, ["assessment"]),
-    "compare_graphs": object_schema(
-        {
-            "from_revision": REVISION,
-            "to_revision": REVISION,
-            "schema_changed": {"type": "boolean"},
-            "nodes": DIFF,
-            "edges": DIFF,
-        },
-        ["from_revision", "to_revision", "schema_changed", "nodes", "edges"],
-    ),
-}
+OUTPUT_SCHEMAS = {name: response_schema(name) for name in TOOL_CATALOG}
 
 
 def create_server(
@@ -163,15 +68,17 @@ def create_server(
     lock = asyncio.Lock()
 
     async def list_tools(ctx: Any, params: Any) -> types.ListToolsResult:
+        catalog = service.tool_catalog
+        schema = service.schema
         return types.ListToolsResult(
             tools=[
                 types.Tool(
                     name=name,
                     description=name.replace("_", " "),
-                    input_schema=inputs,
-                    output_schema=OUTPUT_SCHEMAS[name],
+                    input_schema=request_schema(name, schema, catalog),
+                    output_schema=response_schema(name, catalog),
                 )
-                for name, inputs in tool_schemas(service.schema).items()
+                for name in catalog
             ]
         )
 
@@ -180,86 +87,76 @@ def create_server(
             # A disconnect cannot release serialization while a commit/handler is running.
             with anyio.CancelScope(shield=True):
                 try:
-                    schemas = tool_schemas(service.schema)
-                    if params.name not in schemas:
-                        raise ValueError("Unknown tool")
                     arguments = params.arguments or {}
-                    Draft202012Validator(schemas[params.name], registry=Registry()).validate(
-                        arguments
-                    )
+                    catalog = service.tool_catalog
+                    request = validate_request(params.name, arguments, service.schema, catalog)
                     before_schema = json.dumps(service.schema, sort_keys=True)
                     before_revision = service.revision
                     changed_ids: set[str] = set()
-                    if params.name == "index_model":
-                        preview = await anyio.to_thread.run_sync(
-                            service.dispatch, "detect_changes", {}
+                    if params.name == INDEX_MODEL.name:
+                        preview_wire = await anyio.to_thread.run_sync(
+                            service.dispatch, DETECT_CHANGES.name, {}
                         )
-                        changed_ids.update(preview["changed_nodes"])
-                    if params.name == "apply_changes":
-                        for change in arguments["changes"]:
-                            if change["op"] in {"delete_node", "update_node"}:
-                                changed_ids.add(change["id"])
-                            elif change["op"] == "create_node":
-                                changed_ids.add(change["node"]["id"])
+                        preview = DetectResult.model_validate(preview_wire)
+                        changed_ids.update(preview.changed_nodes)
+                    if isinstance(request, ApplyRequest):
+                        for change in request.changes:
+                            if isinstance(change, (DeleteNode, UpdateNode)):
+                                changed_ids.add(change.id)
+                            elif isinstance(change, CreateNode):
+                                changed_ids.add(change.node.id)
                     result = await anyio.to_thread.run_sync(
                         service.dispatch, params.name, arguments
                     )
-                    if handlers and params.name in {"index_model", "apply_changes"}:
+                    response = validate_response(params.name, result, catalog)
+                    if handlers and isinstance(response, ApplyResult):
                         await execute_pending(service, handlers)
-                    output_schema = OUTPUT_SCHEMAS[params.name]
-                    Draft202012Validator(output_schema, registry=Registry()).validate(result)
                     if subscriptions:
                         if before_schema != json.dumps(service.schema, sort_keys=True):
                             await bus.publish(ToolsListChanged())
-                            await bus.publish(ResourceUpdated("graph://model/schema"))
-                        if (
-                            before_revision != service.revision
-                            or params.name == "submit_assessment"
+                            await bus.publish(ResourceUpdated(str(ResourceURI.schema_resource())))
+                        if before_revision != service.revision or isinstance(
+                            request, SubmitAssessmentRequest
                         ):
-                            event_revision = arguments.get("revision", service.revision)
-                            for segment in (
-                                ("assessments",)
-                                if params.name == "submit_assessment"
-                                else ("revisions", "impact", "assessments")
-                            ):
-                                await bus.publish(
-                                    ResourceUpdated(f"graph://model/{segment}/{event_revision}")
-                                )
-                            changed_ids.update(
-                                item["node_id"] for item in result.get("invalidations", [])
+                            event_revision = (
+                                request.revision
+                                if isinstance(request, SubmitAssessmentRequest)
+                                else service.revision
                             )
-                            for node_id in sorted(changed_ids):
+                            kinds = (
+                                (ResourceKind.ASSESSMENTS,)
+                                if isinstance(request, SubmitAssessmentRequest)
+                                else (
+                                    ResourceKind.REVISION,
+                                    ResourceKind.IMPACT,
+                                    ResourceKind.ASSESSMENTS,
+                                )
+                            )
+                            for kind in kinds:
                                 await bus.publish(
                                     ResourceUpdated(
-                                        f"graph://model/nodes/{quote(node_id, safe='')}"
+                                        str(ResourceURI.revision_resource(kind, event_revision))
                                     )
                                 )
+                            if isinstance(response, ApplyResult):
+                                changed_ids.update(item.node_id for item in response.invalidations)
+                            for node_id in sorted(changed_ids):
+                                await bus.publish(ResourceUpdated(str(ResourceURI.node(node_id))))
                     return types.CallToolResult(
                         content=[types.TextContent(type="text", text=json.dumps(result))],
                         structured_content=result,
                     )
-                except (ValueError, KeyError, OSError) as error:
+                except (ValueError, KeyError, OSError, ValidationError) as error:
                     return types.CallToolResult(
                         content=[types.TextContent(type="text", text=str(error))], is_error=True
                     )
-                except Exception as error:
-                    # Schema errors are domain diagnostics, not transport failures.
-                    from jsonschema.exceptions import ValidationError
-
-                    if isinstance(error, ValidationError):
-                        return types.CallToolResult(
-                            content=[types.TextContent(type="text", text=error.message)],
-                            is_error=True,
-                        )
-                    raise
 
         raise RuntimeError("MCP request interrupted before result")
 
     async def read_resource(
         ctx: Any, params: types.ReadResourceRequestParams
     ) -> types.ReadResourceResult:
-        if not RESOURCE_PATTERN.fullmatch(params.uri):
-            raise ValueError("Unknown graph resource")
+        ResourceURI.parse(params.uri)
         async with lock:
             result = await anyio.to_thread.run_sync(service.resource, params.uri)
         return types.ReadResourceResult(
@@ -274,7 +171,9 @@ def create_server(
         return types.ListResourcesResult(
             resources=[
                 types.Resource(
-                    name="Graph schema", uri="graph://model/schema", mime_type="application/json"
+                    name="Graph schema",
+                    uri=str(ResourceURI.schema_resource()),
+                    mime_type="application/json",
                 )
             ]
         )
@@ -284,15 +183,10 @@ def create_server(
             resource_templates=[
                 types.ResourceTemplate(
                     name=kind,
-                    uri_template=f"graph://model/{kind}/{{{parameter}}}",
+                    uri_template=template,
                     mime_type="application/json",
                 )
-                for kind, parameter in [
-                    ("nodes", "id"),
-                    ("revisions", "revision"),
-                    ("impact", "revision"),
-                    ("assessments", "revision"),
-                ]
+                for kind, template in ResourceURI.templates()
             ]
         )
 
@@ -300,8 +194,7 @@ def create_server(
         ctx: Any, params: types.SubscriptionsListenRequestParams
     ) -> types.SubscriptionsListenResult:
         for uri in params.notifications.resource_subscriptions or []:
-            if not RESOURCE_PATTERN.fullmatch(uri):
-                raise ValueError("Only graph resource subscriptions are permitted")
+            ResourceURI.parse(uri)
         return await listener(ctx, params)
 
     @asynccontextmanager
@@ -327,26 +220,30 @@ def create_server(
 
 
 async def execute_pending(service: GraphService, handlers: ExternalHandlers) -> None:
-    pending = (await anyio.to_thread.run_sync(service.dispatch, "get_assessments", {}))[
-        "assessments"
-    ]
-    definitions = {i["id"]: i for i in service.schema.get("interceptors", [])}
-    for assessment in pending:
-        handler = definitions[assessment["interceptor_id"]]["handler"]
-        if assessment["state"] != "pending" or handler not in handlers.handlers:
+    pending_wire = await anyio.to_thread.run_sync(service.dispatch, GET_ASSESSMENTS.name, {})
+    pending = AssessmentsResult.model_validate(pending_wire)
+    definitions = {i.id: i for i in GraphSchema.model_validate(service.schema).interceptors}
+    for assessment in pending.assessments:
+        handler = definitions[assessment.interceptor_id].handler
+        if assessment.state != "pending" or handler not in handlers.handlers:
             continue
-        arguments = {key: assessment[key] for key in ("revision", "interceptor_id", "target_id")}
         try:
-            arguments["result"] = await anyio.to_thread.run_sync(
-                handlers.execute, handler, assessment["context"]
+            result = await anyio.to_thread.run_sync(handlers.execute, handler, assessment.context)
+            arguments = SubmitAssessmentRequest(
+                revision=assessment.revision,
+                interceptor_id=assessment.interceptor_id,
+                target_id=assessment.target_id,
+                result=result,
             )
-            await anyio.to_thread.run_sync(service.dispatch, "submit_assessment", arguments)
+            await anyio.to_thread.run_sync(
+                service.dispatch, SUBMIT_ASSESSMENT.name, dump_wire(arguments)
+            )
         except Exception as error:
             await anyio.to_thread.run_sync(
                 service.record_handler_failure,
-                assessment["revision"],
-                assessment["interceptor_id"],
-                assessment["target_id"],
+                assessment.revision,
+                assessment.interceptor_id,
+                assessment.target_id,
                 f"Handler failed: {type(error).__name__}",
             )
 

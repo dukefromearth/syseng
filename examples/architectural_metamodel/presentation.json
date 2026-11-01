@@ -1,0 +1,107 @@
+{
+  "label_properties": [
+    "name"
+  ],
+  "body_properties": [
+    "description"
+  ],
+  "group_property": "section",
+  "group_order": [
+    "Purpose",
+    "Domain",
+    "Systems",
+    "Realization",
+    "Example",
+    "Governance"
+  ],
+  "order_property": "order",
+  "type_order": [
+    "ModelPurpose",
+    "DomainConcept",
+    "Invariant",
+    "System",
+    "Responsibility",
+    "Contract",
+    "RealizationConcept",
+    "AbstractionLayer",
+    "Environment",
+    "InteractionBoundary",
+    "Objective",
+    "Capability",
+    "Binding",
+    "SemanticRule",
+    "Guardrail"
+  ],
+  "hidden_properties": [
+    "section",
+    "order"
+  ],
+  "document_node": "purpose",
+  "include_identifiers": false,
+  "compact_properties": true,
+  "compact_relationships": true,
+  "body_first": true,
+  "show_body_labels": false,
+  "show_empty_assessments": false,
+  "summary_tables": [
+    {
+      "group": "Domain",
+      "row_type": "DomainConcept",
+      "title": "Domain concepts",
+      "columns": [
+        {
+          "label": "Concept",
+          "property": "name",
+          "link": true
+        },
+        {
+          "label": "Meaning",
+          "property": "description"
+        }
+      ]
+    },
+    {
+      "group": "Systems",
+      "row_type": "System",
+      "title": "Systems and contracts",
+      "columns": [
+        {
+          "label": "System",
+          "property": "name",
+          "link": true
+        },
+        {
+          "label": "Responsibility",
+          "property": "description",
+          "relation_path": [
+            "owns"
+          ]
+        },
+        {
+          "label": "Contract",
+          "property": "description",
+          "relation_path": [
+            "owns",
+            "specified_by"
+          ]
+        }
+      ]
+    },
+    {
+      "group": "Realization",
+      "row_type": "AbstractionLayer",
+      "title": "Abstraction layers",
+      "columns": [
+        {
+          "label": "Layer",
+          "property": "name",
+          "link": true
+        },
+        {
+          "label": "Information and operations",
+          "property": "description"
+        }
+      ]
+    }
+  ]
+}

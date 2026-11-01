@@ -1,8 +1,15 @@
 # Engineering contract
 - Python 3.12+. Format and lint with Ruff; type-check with mypy; run pytest behavior suites and build before delivery.
 - Hexagonal boundaries: domain imports no application/adapters/IO; application depends on domain and Protocol ports only; adapters implement persistence, sources, MCP and external handlers.
-- No built-in architecture ontology. All types, relations, propagation and evidence obligations come from schema.
+- The generic graph engine has no built-in architecture ontology. An optional architecture application module may define canonical architectural roles, schema, tools and a fixed specification compiler above it; native domain code must not depend on that module.
 - Treat model/files/tool arguments as untrusted. No eval, arbitrary SQL, model-selected commands, remote schema loading or unconstrained paths.
 - Prefer table-driven behavioral tests through public application and real SQLite/files/MCP transports. Avoid mock-heavy/private-method unit tests.
 - Atomic batches, immutable history, deterministic ordering, explicit expected revisions and recoverable source/index consistency are contracts.
 - External effects require operator configuration; assessments never mutate authored graph or equate completion with evidence.
+- Define engine semantics once: strict Pydantic v2 models and enums own primitive, operation, assessment, provenance, request and result contracts. Generate wire schemas and validate runtime data from those models; do not maintain handwritten parallel schemas.
+- One typed tool catalog owns tool names, request/result models, and use-case binding. Derive MCP listing and dispatch from it. Centralize resource parsing/rendering in one typed value object.
+- Keep the engine ontology closed and explicit, but registered model types, relations and property vocabularies open and authored. Dynamic JSON Schema remains authoritative for user properties.
+- Core boundaries use typed records and meaningful identifier/revision aliases; JSON values are allowed only at genuine authored-schema/property/evidence boundaries. Prefer model attributes over untyped dictionary keys.
+- Every semantic addition must change one canonical definition and have behavioral coverage proving generated schemas and runtime validation agree. Do not introduce silent coercion or a general reflection framework.
+- Architecture reading order belongs to the fixed specification compiler, not agent-authored layout/order/block nodes. Agents author meaning. Architectural facts and instance diagrams resolve canonical graph records; metamodel diagrams derive the canonical role/relation catalog. No instance facts or verification claims in templates. Generic graph records remain available in the separate inspector.
+- Only server-generated diagram descriptors may execute in the diagram renderer. Authored Markdown/diagram text is untrusted content; keep local-only assets, strict SVG sanitization, CSP, stable anchors and disclosure state across live updates.

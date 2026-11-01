@@ -156,28 +156,32 @@
       "id": "payments",
       "type": "Boundary",
       "properties": {
-        "name": "Payments boundary"
+        "name": "Payments boundary",
+        "description": "## Responsibility\nThe payments boundary owns authorization policy and communicates with external payment providers through the gateway binding.\n\nPersonal payment data must not appear in application logs."
       }
     },
     {
       "id": "checkout",
       "type": "System",
       "properties": {
-        "name": "Checkout service"
+        "name": "Checkout service",
+        "description": "The checkout service exposes the authorization capability to the purchase workflow.\n\n### Operational behavior\n- Reject incomplete authorization requests before calling the provider.\n- Return a stable correlation identifier for support and audit."
       }
     },
     {
       "id": "authorize",
       "type": "Capability",
       "properties": {
-        "name": "Authorize a payment"
+        "name": "Authorize a payment",
+        "description": "Authorize a payment without creating duplicate charges.\n\nThe caller supplies a unique **idempotency key** for each purchase attempt. Repeated calls with the same key must return the original outcome."
       }
     },
     {
       "id": "gateway",
       "type": "Binding",
       "properties": {
-        "name": "Gateway adapter"
+        "name": "Gateway adapter",
+        "description": "Translate the authorization contract into the provider protocol.\n\nRetries preserve the original idempotency key; timeouts are reported as an unknown outcome until reconciliation completes."
       }
     },
     {
@@ -188,7 +192,8 @@
         "requirements": [
           "Idempotency key is required",
           "No duplicate authorization on retry"
-        ]
+        ],
+        "description": "This contract governs authorization behavior at the provider boundary. The required guarantees are declared once in the requirements property below.\n\n### Review evidence\nA contract-conformance assessment must link to the repeat-request and timeout-recovery evidence."
       }
     }
   ],
