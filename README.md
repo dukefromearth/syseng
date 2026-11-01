@@ -5,8 +5,9 @@ dependency propagation, and evidence-bearing assessments. An MCP server lets age
 inspect and propose typed changes; the graph engine itself never calls an LLM.
 
 **First release:** Python 3.12+, MCP 2.x / protocol 2026-07-28, one local workspace per
-server process. No architecture ontology is built in. The example's Capability,
-Boundary, Binding, Contract and System types are ordinary user-authored definitions.
+server process. The core accepts arbitrary schemas. The optional architecture module
+adds typed architectural authoring and a fixed, coherent specification compiler without
+putting architecture-specific concepts into the graph engine.
 
 ## Quickstart (tutorial)
 
@@ -31,8 +32,12 @@ understand the 2026 protocol; use a compatible client.
 
 ## Live specification reader
 
-The tools author the graph; the reader procedurally formats that same committed
-specification as Markdown and safe HTML. It is **not** a separate document editor.
+Agents author architectural meaning through MCP. The architecture compiler turns the
+committed model into a coherent specification: unified metamodel, domain, systems,
+realizations, cross-model relationships, independence examples and model invariants.
+The compiler owns the reading order; agents do not author layout or document blocks.
+Markdown and safe HTML share one projection. A separate graph inspector provides
+record-level detail; it is not the human specification.
 
 After indexing the example through MCP as above, run a second local process:
 
@@ -51,8 +56,15 @@ at `/tmp/typed-graph-reader-preview` (override with `TYPED_GRAPH_WORKSPACE`; set
 
 For a larger specification authored entirely through real MCP calls, see the
 [Architectural Metamodel v1.0 example](examples/architectural_metamodel/README.md).
-Its typed presentation profile separates Domain, Systems, Realization and Governance
-without adding any of those concepts to the engine.
+That earlier example demonstrates the generic graph inspector and presentation profiles.
+
+The [Presentation Transformation Platform](examples/presentation_transformation/README.md)
+extends that example into a build specification: product requirements, four systems,
+information exchange contracts, candidate bindings and measurable acceptance targets.
+The fixed architecture compiler produces focused Mermaid diagrams and coherent
+expandable system sections from canonical records. The compiler knows architectural
+roles, never platform-specific facts or hand-maintained diagram relationships.
+Requirements and proposed technologies are not reported as proven implementations.
 
 ## Documentation
 
@@ -70,12 +82,18 @@ pip install -r requirements.lock
 pip install --no-build-isolation --no-deps -e '.[dev]'
 npm ci --ignore-scripts
 npm run lint
+npm run check:reader
 ruff format --check .
 ruff check .
 mypy src scripts/preview.py examples/architectural_metamodel/author.py
+mypy examples/presentation_transformation/author.py
 pytest
 python -m build --no-isolation
 ```
+
+The diagram adapter is bundled locally from pinned npm dependencies. After changing
+`scripts/reader-diagrams.js` or its dependencies, run `npm run build:reader` and commit
+the generated asset and license notice. `check:reader` rejects stale generated files.
 
 Behavior suites use real temporary workspaces, SQLite, source documents and MCP
 clients, including subprocess transport. See [AGENTS.md](AGENTS.md) for engineering

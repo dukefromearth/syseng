@@ -122,11 +122,25 @@ def validate_typed_schema(model: GraphSchema) -> None:
     for invariant in model.invariants:
         if invariant.node_type not in model.node_types:
             raise GraphError("Invariant requires registered node_type")
-        if (
-            isinstance(invariant, RequiresEdgeInvariant)
-            and invariant.relation not in model.relations
-        ):
-            raise GraphError("requires_edge references unknown relation")
+        if isinstance(invariant, RequiresEdgeInvariant):
+            required_relation = model.relations.get(invariant.relation)
+            if required_relation is None:
+                raise GraphError("requires_edge references unknown relation")
+            endpoints = (
+                required_relation.source
+                if invariant.direction == "out"
+                else required_relation.target
+            )
+            if invariant.node_type not in endpoints:
+                raise GraphError("requires_edge node_type is incompatible with relation endpoint")
+            if required_relation.cardinality is not None:
+                maximum = (
+                    required_relation.cardinality.out_max
+                    if invariant.direction == "out"
+                    else required_relation.cardinality.in_max
+                )
+                if maximum is not None and invariant.min > maximum:
+                    raise GraphError("requires_edge minimum exceeds relation cardinality maximum")
     seen: set[str] = set()
     for interceptor in model.interceptors:
         if interceptor.id in seen:

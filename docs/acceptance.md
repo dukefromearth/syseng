@@ -28,6 +28,9 @@ Implemented first-release contracts:
 - [x] Local static responsive UI, accessible outline, source view and Markdown download.
 - [x] Loopback/read-only boundary, sanitized rendering, no remote image execution.
 - [x] Frontend ESLint gate plus real HTTP/MCP/SSE behavior coverage.
+- [x] Bounded graph-derived Mermaid views, explicit omission counts and full text fallback.
+- [x] Expandable details with stable anchors and complete Markdown export; novel types
+  retain automatic rendering without new frontend rules.
 
 Deliberate limits:
 
@@ -46,5 +49,8 @@ Deliberate limits:
   timeouts limit invocation; executable behavior still needs operator trust.
 - Evidence is checked for contract compliance and provenance presence, not independently
   attested truth. Agent reviews remain explicit submissions; no LLM is embedded.
+- Diagrams select declared nodes and direct edges, not inferred architectural meanings.
+  A schema can reject malformed or contradictory structural declarations; it cannot
+  prove causal equivalence, semantic preservation or runtime performance from prose.
 - Snapshot files are canonical authored state after import. Original Markdown/YAML
   imports retain formatting and are not silently overwritten by tool changes.

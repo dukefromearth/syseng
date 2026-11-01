@@ -2,9 +2,17 @@
 
 from typing import Protocol
 
-from typed_graph.application.contracts import SearchResult
+from typed_graph.application.contracts import ApplyRequest, SearchResult, ToolSpec
 from typed_graph.application.specification import SpecificationState
-from typed_graph.domain.models import Assessment, Identifier, JsonObject, Revision, Snapshot
+from typed_graph.domain.models import (
+    Assessment,
+    GraphSchema,
+    Identifier,
+    JsonObject,
+    Revision,
+    Snapshot,
+    StrictModel,
+)
 
 
 class Repository(Protocol):
@@ -18,6 +26,17 @@ class Repository(Protocol):
     ) -> SearchResult: ...
     def assessments(self, revision: Revision) -> list[Assessment]: ...
     def record_assessment(self, assessment: Assessment) -> None: ...
+
+
+class PublicationValidator(Protocol):
+    def __call__(self, document: Snapshot, /) -> None: ...
+
+
+class ToolExtension(Protocol):
+    """Optional semantic module: declarations and pure atomic operation builders."""
+
+    def catalog(self, schema: GraphSchema) -> dict[str, ToolSpec]: ...
+    def build(self, name: str, request: StrictModel) -> ApplyRequest: ...
 
 
 type SpecificationToken = str

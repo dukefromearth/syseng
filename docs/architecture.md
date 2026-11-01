@@ -126,3 +126,22 @@ latest state; polling errors preserve the last valid document and remain visible
 Presentation profiles select grouping and graph-derived summaries but never author
 another model or copy contract prose into frontend code. All HTTP controls remain
 read-only and loopback-bound.
+
+## ADR 005: architectural meaning, fixed specification grammar
+
+Architecture authoring is an optional application above the generic graph engine.
+A canonical typed role/relation catalog defines its schema and semantic authoring
+contracts. Publication checks apply equally to high-order authoring tools and generic
+imports/mutations; the latter cannot bypass architectural consistency.
+
+The specification compiler intentionally understands architectural roles, but never
+particular platform names or facts. Its seven-section grammar is fixed. Agents define
+meaning, not an ordered tree of document blocks. Responsibilities, contract obligations,
+requirements and candidate realizations are joined into coherent system sections.
+Metamodel diagrams derive from role definitions; instance diagrams derive from edges.
+The generic graph inspector remains separate and available for arbitrary schemas.
+
+A binding's candidate lifecycle is not verification. Revisioned assessments carry
+proof obligations, evidence and explicit pending/stale states. Structural validation
+can reject malformed references and incompatible contracts, but cannot establish the
+truth of an authored causal, semantic or performance claim.

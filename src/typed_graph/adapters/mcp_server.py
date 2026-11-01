@@ -68,15 +68,17 @@ def create_server(
     lock = asyncio.Lock()
 
     async def list_tools(ctx: Any, params: Any) -> types.ListToolsResult:
+        catalog = service.tool_catalog
+        schema = service.schema
         return types.ListToolsResult(
             tools=[
                 types.Tool(
                     name=name,
                     description=name.replace("_", " "),
-                    input_schema=inputs,
-                    output_schema=OUTPUT_SCHEMAS[name],
+                    input_schema=request_schema(name, schema, catalog),
+                    output_schema=response_schema(name, catalog),
                 )
-                for name, inputs in tool_schemas(service.schema).items()
+                for name in catalog
             ]
         )
 
@@ -86,7 +88,8 @@ def create_server(
             with anyio.CancelScope(shield=True):
                 try:
                     arguments = params.arguments or {}
-                    request = validate_request(params.name, arguments, service.schema)
+                    catalog = service.tool_catalog
+                    request = validate_request(params.name, arguments, service.schema, catalog)
                     before_schema = json.dumps(service.schema, sort_keys=True)
                     before_revision = service.revision
                     changed_ids: set[str] = set()
@@ -105,7 +108,7 @@ def create_server(
                     result = await anyio.to_thread.run_sync(
                         service.dispatch, params.name, arguments
                     )
-                    response = validate_response(params.name, result)
+                    response = validate_response(params.name, result, catalog)
                     if handlers and isinstance(response, ApplyResult):
                         await execute_pending(service, handlers)
                     if subscriptions:

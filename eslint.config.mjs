@@ -1,5 +1,5 @@
 export default [{
-  files: ["src/typed_graph/adapters/static/*.js"],
+  files: ["src/typed_graph/adapters/static/app.js", "scripts/*.js", "scripts/*.mjs"],
   languageOptions: {
     ecmaVersion: 2022,
     sourceType: "module",

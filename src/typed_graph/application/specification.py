@@ -12,13 +12,15 @@ import hashlib
 import json
 import math
 import re
+from enum import StrEnum
 from typing import Annotated
 
 from markdown_it import MarkdownIt
-from pydantic import Field, JsonValue
+from pydantic import BeforeValidator, Field, JsonValue
 
 from typed_graph.domain.models import (
     Assessment,
+    Edge,
     GraphSchema,
     Identifier,
     JsonObject,
@@ -51,6 +53,30 @@ class SummaryTableProfile(StrictModel):
     columns: Annotated[list[SummaryColumn], Field(min_length=1, max_length=8)]
 
 
+class DiagramDirection(StrEnum):
+    LEFT_TO_RIGHT = "LR"
+    TOP_TO_BOTTOM = "TB"
+
+
+class DiagramProfile(StrictModel):
+    """An induced graph view, never independently authored architectural content."""
+
+    id: Identifier
+    title: Identifier
+    node_types: list[Identifier] = Field(default_factory=list)
+    node_ids: list[Identifier] = Field(default_factory=list)
+    relations: list[Identifier] = Field(default_factory=list)
+    relation_path: Omittable[Annotated[list[Identifier], Field(min_length=2, max_length=2)]] = None
+    group: Omittable[Identifier] = None
+    placement_group: Omittable[Identifier] = None
+    direction: Annotated[
+        DiagramDirection,
+        BeforeValidator(lambda value: DiagramDirection(value) if type(value) is str else value),
+    ] = DiagramDirection.LEFT_TO_RIGHT
+    max_nodes: Annotated[int, Field(ge=1, le=60)] = 30
+    max_edges: Annotated[int, Field(ge=1, le=120)] = 60
+
+
 class PresentationProfile(StrictModel):
     title: Identifier = "Architectural specification"
     group_property: Omittable[Identifier] = None
@@ -65,6 +91,11 @@ class PresentationProfile(StrictModel):
     body_first: bool = False
     show_body_labels: bool = True
     show_empty_assessments: bool = True
+    show_type_metadata: bool = True
+    show_projection_metadata: bool = True
+    collapse_nodes: bool = False
+    collapse_schema: bool = False
+    diagrams: Annotated[list[DiagramProfile], Field(max_length=8)] = Field(default_factory=list)
     summary_tables: Annotated[list[SummaryTableProfile], Field(max_length=8)] = Field(
         default_factory=list
     )
@@ -81,6 +112,36 @@ class OutlineEntry(StrictModel):
     line: Annotated[int, Field(ge=0)]
 
 
+class DiagramPath(StrictModel):
+    source: Identifier
+    target: Identifier
+    via: Identifier
+    edge_ids: Annotated[list[Identifier], Field(min_length=2, max_length=2)]
+
+
+class DiagramView(StrictModel):
+    id: Identifier
+    title: str
+    source: str
+    node_ids: list[Identifier]
+    edge_ids: list[Identifier]
+    omitted_node_count: Annotated[int, Field(ge=0)]
+    omitted_edge_count: Annotated[int, Field(ge=0)]
+    line: Annotated[int, Field(ge=0)]
+    paths: list[DiagramPath] = Field(default_factory=list)
+    omitted_path_count: Annotated[int, Field(ge=0)] = 0
+    # Catalog diagrams name registered schema roles/relations, never fictional entity IDs.
+    schema_roles: list[Identifier] = Field(default_factory=list)
+    schema_relations: list[Identifier] = Field(default_factory=list)
+
+
+class DisclosureSection(StrictModel):
+    id: Identifier
+    title: str
+    start_line: Annotated[int, Field(ge=0)]
+    end_line: Annotated[int, Field(ge=0)]
+
+
 class MarkdownSpecification(StrictModel):
     revision: Revision
     assessment_digest: Identifier
@@ -90,6 +151,8 @@ class MarkdownSpecification(StrictModel):
     outline: list[OutlineEntry]
     node_count: Annotated[int, Field(ge=0)]
     edge_count: Annotated[int, Field(ge=0)]
+    diagrams: list[DiagramView] = Field(default_factory=list)
+    disclosures: list[DisclosureSection] = Field(default_factory=list)
 
 
 def _canonical(value: JsonValue) -> str:
@@ -384,6 +447,151 @@ def _node_link(node: Node, profile: PresentationProfile) -> str:
     return f"{link} ({_code(node.id)})" if profile.include_identifiers else link
 
 
+def _diagram_label(value: str) -> str:
+    """Keep graph text inside quoted Mermaid labels, never in Mermaid grammar.
+
+    Mermaid's decimal entity syntax escapes punctuation including quotes, brackets,
+    backticks, percent signs and entity introducers. No user text becomes an ID,
+    directive, click handler, URL, class or style. Controls become ordinary spaces.
+    """
+    value = " ".join(value.split())
+    if len(value) > 180:
+        value = value[:177] + "..."
+    dangerous = frozenset('"\\<>[]{}|`%&#')
+    return "".join(
+        f"#{ord(character)};" if character in dangerous else character for character in value
+    )
+
+
+def _diagram_paths(
+    snapshot: Snapshot, endpoint_ids: set[str], relation_path: list[str]
+) -> list[DiagramPath]:
+    outgoing: dict[tuple[str, str], list[Edge]] = {}
+    for edge in sorted(snapshot.edges, key=lambda item: item.id):
+        outgoing.setdefault((edge.source, edge.type), []).append(edge)
+    paths = []
+    seen: set[tuple[str, str, str]] = set()
+    for source in sorted(endpoint_ids):
+        for first in outgoing.get((source, relation_path[0]), []):
+            for second in outgoing.get((first.target, relation_path[1]), []):
+                key = (source, second.target, first.target)
+                if second.target in endpoint_ids and key not in seen:
+                    seen.add(key)
+                    paths.append(
+                        DiagramPath(
+                            source=source,
+                            target=second.target,
+                            via=first.target,
+                            edge_ids=[first.id, second.id],
+                        )
+                    )
+    return sorted(paths, key=lambda path: (path.source, path.target, path.via, path.edge_ids))
+
+
+def _diagram(
+    writer: _Writer,
+    snapshot: Snapshot,
+    profile: PresentationProfile,
+    selection: DiagramProfile,
+    index: int,
+    heading_level: int = 3,
+) -> DiagramView:
+    eligible = sorted(
+        (
+            node
+            for node in snapshot.nodes
+            if (not selection.node_types or node.type in selection.node_types)
+            and (not selection.node_ids or node.id in selection.node_ids)
+            and (
+                selection.group is None
+                or (
+                    profile.group_property is not None
+                    and node.properties.get(profile.group_property) == selection.group
+                )
+            )
+        ),
+        key=lambda node: node.id,
+    )
+    selected = eligible[: selection.max_nodes]
+    selected_ids = {node.id for node in selected}
+    eligible_ids = {node.id for node in eligible}
+    eligible_edges = sorted(
+        (
+            edge
+            for edge in snapshot.edges
+            if edge.source in eligible_ids
+            and edge.target in eligible_ids
+            and (not selection.relations or edge.type in selection.relations)
+        ),
+        key=lambda edge: (edge.source, edge.type, edge.target, edge.id),
+    )
+    selected_edges = [
+        edge
+        for edge in eligible_edges
+        if edge.source in selected_ids and edge.target in selected_ids
+    ][: selection.max_edges]
+    paths: list[DiagramPath] = []
+    omitted_paths = 0
+    if selection.relation_path is not None:
+        all_paths = _diagram_paths(snapshot, selected_ids, selection.relation_path)
+        paths = all_paths[: selection.max_edges]
+        omitted_paths = len(all_paths) - len(paths)
+    identifiers = {node.id: f"n{_digest(node.id)[:24]}" for node in selected}
+    source = [f"flowchart {selection.direction.value}"]
+    source.extend(
+        f'    {identifiers[node.id]}["{_diagram_label(_node_label(node, profile))}"]'
+        for node in selected
+    )
+    if selection.relation_path is None:
+        source.extend(
+            f'    {identifiers[edge.source]} -->|"{_diagram_label(edge.type.replace("_", " "))}"| '
+            f"{identifiers[edge.target]}"
+            for edge in selected_edges
+        )
+    else:
+        nodes = {node.id: node for node in snapshot.nodes}
+        source.extend(
+            f'    {identifiers[path.source]} -->|"'
+            f'{_diagram_label(_node_label(nodes[path.via], profile))}"| {identifiers[path.target]}'
+            for path in paths
+        )
+    writer.heading(selection.title, heading_level, f"diagram:{index}:{selection.id}")
+    line = len(writer.lines)
+    writer.lines.extend(["```mermaid", *source, "```", ""])
+    omitted_nodes = len(eligible) - len(selected)
+    omitted_edges = (
+        len(eligible_edges) - len(selected_edges) if selection.relation_path is None else 0
+    )
+    if omitted_nodes or omitted_edges:
+        writer.paragraph(
+            f"Bounded diagram: {omitted_nodes} selected nodes and {omitted_edges} selected "
+            "relationships omitted. Complete records remain in the specification below."
+        )
+    if not selected:
+        writer.paragraph("No nodes match this diagram's selection.")
+    if omitted_paths:
+        writer.paragraph(
+            f"Bounded diagram: {omitted_paths} relationship paths between displayed nodes "
+            "omitted. Complete records remain in the specification below."
+        )
+    return DiagramView(
+        id=_anchor(f"diagram:{index}:{selection.id}"),
+        title=selection.title,
+        source="\n".join(source),
+        node_ids=[node.id for node in selected],
+        edge_ids=(
+            [edge.id for edge in selected_edges]
+            if selection.relation_path is None
+            else sorted({edge for path in paths for edge in path.edge_ids})
+        ),
+        omitted_node_count=omitted_nodes,
+        omitted_edge_count=omitted_edges,
+        line=line,
+        paths=paths,
+        omitted_path_count=omitted_paths,
+    )
+
+
 def _assessment_section(
     writer: _Writer,
     assessment: Assessment,
@@ -489,9 +697,13 @@ def _node_content(
         ),
         None,
     )
-    body_keys = {
-        key for key in profile.body_properties if isinstance(node.properties.get(key), str)
-    }
+    body_keys = set()
+    for key in profile.body_properties:
+        value = node.properties.get(key)
+        if isinstance(value, str) or (
+            isinstance(value, list) and all(isinstance(item, str) for item in value)
+        ):
+            body_keys.add(key)
     values: JsonObject = {
         key: value
         for key, value in node.properties.items()
@@ -500,14 +712,19 @@ def _node_content(
 
     def properties() -> None:
         if profile.include_identifiers:
-            writer.paragraph(
-                f"Node identity: {_code(node.id)}. Registered type: {_code(node.type)}."
-            )
-        elif not profile.compact_properties:
+            identity = f"Node identity: {_code(node.id)}."
+            if profile.show_type_metadata:
+                identity += f" Registered type: {_code(node.type)}."
+            writer.paragraph(identity)
+        elif not profile.compact_properties and profile.show_type_metadata:
             writer.paragraph(f"Registered type: {_code(node.type)}.")
         scalar_values = {key: value for key, value in values.items() if not isinstance(value, list)}
         if profile.compact_properties:
-            entries = [] if profile.include_identifiers else [f"**Type:** {_text(node.type)}"]
+            entries = (
+                []
+                if profile.include_identifiers or not profile.show_type_metadata
+                else [f"**Type:** {_text(node.type)}"]
+            )
             entries.extend(
                 f"**{_text(key)}:** " + (_text(value) if isinstance(value, str) else _code(value))
                 for key, value in sorted(scalar_values.items())
@@ -538,11 +755,15 @@ def _node_content(
             if key in body_keys and key not in profile.hidden_properties
         ]
         for key in selected:
-            if profile.show_body_labels or len(selected) > 1:
+            if profile.show_body_labels:
                 writer.paragraph(f"**{_text(key)}**")
             value = node.properties[key]
-            assert isinstance(value, str)
-            writer.body(value, _canonical(["body", node.id, key]), node_level)
+            if isinstance(value, str):
+                writer.body(value, _canonical(["body", node.id, key]), node_level)
+            else:
+                assert isinstance(value, list)
+                writer.lines.extend("- " + _text(str(item)) for item in value)
+                writer.lines.append("")
 
     if profile.body_first or node_level == 1:
         body()
@@ -556,16 +777,23 @@ def _node_content(
         key=lambda edge: (edge.type, edge.source, edge.target, edge.id),
     )
     if profile.compact_relationships:
+        groups: dict[tuple[bool, str], list[str]] = {}
         for edge in relationships:
-            text = (
-                f"{_node_link(node_map[edge.source], profile)} → {_text(edge.type)} → "
-                f"{_node_link(node_map[edge.target], profile)}"
-            )
+            outgoing = edge.source == node.id
+            endpoint = edge.target if outgoing else edge.source
+            text = _node_link(node_map[endpoint], profile)
             if profile.include_identifiers:
                 text += f" (edge {_code(edge.id)})"
             if edge.properties:
                 text += f" — {_code(edge.properties)}"
-            writer.paragraph(text)
+            groups.setdefault((outgoing, edge.type), []).append(text)
+        for (outgoing, relation), endpoints in sorted(
+            groups.items(), key=lambda item: (not item[0][0], item[0][1])
+        ):
+            direction = "Outgoing" if outgoing else "Incoming"
+            writer.paragraph(
+                f"**{direction} · {_text(relation.replace('_', ' '))}:** " + "; ".join(endpoints)
+            )
     elif relationships:
         headers = ["Relation", "Source", "Target", "Properties"]
         if profile.include_identifiers:
@@ -604,25 +832,39 @@ def project_specification(
     )
     assessment_digest = _digest(_canonical([dump_wire(item) for item in assessments]))
     writer = _Writer()
+    diagrams: list[DiagramView] = []
+    disclosures: list[DisclosureSection] = []
     intro = next((node for node in snapshot.nodes if node.id == profile.document_node), None)
     title = _node_label(intro, profile) if intro is not None else profile.title
     writer.heading(title, 1, f"node:{intro.id}" if intro is not None else "document")
     if intro is not None:
         _node_content(writer, intro, snapshot, assessments, profile, 1)
-    writer.paragraph(
-        f"Graph revision: {_code(snapshot.revision)}. "
-        f"Nodes: {len(snapshot.nodes)}. Edges: {len(snapshot.edges)}."
+    if profile.show_projection_metadata:
+        writer.paragraph(
+            f"Graph revision: {_code(snapshot.revision)}. "
+            f"Nodes: {len(snapshot.nodes)}. Edges: {len(snapshot.edges)}."
+        )
+        writer.paragraph(
+            "This specification is a deterministic view of the authored graph. "
+            "Recorded assessments are revision-specific results, "
+            "not independent proof of correctness."
+        )
+    groups = _presentation_groups(
+        [node for node in snapshot.nodes if intro is None or node.id != intro.id], profile
     )
-    writer.paragraph(
-        "This specification is a deterministic view of the authored graph. "
-        "Recorded assessments are revision-specific results, not independent proof of correctness."
-    )
+    group_names = {label for label, _, _ in groups}
+    for index, selection in enumerate(profile.diagrams):
+        # A missing placement group must not make a declared diagram disappear.
+        if selection.placement_group is None or selection.placement_group not in group_names:
+            diagrams.append(_diagram(writer, snapshot, profile, selection, index))
     writer.heading("Specification", 2, "specification")
     if not snapshot.nodes:
         writer.paragraph("No specification nodes have been authored yet.")
-    regular_nodes = [node for node in snapshot.nodes if intro is None or node.id != intro.id]
-    for group_label, group_identity, nodes in _presentation_groups(regular_nodes, profile):
+    for group_label, group_identity, nodes in groups:
         writer.heading(group_label, 3, group_identity)
+        for index, selection in enumerate(profile.diagrams):
+            if selection.placement_group == group_label:
+                diagrams.append(_diagram(writer, snapshot, profile, selection, index, 4))
         for index, table in enumerate(profile.summary_tables):
             if table.group == group_label:
                 _summary_table(
@@ -634,7 +876,17 @@ def project_specification(
                 )
         for node in nodes:
             writer.heading(_node_label(node, profile), 4, f"node:{node.id}")
+            heading = writer.outline[-1]
             _node_content(writer, node, snapshot, assessments, profile, 4)
+            if profile.collapse_nodes:
+                disclosures.append(
+                    DisclosureSection(
+                        id=heading.id,
+                        title=heading.label,
+                        start_line=heading.line,
+                        end_line=len(writer.lines),
+                    )
+                )
     orphaned = [
         item for item in assessments if item.target_id not in {n.id for n in snapshot.nodes}
     ]
@@ -642,15 +894,30 @@ def project_specification(
         writer.heading("Assessments for absent nodes", 2, "orphaned-assessments")
         for assessment in orphaned:
             _assessment_section(writer, assessment, snapshot.revision, profile.include_identifiers)
+    schema_start = len(writer.lines)
     _schema_section(writer, snapshot.schema_definition)
+    if profile.collapse_schema:
+        disclosures.append(
+            DisclosureSection(
+                id=_anchor("schema"),
+                title="Schema reference appendix",
+                start_line=schema_start,
+                end_line=len(writer.lines),
+            )
+        )
     markdown = "\n".join(writer.lines).rstrip() + "\n"
     return MarkdownSpecification(
         revision=snapshot.revision,
         assessment_digest=assessment_digest,
-        state_digest=_digest(f"{snapshot.revision}\n{assessment_digest}\n{markdown}"),
+        state_digest=_digest(
+            f"{snapshot.revision}\n{assessment_digest}\n{markdown}\n"
+            + _canonical([dump_wire(item) for item in disclosures])
+        ),
         title=title,
         markdown=markdown,
         outline=writer.outline,
         node_count=len(snapshot.nodes),
         edge_count=len(snapshot.edges),
+        diagrams=diagrams,
+        disclosures=disclosures,
     )

@@ -30,7 +30,6 @@ from typed_graph.application.ports import SpecificationToken
 from typed_graph.application.specification import SpecificationState
 from typed_graph.domain.models import (
     Assessment,
-    AssessmentKey,
     AssessmentState,
     Edge,
     GraphSchema,
@@ -408,16 +407,27 @@ class WorkspaceRepository:
         return f"{manifest.st_mtime_ns}:{manifest.st_size}:0:0"
 
     def specification_state(self) -> SpecificationState:
-        """Read one committed revision and its assessment log under the writer lock."""
+        """Read one snapshot and latest recorded assessments, retaining original revisions.
+
+        An unrelated commit must not erase unresolved findings. Older records remain
+        explicitly stale in the reader, never carried forward as current verification.
+        MCP revision-specific retrieval is intentionally unchanged.
+        """
         with self.lock():
             snapshot = self.current()
             # Read the authoritative assessment log, not a possibly lagging SQLite projection.
-            latest: dict[AssessmentKey, Assessment] = {}
+            latest: dict[tuple[Identifier, Identifier], Assessment] = {}
             if self.assessment_path.exists():
                 for line in self.assessment_path.read_text().splitlines():
                     assessment = Assessment.model_validate_json(line)
-                    if assessment.revision == snapshot.revision:
-                        latest[assessment.key] = assessment
+                    if assessment.revision > snapshot.revision:
+                        continue
+                    subject = assessment.interceptor_id, assessment.target_id
+                    prior = latest.get(subject)
+                    # A late completion for an old revision must not replace a newer
+                    # pending/completed record. Same-revision append order is authoritative.
+                    if prior is None or assessment.revision >= prior.revision:
+                        latest[subject] = assessment
             return SpecificationState(
                 snapshot=snapshot, assessments=[latest[key] for key in sorted(latest)]
             )
@@ -425,5 +435,9 @@ class WorkspaceRepository:
 
 def open_service(workspace: Path) -> GraphService:
     from typed_graph.application.service import GraphService
+    from typed_graph.architecture.tools import ArchitectureTools
+    from typed_graph.architecture.validation import validate_architecture
 
-    return GraphService(WorkspaceRepository(workspace))
+    return GraphService(
+        WorkspaceRepository(workspace), (validate_architecture,), (ArchitectureTools(),)
+    )

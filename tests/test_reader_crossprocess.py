@@ -153,16 +153,19 @@ async def test_reader_crossprocess(tmp_path: Path) -> None:
             a = wait_state(lambda x: x["revision"] == r)
             event = q.get(timeout=3)
             assert event["state_digest"] == a["state_digest"]
-            assert a["node_count"] == 1 and "Custom" in a["markdown"]
+            assert a["node_count"] == 1 and "Custom" in a["inspector"]["markdown"]
             assert (
-                "<script>" not in a["html"]
-                and 'href="javascript:' not in a["html"]
-                and "<img" not in a["html"]
+                "<script>" not in a["inspector"]["html"]
+                and 'href="javascript:' not in a["inspector"]["html"]
+                and "<img" not in a["inspector"]["html"]
             )
-            assert "<table>" in a["html"] and "<strong>bold</strong>" in a["html"]
-            assert get("/specification.md")[1].decode() == a["markdown"]
-            anchors = {e["id"] for e in a["outline"]}
-            assert all('id="' + anchor + '"' in a["html"] for anchor in anchors)
+            assert (
+                "<table>" in a["inspector"]["html"]
+                and "<strong>bold</strong>" in a["inspector"]["html"]
+            )
+            assert get("/inspector.md")[1].decode() == a["inspector"]["markdown"]
+            anchors = {e["id"] for e in a["inspector"]["outline"]}
+            assert all('id="' + anchor + '"' in a["inspector"]["html"] for anchor in anchors)
             update = {
                 "expected_revision": r,
                 "changes": [
@@ -179,7 +182,7 @@ async def test_reader_crossprocess(tmp_path: Path) -> None:
             b = wait_state(lambda x: x["revision"] == r)
             event = q.get(timeout=3)
             assert event["state_digest"] == b["state_digest"]
-            assert anchors == {e["id"] for e in b["outline"]}
+            assert anchors == {e["id"] for e in b["inspector"]["outline"]}
             invalid = await client.call_tool(
                 "apply_changes",
                 {
@@ -215,7 +218,7 @@ async def test_reader_crossprocess(tmp_path: Path) -> None:
             c = wait_state(lambda x: x["state_digest"] != b["state_digest"])
             assert c["revision"] == r and c["assessment_digest"] != b["assessment_digest"]
             assert q.get(timeout=3)["state_digest"] == c["state_digest"]
-            assert 'href="javascript:' not in c["html"]
+            assert 'href="javascript:' not in c["inspector"]["html"]
             with urllib.request.urlopen(
                 urllib.request.Request(
                     base + "/events", headers={"Last-Event-ID": initial["state_digest"]}

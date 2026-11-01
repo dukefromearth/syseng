@@ -37,13 +37,51 @@ from typed_graph.application.ports import SpecificationSource, SpecificationToke
 from typed_graph.application.specification import (
     MarkdownSpecification,
     PresentationProfile,
+    SpecificationState,
+    _digest,
     project_specification,
 )
+from typed_graph.architecture import compile_architecture
+from typed_graph.architecture.models import PACKAGE_VERSION, Role
 from typed_graph.domain.models import StrictModel, dump_wire
 
 
 class RenderedSpecification(MarkdownSpecification):
     html: str
+
+
+class ReaderSpecification(RenderedSpecification):
+    inspector: RenderedSpecification
+
+
+def project_reader(
+    state: SpecificationState, profile: PresentationProfile | None
+) -> ReaderSpecification:
+    inspector = render_specification(project_specification(state, profile))
+    if state.snapshot.schema_definition.version == PACKAGE_VERSION and any(
+        node.type == Role.MODEL for node in state.snapshot.nodes
+    ):
+        projected = compile_architecture(state)
+    else:
+        markdown = (
+            "# No architecture specification available\n\n"
+            "This workspace has no registered architecture model. "
+            "Its records are available in Graph inspector.\n"
+        )
+        projected = MarkdownSpecification(
+            revision=state.snapshot.revision,
+            assessment_digest=inspector.assessment_digest,
+            state_digest=_digest(inspector.state_digest + markdown),
+            title="No architecture specification available",
+            markdown=markdown,
+            outline=[],
+            node_count=len(state.snapshot.nodes),
+            edge_count=len(state.snapshot.edges),
+        )
+    rendered = render_specification(projected)
+    return ReaderSpecification.model_validate(
+        {**dump_wire(rendered), "inspector": dump_wire(inspector)}
+    )
 
 
 class ReaderStatus(StrictModel):
@@ -79,6 +117,11 @@ SAFE_TAGS = frozenset(
         "th",
         "td",
         "span",
+        "details",
+        "summary",
+        "figure",
+        "figcaption",
+        "div",
     }
 )
 SECURITY_HEADERS = {
@@ -105,10 +148,61 @@ def render_specification(specification: MarkdownSpecification) -> RenderedSpecif
     parser.add_render_rule("image", _image_alt)
     tokens = parser.parse(specification.markdown)
     headings = {entry.line: entry for entry in specification.outline}
+    diagrams = {diagram.line: diagram for diagram in specification.diagrams}
     for token in tokens:
         if token.type == "heading_open" and token.map and token.map[0] in headings:
             token.attrSet("id", headings[token.map[0]].id)
-    rendered = parser.renderer.render(tokens, parser.options, {})
+        if token.type == "fence" and token.map and token.map[0] in diagrams:
+            diagram = diagrams[token.map[0]]
+            # Only a generated fence at its exact recorded source position is executable.
+            # Identical graph-authored Mermaid elsewhere remains ordinary code.
+            if token.info == "mermaid" and token.content.rstrip("\n") == diagram.source:
+                token.type = "html_block"
+                token.content = (
+                    f'<figure data-diagram-id="{html.escape(diagram.id, quote=True)}">'
+                    '<div class="diagram-canvas"></div>'
+                    f"<figcaption>{html.escape(diagram.title)}</figcaption>"
+                    f'<pre class="diagram-source"><code>{html.escape(diagram.source)}</code></pre>'
+                    "</figure>"
+                )
+    insertions: dict[int, list[str]] = {}
+    for section in specification.disclosures:
+        start = next(
+            (
+                index
+                for index, token in enumerate(tokens)
+                if token.type == "heading_open" and token.map and token.map[0] == section.start_line
+            ),
+            None,
+        )
+        if start is None:
+            continue
+        end = next(
+            (
+                index
+                for index, token in enumerate(tokens)
+                if token.map and token.map[0] >= section.end_line
+            ),
+            len(tokens),
+        )
+        summary_end = next(
+            index + 1 for index in range(start + 1, end) if tokens[index].type == "heading_close"
+        )
+        insertions.setdefault(start, []).append(
+            f'<details data-section-id="{html.escape(section.id, quote=True)}"><summary>'
+        )
+        insertions.setdefault(summary_end, []).append("</summary>")
+        # Prepend closers before a following section opener at the same token index.
+        insertions.setdefault(end, []).insert(0, "</details>")
+    expanded: list[Token] = []
+    for index in range(len(tokens) + 1):
+        for markup in insertions.get(index, []):
+            added = Token("html_block", "", 0)
+            added.content = markup
+            expanded.append(added)
+        if index < len(tokens):
+            expanded.append(tokens[index])
+    rendered = parser.renderer.render(expanded, parser.options, {})
     safe = bleach.clean(
         rendered,
         tags=SAFE_TAGS,
@@ -121,6 +215,10 @@ def render_specification(specification: MarkdownSpecification) -> RenderedSpecif
             "h5": ["id"],
             "h6": ["id"],
             "span": ["class"],
+            "details": ["data-section-id"],
+            "figure": ["data-diagram-id"],
+            "div": ["class"],
+            "pre": ["class"],
         },
         protocols={"http", "https", "mailto"},
         strip=True,
@@ -167,7 +265,7 @@ class SpecificationCache:
         self.repository = repository
         self.profile = profile
         self.poll_interval = poll_interval
-        self.latest: RenderedSpecification | None = None
+        self.latest: ReaderSpecification | None = None
         self.generation = 0
         self.status = ReaderStatus(
             state="live", message="Following the latest committed specification"
@@ -180,8 +278,7 @@ class SpecificationCache:
         if token == self.token and self.status.state == "live":
             return
         state = await anyio.to_thread.run_sync(self.repository.specification_state)
-        projected = await anyio.to_thread.run_sync(project_specification, state, self.profile)
-        rendered = await anyio.to_thread.run_sync(render_specification, projected)
+        rendered = await anyio.to_thread.run_sync(project_reader, state, self.profile)
         async with self.condition:
             self.token = token
             changed = self.latest is None or rendered.state_digest != self.latest.state_digest
@@ -213,7 +310,7 @@ class SpecificationCache:
                         self.generation += 1
                         self.condition.notify_all()
 
-    def current(self) -> RenderedSpecification:
+    def current(self) -> ReaderSpecification:
         if self.latest is None:
             raise RuntimeError("Specification cache is not initialized")
         return self.latest
@@ -281,6 +378,9 @@ def create_app(
     async def javascript(request: Request) -> Response:
         return Response((assets / "app.js").read_text(), media_type="text/javascript")
 
+    async def diagram_javascript(request: Request) -> Response:
+        return Response((assets / "reader-diagrams.js").read_text(), media_type="text/javascript")
+
     async def stylesheet(request: Request) -> Response:
         return Response((assets / "styles.css").read_text(), media_type="text/css")
 
@@ -294,6 +394,13 @@ def create_app(
             headers={"Content-Disposition": 'attachment; filename="specification.md"'},
         )
 
+    async def inspector_markdown(request: Request) -> Response:
+        return Response(
+            cache.current().inspector.markdown,
+            media_type="text/markdown",
+            headers={"Content-Disposition": 'attachment; filename="graph-inspector.md"'},
+        )
+
     async def events(request: Request) -> Response:
         return StreamingResponse(
             cache.events(), media_type="text/event-stream", headers={"X-Accel-Buffering": "no"}
@@ -303,9 +410,11 @@ def create_app(
         routes=[
             Route("/", index),
             Route("/app.js", javascript),
+            Route("/reader-diagrams.js", diagram_javascript),
             Route("/styles.css", stylesheet),
             Route("/api/specification", specification),
             Route("/specification.md", markdown),
+            Route("/inspector.md", inspector_markdown),
             Route("/events", events),
         ],
         lifespan=lifespan,

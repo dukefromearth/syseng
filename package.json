@@ -2,10 +2,15 @@
   "name": "typed-reactive-graph-reader",
   "private": true,
   "scripts": {
-    "lint": "eslint src/typed_graph/adapters/static/app.js",
-    "dev": ".venv/bin/python scripts/preview.py"
+    "lint": "eslint src/typed_graph/adapters/static/app.js scripts/reader-diagrams.js scripts/build-reader.mjs",
+    "dev": ".venv/bin/python scripts/preview.py",
+    "build:reader": "node scripts/build-reader.mjs",
+    "check:reader": "node scripts/build-reader.mjs --check"
   },
   "devDependencies": {
+    "@mermaid-js/tiny": "12.2.0",
+    "dompurify": "3.4.17",
+    "esbuild": "0.28.2",
     "eslint": "^10.14.0"
   }
 }

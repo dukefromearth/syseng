@@ -562,7 +562,8 @@ def test_reading_profile_leads_with_authored_prose_and_preserves_meaning_and_pro
     assert "**status:** candidate" in result.markdown
     assert "- A stated fact" in result.markdown
     assert "Authored relationship meaning" in result.markdown
-    assert "→ relates →" in result.markdown
+    assert "**Outgoing · relates:**" in result.markdown
+    assert "**Incoming · relates:**" in result.markdown
     assert "No assessments recorded for this node" not in result.markdown
     assert intro_id not in result.markdown
     assert detail_id not in result.markdown

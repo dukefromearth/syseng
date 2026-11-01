@@ -33,6 +33,29 @@ Resources are JSON: `graph://model/schema`, `graph://model/nodes/{id}`,
 `graph://model/revisions/{revision}`, `graph://model/impact/{revision}`, and
 `graph://model/assessments/{revision}`.
 
+## Optional architecture authoring
+
+A workspace registered with schema version `typed-graph/architecture/v1` advertises five
+additional meaning-oriented tools: `define_concept`, `define_system`, `add_layer`,
+`define_boundary` and `propose_binding`. Their input schemas derive from the same
+strict role models as the registered graph schema. Refresh `tools/list` after
+indexing the package; generic workspaces do not acquire these architectural tools.
+
+Higher-order commands create the related records and edges atomically. For example,
+a system definition includes its responsibility and versioned behavioral contract.
+A proposed binding references a contract and interaction boundaries; it is not a
+verification claim. Expected-revision checks still apply. Generic `apply_changes`
+and source imports undergo the same architecture publication checks, so they cannot
+bypass endpoint, required-reference or same-contract comparison constraints.
+
+Agents author meaning, not reading order or document blocks. The fixed architecture
+compiler produces the human specification from those records. Existing arbitrary
+user schemas remain supported by the generic tools and graph inspector. The package
+keeps architectural roles closed while allowing additional typed domain predicates:
+`architecture_schema(domain_relations=...)` accepts new relations whose endpoints are
+DomainConcept instances. Those predicates appear in the fixed domain section without
+compiler changes. Canonical architecture relations cannot be replaced.
+
 ## Opt-in subscriptions
 
 Add `--subscriptions` to enable `subscriptions/listen` for clients negotiating

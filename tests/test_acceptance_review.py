@@ -286,8 +286,9 @@ def test_hexagonal_import_contract():
 
     root = Path(__file__).parents[1] / "src" / "typed_graph"
     forbidden = {
-        "domain": ("typed_graph.application", "typed_graph.adapters"),
-        "application": ("typed_graph.adapters",),
+        "domain": ("typed_graph.application", "typed_graph.adapters", "typed_graph.architecture"),
+        "application": ("typed_graph.adapters", "typed_graph.architecture"),
+        "architecture": ("typed_graph.adapters",),
     }
     io_modules = {"sqlite3", "pathlib", "os", "subprocess", "socket", "requests", "httpx", "mcp"}
     violations = []

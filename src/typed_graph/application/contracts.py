@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from typing import Annotated, Literal
 
@@ -174,17 +174,22 @@ SUBMIT_ASSESSMENT = _register(
 )
 
 
-def tool_spec(name: str) -> ToolSpec:
+def tool_spec(name: str, catalog: Mapping[str, ToolSpec] | None = None) -> ToolSpec:
     try:
-        return TOOL_CATALOG[name]
+        return (TOOL_CATALOG if catalog is None else catalog)[name]
     except KeyError as error:
         raise ValueError(f"unknown tool {name}") from error
 
 
-def validate_request(name: str, arguments: JsonObject, authored: JsonObject) -> StrictModel:
-    request = tool_spec(name).request_model.model_validate(arguments, strict=True)
+def validate_request(
+    name: str,
+    arguments: JsonObject,
+    authored: JsonObject,
+    catalog: Mapping[str, ToolSpec] | None = None,
+) -> StrictModel:
+    request = tool_spec(name, catalog).request_model.model_validate(arguments, strict=True)
     try:
-        Draft202012Validator(request_schema(name, authored), registry=Registry()).validate(
+        Draft202012Validator(request_schema(name, authored, catalog), registry=Registry()).validate(
             arguments
         )
     except ValidationError as error:
@@ -192,24 +197,32 @@ def validate_request(name: str, arguments: JsonObject, authored: JsonObject) -> 
     return request
 
 
-def validate_response(name: str, result: JsonObject | StrictModel) -> StrictModel:
+def validate_response(
+    name: str,
+    result: JsonObject | StrictModel,
+    catalog: Mapping[str, ToolSpec] | None = None,
+) -> StrictModel:
     # Roundtrip instances too: mutation/model_construct must not bypass boundary validation.
     payload = (
         result.model_dump(mode="python", by_alias=True, exclude_unset=True)
         if isinstance(result, StrictModel)
         else result
     )
-    return tool_spec(name).result_model.model_validate(payload, strict=True)
+    return tool_spec(name, catalog).result_model.model_validate(payload, strict=True)
 
 
-def request_schema(name: str, authored: JsonObject) -> JsonObject:
-    spec = tool_spec(name)
+def request_schema(
+    name: str,
+    authored: JsonObject,
+    catalog: Mapping[str, ToolSpec] | None = None,
+) -> JsonObject:
+    spec = tool_spec(name, catalog)
     base = spec.request_model.model_json_schema(by_alias=True)
     return spec.specialize_input(base, authored) if spec.specialize_input else base
 
 
-def response_schema(name: str) -> JsonObject:
-    return tool_spec(name).result_model.model_json_schema(by_alias=True)
+def response_schema(name: str, catalog: Mapping[str, ToolSpec] | None = None) -> JsonObject:
+    return tool_spec(name, catalog).result_model.model_json_schema(by_alias=True)
 
 
 class NodeResourceResult(StrictModel):

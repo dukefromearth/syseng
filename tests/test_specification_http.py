@@ -146,11 +146,15 @@ async def test_reader_assets_projection_sanitization_and_read_only_boundary(
         assert (await client.get("/styles.css")).status_code == 200
         spec = (await client.get("/api/specification")).json()
         assert spec["revision"] == 1 and spec["node_count"] == 1
+        assert "No architecture specification available" in spec["html"]
+        assert "living" not in spec["html"]
+        assert (await client.get("/specification.md")).text == spec["markdown"]
+        spec = spec["inspector"]
         assert "<strong>living</strong>" in spec["html"]
         assert "<script" not in spec["html"] and "<img" not in spec["html"]
         assert "tracking pixel" in spec["html"] and 'href="javascript:' not in spec["html"]
         assert all(f'id="{entry["id"]}"' in spec["html"] for entry in spec["outline"])
-        downloaded = await client.get("/specification.md")
+        downloaded = await client.get("/inspector.md")
         assert downloaded.text == spec["markdown"]
         assert "attachment" in downloaded.headers["content-disposition"]
         assert (await client.post("/api/specification", json={})).status_code == 405
@@ -197,7 +201,7 @@ async def test_sse_cross_process_revision_assessment_noop_and_reconnect(
                 },
             )
             updated = await next_event(lines, "specification")
-            assert updated["revision"] == 2 and "Updated reader" in updated["html"]
+            assert updated["revision"] == 2 and "Updated reader" in updated["inspector"]["html"]
             assert original["state_digest"] != updated["state_digest"]
             await mcp_write(
                 "submit_assessment",
@@ -215,7 +219,7 @@ async def test_sse_cross_process_revision_assessment_noop_and_reconnect(
             assessed = await next_event(lines, "specification")
             assert assessed["revision"] == 2
             assert assessed["assessment_digest"] != updated["assessment_digest"]
-            assert "pass" in assessed["markdown"]
+            assert "pass" in assessed["inspector"]["markdown"]
             await mcp_write("apply_changes", {"expected_revision": 2, "changes": []})
             with pytest.raises(TimeoutError):
                 async with asyncio.timeout(1.3):

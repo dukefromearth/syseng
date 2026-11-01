@@ -1,0 +1,1406 @@
+{
+  "version": "typed-graph/architecture/v1",
+  "node_types": {
+    "ArchitectureModel": {
+      "$defs": {
+        "Identifier": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "statements": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Statements",
+          "type": "array"
+        },
+        "version": {
+          "$ref": "#/$defs/Identifier"
+        }
+      },
+      "required": [
+        "name",
+        "description",
+        "version"
+      ],
+      "title": "ModelProperties",
+      "type": "object"
+    },
+    "Ontology": {
+      "$defs": {
+        "Identifier": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "statements": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Statements",
+          "type": "array"
+        },
+        "kind": {
+          "enum": [
+            "domain",
+            "system",
+            "realization"
+          ],
+          "title": "Kind",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "description",
+        "kind"
+      ],
+      "title": "OntologyProperties",
+      "type": "object"
+    },
+    "DomainConcept": {
+      "$defs": {
+        "Identifier": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "statements": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Statements",
+          "type": "array"
+        }
+      },
+      "required": [
+        "name",
+        "description"
+      ],
+      "title": "BaseProperties",
+      "type": "object"
+    },
+    "Invariant": {
+      "$defs": {
+        "Identifier": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "statements": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Statements",
+          "type": "array"
+        }
+      },
+      "required": [
+        "name",
+        "description"
+      ],
+      "title": "BaseProperties",
+      "type": "object"
+    },
+    "System": {
+      "$defs": {
+        "Identifier": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "statements": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Statements",
+          "type": "array"
+        }
+      },
+      "required": [
+        "name",
+        "description"
+      ],
+      "title": "BaseProperties",
+      "type": "object"
+    },
+    "Responsibility": {
+      "$defs": {
+        "Identifier": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "statements": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Statements",
+          "type": "array"
+        }
+      },
+      "required": [
+        "name",
+        "description"
+      ],
+      "title": "BaseProperties",
+      "type": "object"
+    },
+    "BehavioralContract": {
+      "$defs": {
+        "Identifier": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "statements": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Statements",
+          "type": "array"
+        },
+        "version": {
+          "$ref": "#/$defs/Identifier"
+        }
+      },
+      "required": [
+        "name",
+        "description",
+        "version"
+      ],
+      "title": "ContractProperties",
+      "type": "object"
+    },
+    "ExchangeContract": {
+      "$defs": {
+        "Identifier": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "statements": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Statements",
+          "type": "array"
+        },
+        "version": {
+          "$ref": "#/$defs/Identifier"
+        }
+      },
+      "required": [
+        "name",
+        "description",
+        "version"
+      ],
+      "title": "ContractProperties",
+      "type": "object"
+    },
+    "ScopedConcept": {
+      "$defs": {
+        "Identifier": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "statements": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Statements",
+          "type": "array"
+        }
+      },
+      "required": [
+        "name",
+        "description"
+      ],
+      "title": "BaseProperties",
+      "type": "object"
+    },
+    "RealizationConcept": {
+      "$defs": {
+        "Identifier": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "statements": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Statements",
+          "type": "array"
+        }
+      },
+      "required": [
+        "name",
+        "description"
+      ],
+      "title": "BaseProperties",
+      "type": "object"
+    },
+    "Environment": {
+      "$defs": {
+        "Identifier": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "statements": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Statements",
+          "type": "array"
+        }
+      },
+      "required": [
+        "name",
+        "description"
+      ],
+      "title": "BaseProperties",
+      "type": "object"
+    },
+    "Boundary": {
+      "$defs": {
+        "Identifier": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "statements": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Statements",
+          "type": "array"
+        }
+      },
+      "required": [
+        "name",
+        "description"
+      ],
+      "title": "BaseProperties",
+      "type": "object"
+    },
+    "Capability": {
+      "$defs": {
+        "Identifier": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "statements": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Statements",
+          "type": "array"
+        }
+      },
+      "required": [
+        "name",
+        "description"
+      ],
+      "title": "BaseProperties",
+      "type": "object"
+    },
+    "Layer": {
+      "$defs": {
+        "Identifier": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "statements": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Statements",
+          "type": "array"
+        },
+        "rank": {
+          "minimum": 0,
+          "title": "Rank",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "name",
+        "description"
+      ],
+      "title": "LayerProperties",
+      "type": "object"
+    },
+    "Binding": {
+      "$defs": {
+        "Identifier": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "statements": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Statements",
+          "type": "array"
+        },
+        "lifecycle": {
+          "const": "candidate",
+          "default": "candidate",
+          "title": "Lifecycle",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "description"
+      ],
+      "title": "BindingProperties",
+      "type": "object"
+    },
+    "TechnologyCandidate": {
+      "$defs": {
+        "Identifier": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "statements": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Statements",
+          "type": "array"
+        }
+      },
+      "required": [
+        "name",
+        "description"
+      ],
+      "title": "BaseProperties",
+      "type": "object"
+    },
+    "Requirement": {
+      "$defs": {
+        "Identifier": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "statements": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Statements",
+          "type": "array"
+        },
+        "priority": {
+          "default": "required",
+          "enum": [
+            "required",
+            "future"
+          ],
+          "title": "Priority",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "description"
+      ],
+      "title": "RequirementProperties",
+      "type": "object"
+    },
+    "AcceptanceCriterion": {
+      "$defs": {
+        "Identifier": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "statements": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Statements",
+          "type": "array"
+        }
+      },
+      "required": [
+        "name",
+        "description"
+      ],
+      "title": "BaseProperties",
+      "type": "object"
+    },
+    "Scenario": {
+      "$defs": {
+        "Identifier": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "statements": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Statements",
+          "type": "array"
+        },
+        "scope": {
+          "default": "reference",
+          "enum": [
+            "reference",
+            "future"
+          ],
+          "title": "Scope",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "description"
+      ],
+      "title": "ScopedProperties",
+      "type": "object"
+    },
+    "ScenarioStep": {
+      "$defs": {
+        "Identifier": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "statements": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Statements",
+          "type": "array"
+        }
+      },
+      "required": [
+        "name",
+        "description"
+      ],
+      "title": "BaseProperties",
+      "type": "object"
+    },
+    "FailureCase": {
+      "$defs": {
+        "Identifier": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "statements": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Statements",
+          "type": "array"
+        }
+      },
+      "required": [
+        "name",
+        "description"
+      ],
+      "title": "BaseProperties",
+      "type": "object"
+    },
+    "Phase": {
+      "$defs": {
+        "Identifier": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "statements": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Statements",
+          "type": "array"
+        },
+        "scope": {
+          "default": "reference",
+          "enum": [
+            "reference",
+            "future"
+          ],
+          "title": "Scope",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "description"
+      ],
+      "title": "ScopedProperties",
+      "type": "object"
+    },
+    "Exclusion": {
+      "$defs": {
+        "Identifier": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "statements": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Statements",
+          "type": "array"
+        }
+      },
+      "required": [
+        "name",
+        "description"
+      ],
+      "title": "BaseProperties",
+      "type": "object"
+    },
+    "GovernanceRule": {
+      "$defs": {
+        "Identifier": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "statements": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Statements",
+          "type": "array"
+        },
+        "category": {
+          "enum": [
+            "model_invariant",
+            "build_constraint",
+            "runtime_constraint",
+            "measurement",
+            "reuse"
+          ],
+          "title": "Category",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "description",
+        "category"
+      ],
+      "title": "GovernanceProperties",
+      "type": "object"
+    },
+    "GovernanceRole": {
+      "$defs": {
+        "Identifier": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "statements": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Statements",
+          "type": "array"
+        }
+      },
+      "required": [
+        "name",
+        "description"
+      ],
+      "title": "BaseProperties",
+      "type": "object"
+    },
+    "Objective": {
+      "$defs": {
+        "Identifier": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "statements": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Statements",
+          "type": "array"
+        }
+      },
+      "required": [
+        "name",
+        "description"
+      ],
+      "title": "BaseProperties",
+      "type": "object"
+    },
+    "IndependenceExample": {
+      "$defs": {
+        "Identifier": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "statements": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Statements",
+          "type": "array"
+        }
+      },
+      "required": [
+        "name",
+        "description"
+      ],
+      "title": "BaseProperties",
+      "type": "object"
+    }
+  },
+  "relations": {
+    "exchanges": {
+      "source": [
+        "BehavioralContract"
+      ],
+      "target": [
+        "ExchangeContract"
+      ],
+      "impact": "target_to_source"
+    },
+    "constrains_contract": {
+      "source": [
+        "Requirement",
+        "AcceptanceCriterion",
+        "FailureCase",
+        "Objective"
+      ],
+      "target": [
+        "BehavioralContract"
+      ],
+      "impact": "source_to_target"
+    },
+    "owns": {
+      "source": [
+        "System"
+      ],
+      "target": [
+        "Responsibility"
+      ],
+      "impact": "target_to_source",
+      "cardinality": {
+        "out_min": 1,
+        "out_max": 1,
+        "in_min": 1,
+        "in_max": 1
+      }
+    },
+    "specified_by": {
+      "source": [
+        "Responsibility"
+      ],
+      "target": [
+        "BehavioralContract"
+      ],
+      "impact": "target_to_source",
+      "cardinality": {
+        "out_min": 1,
+        "out_max": 1
+      }
+    },
+    "concerns": {
+      "source": [
+        "Responsibility",
+        "Objective"
+      ],
+      "target": [
+        "DomainConcept"
+      ],
+      "impact": "target_to_source"
+    },
+    "defined_in_terms_of": {
+      "source": [
+        "BehavioralContract",
+        "ExchangeContract"
+      ],
+      "target": [
+        "DomainConcept",
+        "RealizationConcept"
+      ],
+      "impact": "target_to_source"
+    },
+    "produces": {
+      "source": [
+        "System",
+        "Binding"
+      ],
+      "target": [
+        "ExchangeContract"
+      ],
+      "impact": "target_to_source"
+    },
+    "consumed_by": {
+      "source": [
+        "ExchangeContract"
+      ],
+      "target": [
+        "System"
+      ],
+      "impact": "source_to_target"
+    },
+    "constrains": {
+      "source": [
+        "Ontology"
+      ],
+      "target": [
+        "Ontology"
+      ],
+      "impact": "source_to_target"
+    },
+    "constrains_concept": {
+      "source": [
+        "Invariant"
+      ],
+      "target": [
+        "DomainConcept"
+      ],
+      "impact": "source_to_target"
+    },
+    "includes": {
+      "source": [
+        "Ontology"
+      ],
+      "target": [
+        "DomainConcept",
+        "Invariant",
+        "System",
+        "RealizationConcept",
+        "Environment",
+        "Boundary",
+        "Capability",
+        "Layer",
+        "Binding",
+        "TechnologyCandidate"
+      ],
+      "impact": "none"
+    },
+    "uses_concept": {
+      "source": [
+        "System"
+      ],
+      "target": [
+        "DomainConcept",
+        "ScopedConcept",
+        "RealizationConcept"
+      ],
+      "impact": "target_to_source"
+    },
+    "specializes": {
+      "source": [
+        "ScopedConcept",
+        "DomainConcept"
+      ],
+      "target": [
+        "DomainConcept",
+        "RealizationConcept"
+      ],
+      "impact": "target_to_source"
+    },
+    "expressed_as": {
+      "source": [
+        "DomainConcept"
+      ],
+      "target": [
+        "DomainConcept"
+      ],
+      "impact": "source_to_target"
+    },
+    "consumes": {
+      "source": [
+        "DomainConcept"
+      ],
+      "target": [
+        "DomainConcept"
+      ],
+      "impact": "target_to_source"
+    },
+    "yields": {
+      "source": [
+        "DomainConcept"
+      ],
+      "target": [
+        "DomainConcept"
+      ],
+      "impact": "source_to_target"
+    },
+    "informs": {
+      "source": [
+        "DomainConcept"
+      ],
+      "target": [
+        "DomainConcept"
+      ],
+      "impact": "source_to_target"
+    },
+    "selects": {
+      "source": [
+        "DomainConcept"
+      ],
+      "target": [
+        "DomainConcept"
+      ],
+      "impact": "source_to_target"
+    },
+    "modifies": {
+      "source": [
+        "DomainConcept"
+      ],
+      "target": [
+        "DomainConcept"
+      ],
+      "impact": "source_to_target"
+    },
+    "attempts_to_fulfill": {
+      "source": [
+        "Binding"
+      ],
+      "target": [
+        "BehavioralContract"
+      ],
+      "impact": "target_to_source",
+      "cardinality": {
+        "out_min": 1,
+        "out_max": 1
+      }
+    },
+    "uses_boundary": {
+      "source": [
+        "Binding"
+      ],
+      "target": [
+        "Boundary"
+      ],
+      "impact": "target_to_source"
+    },
+    "requires_capability": {
+      "source": [
+        "Binding",
+        "BehavioralContract"
+      ],
+      "target": [
+        "Capability"
+      ],
+      "impact": "target_to_source"
+    },
+    "must_preserve": {
+      "source": [
+        "Binding",
+        "BehavioralContract"
+      ],
+      "target": [
+        "Invariant"
+      ],
+      "impact": "target_to_source"
+    },
+    "candidate_for": {
+      "source": [
+        "TechnologyCandidate"
+      ],
+      "target": [
+        "Binding",
+        "Boundary"
+      ],
+      "impact": "source_to_target"
+    },
+    "exposes": {
+      "source": [
+        "Environment"
+      ],
+      "target": [
+        "Boundary"
+      ],
+      "impact": "source_to_target"
+    },
+    "provides": {
+      "source": [
+        "Boundary"
+      ],
+      "target": [
+        "Capability"
+      ],
+      "impact": "target_to_source"
+    },
+    "classified_by": {
+      "source": [
+        "Boundary"
+      ],
+      "target": [
+        "Layer"
+      ],
+      "impact": "target_to_source"
+    },
+    "applies_to": {
+      "source": [
+        "Requirement",
+        "AcceptanceCriterion",
+        "FailureCase",
+        "Objective"
+      ],
+      "target": [
+        "System",
+        "GovernanceRole",
+        "Scenario",
+        "Binding",
+        "Objective"
+      ],
+      "impact": "source_to_target"
+    },
+    "governed_by": {
+      "source": [
+        "Requirement",
+        "AcceptanceCriterion"
+      ],
+      "target": [
+        "Invariant"
+      ],
+      "impact": "target_to_source"
+    },
+    "contains_step": {
+      "source": [
+        "Scenario"
+      ],
+      "target": [
+        "ScenarioStep"
+      ],
+      "impact": "none"
+    },
+    "performed_by": {
+      "source": [
+        "ScenarioStep"
+      ],
+      "target": [
+        "System"
+      ],
+      "impact": "target_to_source"
+    },
+    "next": {
+      "source": [
+        "ScenarioStep",
+        "Phase"
+      ],
+      "target": [
+        "ScenarioStep",
+        "Phase"
+      ],
+      "impact": "none"
+    },
+    "delivers": {
+      "source": [
+        "Phase"
+      ],
+      "target": [
+        "Requirement"
+      ],
+      "impact": "target_to_source"
+    },
+    "evaluates": {
+      "source": [
+        "Phase"
+      ],
+      "target": [
+        "AcceptanceCriterion"
+      ],
+      "impact": "target_to_source"
+    },
+    "supports": {
+      "source": [
+        "Requirement"
+      ],
+      "target": [
+        "Requirement"
+      ],
+      "impact": "target_to_source"
+    },
+    "demonstrates_objective": {
+      "source": [
+        "IndependenceExample"
+      ],
+      "target": [
+        "Objective"
+      ],
+      "impact": "target_to_source",
+      "cardinality": {
+        "out_min": 1,
+        "out_max": 1
+      }
+    },
+    "holds_contract": {
+      "source": [
+        "IndependenceExample"
+      ],
+      "target": [
+        "BehavioralContract"
+      ],
+      "impact": "target_to_source",
+      "cardinality": {
+        "out_min": 1,
+        "out_max": 1
+      }
+    },
+    "compares_binding": {
+      "source": [
+        "IndependenceExample"
+      ],
+      "target": [
+        "Binding"
+      ],
+      "impact": "target_to_source",
+      "cardinality": {
+        "out_min": 2
+      }
+    }
+  },
+  "invariants": [
+    {
+      "kind": "unique",
+      "node_type": "DomainConcept",
+      "property": "name"
+    },
+    {
+      "kind": "unique",
+      "node_type": "RealizationConcept",
+      "property": "name"
+    },
+    {
+      "kind": "unique",
+      "node_type": "System",
+      "property": "name"
+    },
+    {
+      "kind": "unique",
+      "node_type": "ExchangeContract",
+      "property": "name"
+    },
+    {
+      "kind": "unique",
+      "node_type": "Ontology",
+      "property": "kind"
+    },
+    {
+      "kind": "requires_edge",
+      "node_type": "System",
+      "relation": "owns",
+      "direction": "out"
+    },
+    {
+      "kind": "requires_edge",
+      "node_type": "Responsibility",
+      "relation": "specified_by",
+      "direction": "out"
+    },
+    {
+      "kind": "requires_edge",
+      "node_type": "Binding",
+      "relation": "attempts_to_fulfill",
+      "direction": "out"
+    },
+    {
+      "kind": "requires_edge",
+      "node_type": "Binding",
+      "relation": "uses_boundary",
+      "direction": "out"
+    },
+    {
+      "kind": "requires_edge",
+      "node_type": "ExchangeContract",
+      "relation": "consumed_by",
+      "direction": "out"
+    },
+    {
+      "kind": "requires_edge",
+      "node_type": "ExchangeContract",
+      "relation": "produces",
+      "direction": "in"
+    },
+    {
+      "kind": "requires_edge",
+      "node_type": "Requirement",
+      "relation": "applies_to",
+      "direction": "out"
+    },
+    {
+      "kind": "requires_edge",
+      "node_type": "AcceptanceCriterion",
+      "relation": "applies_to",
+      "direction": "out"
+    }
+  ],
+  "interceptors": [
+    {
+      "id": "binding-conformance",
+      "target_type": "Binding",
+      "handler": "pending",
+      "version": "1",
+      "trigger": "dependency_changed",
+      "evidence_required": [
+        "contract-conformance",
+        "capability-availability",
+        "invariant-preservation",
+        "performance-measurements"
+      ]
+    }
+  ]
+}

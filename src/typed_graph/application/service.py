@@ -31,13 +31,14 @@ from typed_graph.application.contracts import (
     SearchRequest,
     SearchResult,
     SubmitAssessmentRequest,
+    ToolSpec,
     TraceRequest,
     TraceResult,
     tool_spec,
     validate_request,
     validate_response,
 )
-from typed_graph.application.ports import Repository
+from typed_graph.application.ports import PublicationValidator, Repository, ToolExtension
 from typed_graph.domain.engine import (
     apply_typed_operations,
     changed_node_ids,
@@ -53,6 +54,7 @@ from typed_graph.domain.models import (
     AssessmentStatus,
     AssessmentView,
     Edge,
+    GraphSchema,
     HistoryChange,
     Identifier,
     ImpactContext,
@@ -88,8 +90,15 @@ def entity_diff[T: Node | Edge](old: list[T], new: list[T]) -> Diff:
 
 
 class GraphService:
-    def __init__(self, store: Repository):
+    def __init__(
+        self,
+        store: Repository,
+        publication_validators: tuple[PublicationValidator, ...] = (),
+        tool_extensions: tuple[ToolExtension, ...] = (),
+    ):
         self.store = store
+        self.publication_validators = publication_validators
+        self.tool_extensions = tool_extensions
         # Fail at composition time if an extension's declared contract and use case drift.
         for spec in TOOL_CATALOG.values():
             handler = getattr(self, spec.handler_name, None)
@@ -112,11 +121,33 @@ class GraphService:
     def revision(self) -> Revision:
         return self.store.current().revision
 
+    @property
+    def tool_catalog(self) -> dict[str, ToolSpec]:
+        return self._catalog_for(self.store.current().schema_definition)
+
+    def _catalog_for(self, schema: GraphSchema) -> dict[str, ToolSpec]:
+        catalog = dict(TOOL_CATALOG)
+        for extension in self.tool_extensions:
+            for name, spec in extension.catalog(schema).items():
+                if name in catalog:
+                    raise ValueError(f"Duplicate extension tool: {name}")
+                catalog[name] = spec
+        return catalog
+
     def dispatch(self, tool: str, args: JsonObject) -> JsonObject:
-        spec = tool_spec(tool)
-        request = validate_request(tool, args, self.schema)
-        handler = cast(Callable[[StrictModel], StrictModel], getattr(self, spec.handler_name))
-        return dump_wire(validate_response(tool, handler(request)))
+        schema = self.store.current().schema_definition
+        catalog = self._catalog_for(schema)
+        spec = tool_spec(tool, catalog)
+        request = validate_request(tool, args, dump_wire(schema), catalog)
+        if tool in TOOL_CATALOG:
+            handler = cast(Callable[[StrictModel], StrictModel], getattr(self, spec.handler_name))
+            result = handler(request)
+        else:
+            extension = next(
+                module for module in self.tool_extensions if tool in module.catalog(schema)
+            )
+            result = self.apply_changes(extension.build(tool, request))
+        return dump_wire(validate_response(tool, result, catalog))
 
     def get_graph_schema(self, args: EmptyRequest) -> GraphSchemaResult:
         document = self.store.current()
@@ -125,6 +156,8 @@ class GraphService:
     def _validate(self, document: Snapshot) -> None:
         validate_typed_schema(document.schema_definition)
         validate_typed_graph(document.schema_definition, document.nodes, document.edges)
+        for validator in self.publication_validators:
+            validator(document)
 
     def _commit(
         self, old: Snapshot, new: Snapshot, changes: list[HistoryChange], changed: list[Identifier]
