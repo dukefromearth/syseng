@@ -1,0 +1,32 @@
+{
+  "tool": "define_product_boundary",
+  "revision": 1,
+  "call_id": "e6575e05-0875-4384-8e60-e04000b18d04",
+  "timestamp": "2026-11-06T14:58:27.407401+00:00",
+  "data": {
+    "name": "Personal Visual Substitution System",
+    "intended_experience": "The user sees chosen visual content replaced in their live view, such as blood in a game becoming glitter, while the underlying application continues to behave normally and the user's normal interaction remains unchanged. The eventual experience spans desktop applications rather than requiring a modification to each application.",
+    "scope": "A user-controlled visual mediation product that obtains authorized rendered imagery, identifies selected visual content, creates a temporally coherent substitute, and presents the altered view to that user. Owns replacement preferences, enable/disable controls, visual processing, timing and presentation coordination, and explicit handling of unsupported surfaces and failures. Desktop-wide coverage is a target, not a proven capability. Initial validation should use one supported desktop environment and game/display mode, chosen after feasibility testing. Application state, input delivery, and the original application's rendering remain outside the product boundary.",
+    "exclusions": [
+      "Changing game logic, game assets, simulation state, multiplayer state, or application behavior.",
+      "Intercepting, remapping, synthesizing, or rerouting normal application input as a product feature.",
+      "Replacing what other players or remote viewers see, or creating a recording/streaming service.",
+      "Bypassing protected-content, secure-desktop, permission, or anti-cheat restrictions.",
+      "A promise of perfect recognition, zero added latency, or universal desktop coverage before measurement."
+    ],
+    "external_dependencies": [
+      "The host operating system, compositor, graphics drivers, GPU, displays, and supported capture/presentation facilities.",
+      "Source applications and games, including their display modes, capture restrictions, and anti-cheat compatibility.",
+      "User-granted screen access and applicable platform permissions.",
+      "Recognition models and permitted evaluation examples capable of distinguishing blood from unrelated red content; these capabilities remain to be validated."
+    ],
+    "open_questions": [
+      "Which operating system, GPU, game, display mode, refresh rate, and monitor configuration should be supported first?",
+      "What added latency and recognition errors are acceptable, including brief exposure to original blood imagery?",
+      "Should uncertain detections or processing failures show original content, mask the affected area, or stop the altered view? This choice trades content avoidance against uninterrupted visibility.",
+      "Should glitter cover the original region or reconstruct the scene behind it, and how closely must it track motion and lighting?",
+      "Can a supported presentation mechanism preserve focus, pointer behavior, and normal input while avoiding capture of its own replacement output?",
+      "Proposed privacy default: process locally without retaining screen images. Is any recording or remote processing actually needed?"
+    ]
+  }
+}

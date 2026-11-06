@@ -1,0 +1,107 @@
+{
+  "tool": "decompose_system",
+  "revision": 1,
+  "call_id": "3406aa70-9364-45f5-86f3-6fb9024fa09a",
+  "timestamp": "2026-11-06T15:00:00.067673+00:00",
+  "data": {
+    "system_of_interest": "Personal visual substitution system",
+    "systems": [
+      {
+        "name": "Viewing integration",
+        "responsibility": "Mediate between the native visual environment and the user's displayed view while leaving native application execution and input routing intact.",
+        "boundary": "Own platform-specific access to source visuals, timing and coordinate normalization, presentation of substitutions, original-view exclusion where required, recursion prevention, and recovery when integration is lost. Exclude semantic target selection and replacement design. Do not assume capture alone grants control over final display output.",
+        "independence": "Can be prototyped with deterministic synthetic masks and replacements before recognition exists. A platform adapter can be replaced without changing the meaning of a substitution. Acquisition and presentation initially share this boundary because their timing, feedback, focus, and display-mode constraints are tightly coupled."
+      },
+      {
+        "name": "Visual interpretation",
+        "responsibility": "Identify and track the visual content that the user wants substituted.",
+        "boundary": "Own target recognition, spatial masks, temporal identity, confidence, and uncertainty. Exclude glitter appearance, platform capture mechanisms, and application state modification. Red pixels alone are not equivalent to blood.",
+        "independence": "Can be developed and assessed on authorized sample sequences with labeled target masks, independently of live display integration or a particular replacement style."
+      },
+      {
+        "name": "Replacement synthesis",
+        "responsibility": "Produce a temporally coherent preferred appearance for the identified target while preserving unrelated visual content.",
+        "boundary": "Own substitution appearance, effects, occlusion treatment, and any reconstruction needed to cover the original target. Consume target evidence rather than deciding what the user meant. Exclude application simulation and final OS presentation.",
+        "independence": "Can be tested against recorded frames and known masks and swapped between simple stylization and richer synthesis without changing platform integration or control semantics."
+      },
+      {
+        "name": "Experience control",
+        "responsibility": "Translate the user's substitution preferences and scope into a coherent active viewing session and expose its status and recovery controls.",
+        "boundary": "Own selected targets, replacement choices, enabled applications or displays, policy versions, user-approved fallback behavior, and enable/disable status. Exclude frame analysis, pixel generation, and implementation of OS permissions. Preserve normal application interaction outside intentional configuration actions.",
+        "independence": "Can operate against simulated capabilities and health events; the other systems can operate against fixed versioned policies without a finished settings interface."
+      }
+    ],
+    "interfaces": [
+      {
+        "source": "Experience control",
+        "target": "Viewing integration",
+        "exchange": "Versioned session scope, enabled state, latency budget and agreed fallback policy; platform capability and permission requests remain explicit."
+      },
+      {
+        "source": "Experience control",
+        "target": "Visual interpretation",
+        "exchange": "Versioned target definitions, applicable context and confidence policy."
+      },
+      {
+        "source": "Experience control",
+        "target": "Replacement synthesis",
+        "exchange": "Versioned replacement appearance and preservation constraints."
+      },
+      {
+        "source": "Viewing integration",
+        "target": "Visual interpretation",
+        "exchange": "Read-only source frame handles with frame identity, timestamp, surface identity, coordinate transform and color-space metadata; bounded lifetime and backpressure contract."
+      },
+      {
+        "source": "Viewing integration",
+        "target": "Replacement synthesis",
+        "exchange": "Source frame reference and metadata matching the interpretation frame; presentation deadline and cancellation signal for obsolete work."
+      },
+      {
+        "source": "Visual interpretation",
+        "target": "Replacement synthesis",
+        "exchange": "Frame-keyed target masks, temporal identities, confidence and uncertainty, with the matching policy version. Stale masks must not silently apply to a different frame."
+      },
+      {
+        "source": "Replacement synthesis",
+        "target": "Viewing integration",
+        "exchange": "Frame-keyed replacement layer or composed image, coverage information, synchronization readiness and status. Integration decides deadline handling under the explicit fallback policy."
+      },
+      {
+        "source": "Viewing integration",
+        "target": "Experience control",
+        "exchange": "Supported scopes and modes, permission and presentation status, measured delay, lost integration and recovery events."
+      },
+      {
+        "source": "Visual interpretation",
+        "target": "Experience control",
+        "exchange": "Recognition availability and aggregate uncertainty status without requiring storage of source screen content."
+      },
+      {
+        "source": "Replacement synthesis",
+        "target": "Experience control",
+        "exchange": "Replacement availability, synthesis failures and deadline misses."
+      }
+    ],
+    "research_basis": [
+      "User-established intent: blood in a game can appear as glitter; eventual desktop-wide scope; only the user's view changes, not game behavior or the way the user interacts. The initial operating system and acceptable quality thresholds are not specified.",
+      "Microsoft documents Desktop Duplication as providing GPU-accessible desktop images, including some full-screen graphics scenarios, while protecting protected video content. This supports a possible acquisition mechanism, not a claim of universal interception or output replacement. https://learn.microsoft.com/en-us/windows-hardware/drivers/display/desktop-duplication-api ; https://learn.microsoft.com/en-us/windows/win32/direct3ddxgi/desktop-dup-api",
+      "Microsoft's screen-capture documentation describes user-selected application or display capture with OS capture UI. This is evidence that capture has platform consent and scope boundaries; it does not establish that a click-through transformed view can replace the original display in all modes. https://learn.microsoft.com/en-us/windows/apps/develop/media-authoring-processing/screen-capture",
+      "Architecture hypothesis: separate semantic interpretation from replacement appearance because blood detection and glitter rendering have different models, quality criteria and change rates. They may share GPU resources or a process; independent realization does not imply network services or pixel copies.",
+      "Alternative hypothesis: a simple color transform could meet a stylized recoloring requirement with no separately realized semantic interpreter. It would also transform unrelated similarly colored content and would not establish blood understanding. Validate this interpretation before selecting an expensive segmentation or generative approach.",
+      "Alternative boundary: a game-native visual mod may achieve high fidelity and low latency for one game, but depends on game-specific integration and does not satisfy the eventual desktop boundary by itself. A separate captured preview is easier to realize but does not meet unchanged interaction and same-view expectations without further validation.",
+      "Alternative integration: a permitted compositor or display-path integration could provide stronger output control than a capture-plus-overlay approach. An external video processor offers another boundary but adds hardware and signal constraints. No such path has been selected or demonstrated. Prototype output ownership, input preservation, feedback avoidance and latency before committing to capture-plus-overlay.",
+      "Proposed feasibility gate, not a result: demonstrate deterministic replacement over a supported live game with unchanged input/focus and measured display delay, then separately measure target precision/recall and temporal stability on blood versus red non-blood examples. Test mode switches, overlap, scaling and capture-loss behavior. No performance or universal compatibility claim has been verified."
+    ],
+    "open_questions": [
+      "Which initial OS, game, GPU and window/full-screen mode define the first feasibility test?",
+      "Can the chosen integration replace what the user actually sees without revealing the original target first, capturing its own output, stealing focus, or changing interaction? If not, the viewing integration boundary must change.",
+      "Is approximate stylization sufficient, or must the replacement remove blood convincingly while preserving scene context and motion? This can merge or expand the interpretation and synthesis boundaries.",
+      "What are the allowable end-to-end visual delay, error rates and flicker? Zero missed exposure cannot be promised by an unvalidated recognition pipeline.",
+      "What fallback should apply on uncertainty, a late frame or loss of output control? Showing the original preserves continuity but may defeat the viewing intent; obscuring it changes available visual information.",
+      "What desktop surfaces, applications and protection modes may remain unsupported, and how should unsupported content be communicated?",
+      "Must processing be entirely local, and what storage or diagnostics are permitted?",
+      "Does the unchanged-experience requirement include screenshots and recordings, or only the physical view presented to the user?"
+    ]
+  }
+}

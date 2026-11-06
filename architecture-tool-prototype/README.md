@@ -44,4 +44,4 @@ Installed/tested dependency versions: mcp 1.29.0, pydantic 2.13.4.
 
 ## Provenance
 
-Imported from the [November 1 experiment](https://github.com/dukefromearth/syseng/tree/58881ff3167605449f2b7e2767e6087043f0a4c6/experiments/architecture-tool-prototype). The server, client, smoke test, dependency pins, and saved experiment evidence are unchanged.
+Initially imported unchanged from the [November 1 experiment](https://github.com/dukefromearth/syseng/tree/58881ff3167605449f2b7e2767e6087043f0a4c6/experiments/architecture-tool-prototype). The [November 6 wording experiment](EXPERIMENT-2026-11-06.md) adds 33 words to the two tool descriptions to challenge intent and the decomposition itself. Input schemas, runtime behavior, client, smoke test, dependency pins, and original experiment evidence remain unchanged.

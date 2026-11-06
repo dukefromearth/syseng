@@ -64,13 +64,17 @@ DEFINITIONS = {
     "define_product_boundary": (
         ProductBoundary,
         "Define the system of interest, intended experience, and product boundary "
-        "for conceptual design.",
+        "for conceptual design. Surface ambiguities and missing intent rather than silently "
+        "resolving them.",
     ),
     "decompose_system": (
         SystemDecomposition,
         "Research and propose a conceptual architecture for the system of interest through "
         "system decomposition, separation of concerns, high cohesion, and loose coupling. "
-        "Identify independently realizable constituent systems and their interfaces.",
+        "Identify independently realizable constituent systems and their interfaces. "
+        "Treat the decomposition as a hypothesis: challenge whether these are the right "
+        "systems for the intended experience, including plausible alternative interpretations "
+        "and boundaries.",
     ),
 }
 

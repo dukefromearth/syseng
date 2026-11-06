@@ -1,0 +1,179 @@
+{
+  "tools": [
+    {
+      "name": "define_product_boundary",
+      "description": "Define the system of interest, intended experience, and product boundary for conceptual design. Surface ambiguities and missing intent rather than silently resolving them.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "description": "Name of the system of interest",
+            "title": "Name",
+            "type": "string"
+          },
+          "intended_experience": {
+            "description": "Desired outcome in solution-independent terms",
+            "title": "Intended Experience",
+            "type": "string"
+          },
+          "scope": {
+            "description": "What is within the product boundary",
+            "title": "Scope",
+            "type": "string"
+          },
+          "exclusions": {
+            "description": "What is outside the product boundary",
+            "items": {
+              "type": "string"
+            },
+            "title": "Exclusions",
+            "type": "array"
+          },
+          "external_dependencies": {
+            "description": "External systems or environmental dependencies",
+            "items": {
+              "type": "string"
+            },
+            "title": "External Dependencies",
+            "type": "array"
+          },
+          "open_questions": {
+            "description": "Unresolved questions affecting the product boundary",
+            "items": {
+              "type": "string"
+            },
+            "title": "Open Questions",
+            "type": "array"
+          }
+        },
+        "required": [
+          "name",
+          "intended_experience",
+          "scope",
+          "exclusions",
+          "external_dependencies",
+          "open_questions"
+        ],
+        "title": "ProductBoundary",
+        "type": "object"
+      }
+    },
+    {
+      "name": "decompose_system",
+      "description": "Research and propose a conceptual architecture for the system of interest through system decomposition, separation of concerns, high cohesion, and loose coupling. Identify independently realizable constituent systems and their interfaces. Treat the decomposition as a hypothesis: challenge whether these are the right systems for the intended experience, including plausible alternative interpretations and boundaries.",
+      "inputSchema": {
+        "$defs": {
+          "ConstituentSystem": {
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "description": "Constituent system identity",
+                "title": "Name",
+                "type": "string"
+              },
+              "responsibility": {
+                "description": "Cohesive responsibility",
+                "title": "Responsibility",
+                "type": "string"
+              },
+              "boundary": {
+                "description": "Owned and excluded concerns",
+                "title": "Boundary",
+                "type": "string"
+              },
+              "independence": {
+                "description": "Rationale for independent realization",
+                "title": "Independence",
+                "type": "string"
+              }
+            },
+            "required": [
+              "name",
+              "responsibility",
+              "boundary",
+              "independence"
+            ],
+            "title": "ConstituentSystem",
+            "type": "object"
+          },
+          "Interface": {
+            "additionalProperties": false,
+            "properties": {
+              "source": {
+                "description": "Source system name",
+                "title": "Source",
+                "type": "string"
+              },
+              "target": {
+                "description": "Target system name",
+                "title": "Target",
+                "type": "string"
+              },
+              "exchange": {
+                "description": "Information, material, or energy exchanged",
+                "title": "Exchange",
+                "type": "string"
+              }
+            },
+            "required": [
+              "source",
+              "target",
+              "exchange"
+            ],
+            "title": "Interface",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "system_of_interest": {
+            "description": "Name of the product or system being decomposed",
+            "title": "System Of Interest",
+            "type": "string"
+          },
+          "systems": {
+            "description": "Independently realizable constituent systems",
+            "items": {
+              "$ref": "#/$defs/ConstituentSystem"
+            },
+            "title": "Systems",
+            "type": "array"
+          },
+          "interfaces": {
+            "description": "Interfaces between systems",
+            "items": {
+              "$ref": "#/$defs/Interface"
+            },
+            "title": "Interfaces",
+            "type": "array"
+          },
+          "research_basis": {
+            "description": "Findings supporting the decomposition; distinguish assumptions from established knowledge and do not fabricate sources",
+            "items": {
+              "type": "string"
+            },
+            "title": "Research Basis",
+            "type": "array"
+          },
+          "open_questions": {
+            "description": "Unresolved questions that could change the decomposition",
+            "items": {
+              "type": "string"
+            },
+            "title": "Open Questions",
+            "type": "array"
+          }
+        },
+        "required": [
+          "system_of_interest",
+          "systems",
+          "interfaces",
+          "research_basis",
+          "open_questions"
+        ],
+        "title": "SystemDecomposition",
+        "type": "object"
+      }
+    }
+  ]
+}

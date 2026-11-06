@@ -1,0 +1,6 @@
+{
+  "initial_user_prompt": "I want to build something that will intercept what’s rendered on a screen, and replace it. Use the define_product_boundary and decompose_system tools.",
+  "simulated_user_clarification": "For example, replace blood in a game with glitter. Eventually across the desktop, not just one application. I only want to change what I see, not how the game behaves or how I interact with it.",
+  "baseline_question": "Which screen or environment should this work on (for example, a browser, a particular desktop app, the whole operating system, or a video feed), and what should it replace with what? A concrete example would help define the boundary before I use the two tools.",
+  "revised_question": "Before defining the boundary: What should someone see instead of the original screen content, and where should this work: inside one app or browser, across a computer’s desktop, or on a separate display/video feed?"
+}
