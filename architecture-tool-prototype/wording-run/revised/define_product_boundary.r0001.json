@@ -1,0 +1,30 @@
+{
+  "tool": "define_product_boundary",
+  "revision": 1,
+  "call_id": "8e4251ea-c737-47c0-b049-260cde76fb2a",
+  "timestamp": "2026-11-06T14:58:52.202732+00:00",
+  "data": {
+    "name": "Personal visual substitution system",
+    "intended_experience": "Let a person see selected visual content replaced with a preferred alternative, such as blood in a game appearing as glitter, while the underlying application behaves identically and the person continues to interact with it in the same way. Eventually provide this experience across the desktop rather than only one application.",
+    "scope": "The product owns user selection of visual substitution intent, recognition of target visual content, construction of its visual replacement, and delivery of the altered view to the user. It must preserve application state, input behavior, focus, and usable visual timing. Desktop-wide use is the intended destination; an initial supported platform and application set remain undecided. The boundary is the personal viewing experience, not necessarily an interception hook, capture utility, or application modification.",
+    "exclusions": [
+      "Changing game logic, world state, game assets, or other users' views as the intended product behavior",
+      "Changing input mappings, replaying input, or requiring the user to interact through a different application",
+      "Recording, streaming, or sharing altered views as a required product capability",
+      "Circumventing protected content, OS security restrictions, or anti-cheat controls"
+    ],
+    "external_dependencies": [
+      "Applications and games remain the authoritative producers of their original content and recipients of user input",
+      "The operating system, graphics stack, display hardware, and their permitted integration surfaces determine whether an altered view can be delivered",
+      "Target-specific visual recognition capability and replacement content must exist or be developed; their feasibility is not established"
+    ],
+    "open_questions": [
+      "Which operating system, graphics hardware, game, and display mode should be supported first?",
+      "Does replacement mean stylized recoloring or a semantically convincing substitution of blood geometry and motion with glitter?",
+      "How much visual delay, flicker, missed blood, or accidental substitution is acceptable?",
+      "If replacement is uncertain or unavailable, should the system show the original content, obscure it, or stop with a warning?",
+      "Is desktop-wide use required for the first release or a later expansion, and which protected surfaces may be explicitly unsupported?",
+      "Must screen content remain local, and what diagnostic retention, if any, is acceptable?"
+    ]
+  }
+}

@@ -1,0 +1,102 @@
+{
+  "tool": "decompose_system",
+  "revision": 1,
+  "call_id": "9fc52f30-e29e-400e-8f6d-6cf55c2b8ae9",
+  "timestamp": "2026-11-06T14:59:32.280372+00:00",
+  "data": {
+    "system_of_interest": "Personal Visual Substitution System",
+    "systems": [
+      {
+        "name": "Display Mediation System",
+        "responsibility": "Provide a supported connection between unmodified source imagery and the user's altered live view.",
+        "boundary": "Owns platform-specific frame acquisition, display geometry and color metadata, replacement presentation, capture-feedback prevention, and reporting of permissions and supported surfaces. Excludes semantic recognition, replacement style decisions, application state changes, and input synthesis. Must preserve source-application focus and normal input routing; a platform integration that cannot do so does not meet this boundary.",
+        "independence": "Can be realized for each operating system and tested with synthetic replacement frames independently of recognition or glitter generation. Its acquisition and presentation adapters share responsibility for the same display session and feedback-free output."
+      },
+      {
+        "name": "Visual Interpretation System",
+        "responsibility": "Determine which visible regions match a requested content category and maintain their identity over time.",
+        "boundary": "Owns recognition, region segmentation, confidence estimation, and temporal tracking. Accepts image samples and target categories; returns frame-associated region descriptions. Excludes policy decisions about what to replace, effect creation, and operating-system presentation.",
+        "independence": "Can be evaluated against labeled video sequences without a live display integration and replaced by another model without changing presentation or user controls."
+      },
+      {
+        "name": "Visual Substitution System",
+        "responsibility": "Create a coherent altered image that substitutes selected regions with the requested appearance.",
+        "boundary": "Owns glitter/effect assets, motion-consistent effect state, region coverage, and image composition. Accepts source imagery, selected region descriptions, and effect specifications. Excludes deciding whether a region contains blood, changing application assets, and presenting to the operating system.",
+        "independence": "Can render and test against recorded imagery and synthetic masks. Different replacement styles can be developed independently using the same region and frame contracts."
+      },
+      {
+        "name": "User Policy and Control System",
+        "responsibility": "Translate the user's visual preferences into explicit operating policy and provide understandable control and status.",
+        "boundary": "Owns selected content classes, replacement choices, supported application/display scope, enable/disable controls, and user-selected uncertainty and failure behavior. Displays actual capability limits. Excludes frame processing and normal application input handling; control interactions must not permanently take over application focus.",
+        "independence": "Can be implemented and tested with a simulated processing session. Policy versioning keeps UI choices separate from recognition models and platform details."
+      },
+      {
+        "name": "Live Session Coordination System",
+        "responsibility": "Maintain a timely, internally consistent transformation session and enforce selected operating and failure policy.",
+        "boundary": "Owns session lifecycle, frame/result correlation, scheduling, bounded work queues, stale-result rejection, health measurement, and transition to the configured bypass or masking mode. Excludes platform acquisition mechanics, semantic inference, effect rendering, and inventing policy defaults that could expose unwanted content.",
+        "independence": "Can be tested with simulated frame sources and delayed or failing processing systems. Timing and fault policy can evolve without changing recognition or rendering implementations."
+      }
+    ],
+    "interfaces": [
+      {
+        "source": "Display Mediation System",
+        "target": "Live Session Coordination System",
+        "exchange": "Source frame handles with session/frame identifiers, capture timestamps, dimensions, coordinate transforms, color space, cursor treatment, and current display capabilities; explicit permission, mode-change, and capture-loss events."
+      },
+      {
+        "source": "User Policy and Control System",
+        "target": "Live Session Coordination System",
+        "exchange": "Versioned target categories and replacement specifications, selected surfaces, start/stop requests, latency budget, and explicit uncertainty/failure behavior."
+      },
+      {
+        "source": "Live Session Coordination System",
+        "target": "Visual Interpretation System",
+        "exchange": "Frame references and identifiers, requested categories, relevant temporal context, and processing deadlines; explicit cancellation/reset events."
+      },
+      {
+        "source": "Visual Interpretation System",
+        "target": "Live Session Coordination System",
+        "exchange": "Frame-associated masks or regions, content classes, confidence, track identities, and inference health/timing. Results are not silently applied to a different frame."
+      },
+      {
+        "source": "Live Session Coordination System",
+        "target": "Visual Substitution System",
+        "exchange": "Matched source-frame and region references, effect specification, policy revision, deadline, and temporal reset information."
+      },
+      {
+        "source": "Visual Substitution System",
+        "target": "Live Session Coordination System",
+        "exchange": "Altered frame or replacement layer with source-frame identity, geometry, color/alpha contract, timing, and rendering status."
+      },
+      {
+        "source": "Live Session Coordination System",
+        "target": "Display Mediation System",
+        "exchange": "Completed frame/layer, intended surface, source-frame identity and age, presentation deadline, and selected bypass/masking command."
+      },
+      {
+        "source": "Live Session Coordination System",
+        "target": "User Policy and Control System",
+        "exchange": "Actual active state, measured latency and dropped work, supported/unsupported surfaces, permission failures, uncertainty status, and failure-mode transitions; no retained raw screen content by default."
+      }
+    ],
+    "research_basis": [
+      "User requirement: replace blood with glitter in a game, eventually across the desktop, while changing only what the user sees and preserving application behavior and interaction. This supports an external visual mediation boundary rather than game modification or input automation.",
+      "Established platform capability, not a selected platform: Microsoft documents Windows.Graphics.Capture acquiring frames from a display or application window. It also documents support checks and HDR pixel-format considerations. Source reviewed via web search: https://learn.microsoft.com/en-us/windows/uwp/audio-video-camera/screen-capture . This supports isolating platform acquisition and carrying color metadata; it does not establish a general facility for replacing desktop output.",
+      "Established platform capability: Microsoft's Desktop Duplication documentation describes frame-by-frame desktop-image access and explicit pointer handling. Source reviewed via web search: https://learn.microsoft.com/en-us/windows/win32/direct3ddxgi/desktop-dup-api . The documented capture capability alone does not prove that a click-through, synchronized replacement view works in every game mode.",
+      "Established limitation: desktop duplication interfaces can become invalid on desktop producer or mode changes, and acquisition can fail when access is lost. Sources reviewed via web search: https://learn.microsoft.com/en-us/windows/win32/api/dxgi1_2/nn-dxgi1_2-idxgioutputduplication and https://learn.microsoft.com/en-us/windows/win32/api/dxgi1_2/nf-dxgi1_2-idxgioutputduplication-acquirenextframe . This motivates capability/error contracts and an explicit session recovery owner.",
+      "Conceptual design inference: acquisition, semantic interpretation, visual synthesis, user policy, and live-session timing have different change drivers and can be independently validated through stable frame, region, policy, and capability contracts. These are responsibility boundaries, not a requirement to use separate processes or network services.",
+      "Unverified assumption: a local recognition model can distinguish blood from unrelated red imagery with sufficient temporal stability and latency on the user's hardware. No model, benchmark, or representative test corpus has yet established this.",
+      "Unverified feasibility: an authorized presentation mechanism can replace the user's view while preserving normal input and avoiding self-capture. A noninteractive overlay, compositor integration, or dedicated display path remains a candidate, not a committed architecture. Full-screen modes, anti-cheat, HDR, and multiple displays require testing.",
+      "Proposed validation sequence: first prove unchanged focus/input and feedback-free presentation using synthetic masks on one supported game/display mode; then measure recognition and glitter substitution on representative sequences; finally measure end-to-end frame age, missed targets, false replacements, flicker, and failure behavior before expanding desktop coverage. Local processing without screen retention is a provisional privacy default."
+    ],
+    "open_questions": [
+      "Which initial OS, GPU, game, and display mode provide a supported acquisition and presentation path, and can that path preserve interaction without input interception?",
+      "What maximum end-to-end frame age, false-replacement rate, missed-target rate, and visual instability are acceptable?",
+      "Must original blood imagery never appear even for a single frame? If so, the display path and buffering strategy may change materially, with additional latency and coverage constraints.",
+      "What should the user see when confidence is low, processing is late, capture access disappears, or the game enters an unsupported mode?",
+      "Does glitter need only opaque replacement, or scene reconstruction, depth-aware occlusion, and motion/lighting matching?",
+      "Are a visual preview and a one-game prototype sufficient for the first milestone, and which desktop surfaces and monitor configurations define eventual coverage?",
+      "Can the target game's anti-cheat and the OS's security restrictions permit the selected non-modifying visual path? Unsupported cases should be reported, not bypassed."
+    ]
+  }
+}

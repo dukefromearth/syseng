@@ -1,0 +1,31 @@
+{
+  "tool": "define_product_boundary",
+  "revision": 1,
+  "call_id": "445f25be-c65c-45b0-b7de-f67059e89356",
+  "timestamp": "2026-11-01T15:52:33.682786+00:00",
+  "data": {
+    "name": "Personal Visual Replacement System",
+    "intended_experience": "The user sees selected visual content replaced—for example, blood in a game appears as glitter—without changing the game's behavior or the user's normal interaction. The eventual experience extends across the desktop rather than being tied to one application.",
+    "scope": "Provisional conceptual boundary: user-selected visual replacement rules, access to permitted rendered visual content, identification and temporally consistent replacement of selected regions, and presentation to the local user while preserving underlying application behavior and normal input. Desktop-wide coverage is a product goal, not a verified capability; the initial supported platform, applications and display path remain undecided.",
+    "exclusions": [
+      "Changes to game simulation, application logic or source assets.",
+      "Input automation, remapping or changes to how the user interacts with the game.",
+      "Changing what other players or remote viewers see unless separately requested.",
+      "Bypassing protected content or operating-system security restrictions."
+    ],
+    "external_dependencies": [
+      "Source games and desktop applications that continue to render and receive normal input.",
+      "Operating-system graphics, display composition, capture/access permissions and presentation facilities; platform not yet specified.",
+      "Display and graphics hardware; performance envelope not yet specified."
+    ],
+    "open_questions": [
+      "What operating system, graphics hardware and initial game should be targeted?",
+      "Must original content never appear, even for one frame, or is occasional brief exposure acceptable?",
+      "What latency, frame rate, resolution and replacement accuracy are acceptable?",
+      "Must exclusive fullscreen, multiple monitors, HDR and protected or anti-cheat applications be supported?",
+      "Should replacement be rule-based, user-marked or automatically recognize semantic content such as blood?",
+      "What should happen on uncertainty, overload or failure: show original content, obscure it, freeze, or stop?",
+      "Must processing stay on-device, and may any captured content be retained?"
+    ]
+  }
+}
